@@ -148,8 +148,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 1:
           return { 
             height: 0.12, 
-            baseColor: "#718096", 
-            turretColor: "#4a5568",
+            baseColor: "#22c55e", 
+            turretColor: "#16a34a",
             segments: 8,
             barrelLength: 0.25,
             barrelRadius: 0.02,
@@ -159,8 +159,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 2:
           return { 
             height: 0.18, 
-            baseColor: "#4299e1", 
-            turretColor: "#2b6cb0",
+            baseColor: "#3b82f6", 
+            turretColor: "#2563eb",
             segments: 10,
             barrelLength: 0.32,
             barrelRadius: 0.025,
@@ -170,8 +170,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 3:
           return { 
             height: 0.26, 
-            baseColor: "#48bb78", 
-            turretColor: "#2f855a",
+            baseColor: "#a855f7", 
+            turretColor: "#9333ea",
             segments: 12,
             barrelLength: 0.4,
             barrelRadius: 0.03,
@@ -181,8 +181,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 4:
           return { 
             height: 0.36, 
-            baseColor: "#ed8936", 
-            turretColor: "#c05621",
+            baseColor: "#ef4444", 
+            turretColor: "#dc2626",
             segments: 14,
             barrelLength: 0.5,
             barrelRadius: 0.035,
@@ -192,8 +192,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 5:
           return { 
             height: 0.48, 
-            baseColor: "#e53e3e", 
-            turretColor: "#c53030",
+            baseColor: "#f59e0b", 
+            turretColor: "#d97706",
             segments: 16,
             barrelLength: 0.62,
             barrelRadius: 0.04,
@@ -217,8 +217,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 1:
           return { 
             height: 0.1, 
-            baseColor: "#d69e2e", 
-            turretColor: "#b7791f",
+            baseColor: "#22c55e", 
+            turretColor: "#16a34a",
             segments: 6,
             cannonLength: 0.12,
             cannonRadius: 0.04,
@@ -227,8 +227,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 2:
           return { 
             height: 0.15, 
-            baseColor: "#f6ad55", 
-            turretColor: "#dd6b20",
+            baseColor: "#3b82f6", 
+            turretColor: "#2563eb",
             segments: 8,
             cannonLength: 0.16,
             cannonRadius: 0.05,
@@ -237,8 +237,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 3:
           return { 
             height: 0.22, 
-            baseColor: "#9f7aea", 
-            turretColor: "#805ad5",
+            baseColor: "#a855f7", 
+            turretColor: "#9333ea",
             segments: 10,
             cannonLength: 0.21,
             cannonRadius: 0.06,
@@ -247,8 +247,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 4:
           return { 
             height: 0.31, 
-            baseColor: "#f687b3", 
-            turretColor: "#d53f8c",
+            baseColor: "#ef4444", 
+            turretColor: "#dc2626",
             segments: 12,
             cannonLength: 0.27,
             cannonRadius: 0.07,
@@ -257,8 +257,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 5:
           return { 
             height: 0.42, 
-            baseColor: "#4fd1c7", 
-            turretColor: "#319795",
+            baseColor: "#f59e0b", 
+            turretColor: "#d97706",
             segments: 14,
             cannonLength: 0.34,
             cannonRadius: 0.08,

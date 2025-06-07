@@ -78,6 +78,13 @@ export interface GridCell {
   z: number;
 }
 
+export interface Obstacle {
+  id: string;
+  x: number;
+  z: number;
+  type: 'rock' | 'tree' | 'barrier';
+}
+
 interface TowerDefenseState {
   // Game state
   gamePhase: GamePhase;
@@ -94,11 +101,14 @@ interface TowerDefenseState {
   muzzleFlashes: MuzzleFlash[];
   explosions: Explosion[];
   impacts: Impact[];
+  obstacles: Obstacle[];
   
   // UI state
   selectedGridCell: GridCell | null;
   selectedTower: Tower | null;
   selectedTowerType: 'turret' | 'mortar';
+  selectedObstacleSlot: { x: number; z: number } | null;
+  obstacleMode: boolean;
   
   // Wave management
   enemiesInWave: number;
@@ -113,6 +123,12 @@ interface TowerDefenseState {
   selectTowerType: (type: 'turret' | 'mortar') => void;
   buyTower: () => void;
   mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => void;
+  
+  // Obstacle actions
+  toggleObstacleMode: () => void;
+  selectObstacleSlot: (x: number, z: number) => void;
+  buyObstacle: () => void;
+  removeObstacle: (id: string) => void;
   
   // Game logic
   spawnEnemy: (enemy: Enemy) => void;
@@ -158,10 +174,13 @@ export const useTowerDefense = create<TowerDefenseState>()(
     muzzleFlashes: [],
     explosions: [],
     impacts: [],
+    obstacles: [],
     
     selectedGridCell: null,
     selectedTower: null,
     selectedTowerType: 'turret',
+    selectedObstacleSlot: null,
+    obstacleMode: false,
     
     enemiesInWave: 5,
     enemiesSpawned: 0,
