@@ -137,91 +137,117 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Advanced pathfinding to prevent getting stuck and circling
+        // Grid-based pathfinding to handle complex obstacle clusters
+        const gridSize = 0.5;
+        const searchRadius = 6;
         
-        // Store enemy's recent positions to detect circling
-        if (!enemy.recentPositions) {
-          enemy.recentPositions = [];
-        }
-        enemy.recentPositions.push({ x: enemy.x, z: enemy.z });
-        if (enemy.recentPositions.length > 8) {
-          enemy.recentPositions.shift();
-        }
-
-        // Check if enemy is circling (returning to recent positions)
-        const isCircling = enemy.recentPositions.length > 4 && enemy.recentPositions.some(pos => 
-          Math.sqrt((pos.x - enemy.x) ** 2 + (pos.z - enemy.z) ** 2) < 0.5
-        );
-
-        // Find the best clear path using raycasting
-        const raycastOptions = [];
-        const angles = [
-          -Math.PI/2, -Math.PI/3, -Math.PI/4, -Math.PI/6, // Left angles
-          Math.PI/6, Math.PI/4, Math.PI/3, Math.PI/2,     // Right angles
-          Math.PI, -Math.PI * 2/3, Math.PI * 2/3,        // Back angles (if circling)
-        ];
-
-        for (const angle of angles) {
-          const testDirection = {
-            x: Math.cos(Math.atan2(dz, dx) + angle),
-            z: Math.sin(Math.atan2(dz, dx) + angle)
-          };
+        // Convert world positions to grid coordinates
+        const startGridX = Math.round(enemy.x / gridSize);
+        const startGridZ = Math.round(enemy.z / gridSize);
+        const targetGridX = Math.round(currentTarget.x / gridSize);
+        const targetGridZ = Math.round(currentTarget.z / gridSize);
+        
+        // Simple A* pathfinding
+        type PathNode = { x: number; z: number; g: number; h: number; f: number; parent: PathNode | null };
+        const openSet: PathNode[] = [{ x: startGridX, z: startGridZ, g: 0, h: 0, f: 0, parent: null }];
+        const closedSet = new Set<string>();
+        const visited = new Map<string, PathNode>();
+        
+        while (openSet.length > 0) {
+          // Find node with lowest f score
+          openSet.sort((a, b) => a.f - b.f);
+          const current = openSet.shift()!;
+          const currentKey = `${current.x},${current.z}`;
           
-          const testX = enemy.x + testDirection.x * moveDistance * 1.5;
-          const testZ = enemy.z + testDirection.z * moveDistance * 1.5;
+          if (closedSet.has(currentKey)) continue;
+          closedSet.add(currentKey);
           
-          // Check if path is clear
-          let pathClear = true;
-          for (let i = 0.2; i <= 1.5; i += 0.2) {
-            const checkX = enemy.x + testDirection.x * moveDistance * i;
-            const checkZ = enemy.z + testDirection.z * moveDistance * i;
-            if (isBlocked(checkX, checkZ)) {
-              pathClear = false;
-              break;
+          // Check if we reached target or got close enough
+          const distToTarget = Math.sqrt((current.x - targetGridX) ** 2 + (current.z - targetGridZ) ** 2);
+          if (distToTarget < 3) {
+            // Reconstruct path and take first step
+            let pathNode: PathNode = current;
+            while (pathNode.parent && pathNode.parent.parent) {
+              pathNode = pathNode.parent;
             }
-          }
-          
-          if (pathClear) {
-            const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
-            const currentDistToTarget = Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2);
             
-            // Prefer paths that don't move too far from target, unless circling
-            const maxDistanceIncrease = isCircling ? 2.0 : 0.8;
-            if (distToTarget <= currentDistToTarget + maxDistanceIncrease) {
-              raycastOptions.push({
-                x: testX,
-                z: testZ,
-                score: distToTarget + (isCircling ? -Math.abs(angle) : Math.abs(angle)) // Favor extreme angles if circling
-              });
+            const worldX = pathNode.x * gridSize;
+            const worldZ = pathNode.z * gridSize;
+            const dirToNext = {
+              x: worldX - enemy.x,
+              z: worldZ - enemy.z
+            };
+            const dirLength = Math.sqrt(dirToNext.x ** 2 + dirToNext.z ** 2);
+            
+            if (dirLength > 0) {
+              newX = enemy.x + (dirToNext.x / dirLength) * moveDistance;
+              newZ = enemy.z + (dirToNext.z / dirLength) * moveDistance;
+            }
+            break;
+          }
+          
+          // Explore neighbors
+          const neighbors = [
+            { x: current.x + 1, z: current.z },
+            { x: current.x - 1, z: current.z },
+            { x: current.x, z: current.z + 1 },
+            { x: current.x, z: current.z - 1 },
+            // Diagonal moves for better pathfinding
+            { x: current.x + 1, z: current.z + 1 },
+            { x: current.x + 1, z: current.z - 1 },
+            { x: current.x - 1, z: current.z + 1 },
+            { x: current.x - 1, z: current.z - 1 }
+          ];
+          
+          for (const neighbor of neighbors) {
+            const neighborKey = `${neighbor.x},${neighbor.z}`;
+            if (closedSet.has(neighborKey)) continue;
+            
+            // Check if neighbor is too far from start
+            const distFromStart = Math.sqrt((neighbor.x - startGridX) ** 2 + (neighbor.z - startGridZ) ** 2);
+            if (distFromStart > searchRadius) continue;
+            
+            // Check if neighbor is blocked
+            const worldNeighborX = neighbor.x * gridSize;
+            const worldNeighborZ = neighbor.z * gridSize;
+            if (isBlocked(worldNeighborX, worldNeighborZ)) continue;
+            
+            const isDiagonal = neighbor.x !== current.x && neighbor.z !== current.z;
+            const moveCost = isDiagonal ? 1.414 : 1;
+            const g = current.g + moveCost;
+            const h = Math.sqrt((neighbor.x - targetGridX) ** 2 + (neighbor.z - targetGridZ) ** 2);
+            const f = g + h;
+            
+            const existingNode = visited.get(neighborKey);
+            if (!existingNode || g < existingNode.g) {
+              const node: PathNode = { x: neighbor.x, z: neighbor.z, g, h, f, parent: current };
+              visited.set(neighborKey, node);
+              openSet.push(node);
             }
           }
+          
+          // Limit search to prevent performance issues
+          if (closedSet.size > 100) break;
         }
-
-        if (raycastOptions.length > 0) {
-          // Choose the best scoring option
-          const bestOption = raycastOptions.reduce((best, option) => 
-            option.score < best.score ? option : best
-          );
-          
-          // Move toward the best option
-          const dirX = bestOption.x - enemy.x;
-          const dirZ = bestOption.z - enemy.z;
-          const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
-          
-          if (dirLength > 0) {
-            newX = enemy.x + (dirX / dirLength) * moveDistance;
-            newZ = enemy.z + (dirZ / dirLength) * moveDistance;
-          }
-        } else {
-          // Completely stuck - teleport slightly away from obstacles
-          if (isCircling) {
-            const escapeAngle = Math.random() * Math.PI * 2;
-            newX = enemy.x + Math.cos(escapeAngle) * moveDistance * 2;
-            newZ = enemy.z + Math.sin(escapeAngle) * moveDistance * 2;
-            enemy.recentPositions = []; // Reset position history
-          } else {
-            newX = enemy.x;
-            newZ = enemy.z;
+        
+        // If pathfinding failed, use simple avoidance
+        if (newX === enemy.x + (dx / distance) * moveDistance && newZ === enemy.z + (dz / distance) * moveDistance) {
+          const avoidanceAngles = [-Math.PI/2, Math.PI/2, -Math.PI/4, Math.PI/4, Math.PI];
+          for (const angle of avoidanceAngles) {
+            const testX = enemy.x + Math.cos(Math.atan2(dz, dx) + angle) * moveDistance * 1.5;
+            const testZ = enemy.z + Math.sin(Math.atan2(dz, dx) + angle) * moveDistance * 1.5;
+            
+            if (!isBlocked(testX, testZ)) {
+              const dirX = testX - enemy.x;
+              const dirZ = testZ - enemy.z;
+              const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
+              
+              if (dirLength > 0) {
+                newX = enemy.x + (dirX / dirLength) * moveDistance;
+                newZ = enemy.z + (dirZ / dirLength) * moveDistance;
+                break;
+              }
+            }
           }
         }
       }
