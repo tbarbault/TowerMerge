@@ -32,7 +32,8 @@ export interface Bullet {
   x: number;
   y: number;
   z: number;
-  targetId: string;
+  directionX: number;
+  directionZ: number;
   damage: number;
   speed: number;
   color: string;
@@ -220,9 +221,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       const getTowerStats = (type: 'turret' | 'mortar') => {
         if (type === 'turret') {
-          return { damage: 10, range: 2.5, fireRate: 1000 };
+          return { damage: 10, range: 6.0, fireRate: 400 };
         } else {
-          return { damage: 25, range: 3.5, fireRate: 2000 };
+          return { damage: 25, range: 7.0, fireRate: 1200 };
         }
       };
 

@@ -154,7 +154,8 @@ function updateTowers(gameState: any, currentTime: number) {
         x: barrelEndX,
         y: 1.2 + tower.level * 0.2, // Height matches tower level
         z: barrelEndZ,
-        targetId: target.id,
+        directionX: normalizedDx,
+        directionZ: normalizedDz,
         damage: tower.damage,
         speed: tower.type === 'mortar' ? 4 : 8, // Mortars are slower
         color: tower.type === 'mortar' 
