@@ -137,126 +137,30 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Persistent direction pathfinding - pick a side and stick with it
-        let foundAlternative = false;
+        // Ultra-simple obstacle avoidance: just try left, right, or forward
+        let foundPath = false;
         
-        // If no avoidance direction is set, pick one based on obstacle position
-        if (!enemy.avoidanceDirection) {
-          const nearestObstacle = gameState.obstacles.reduce((nearest: any, obstacle: any) => {
-            const dist = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
-            if (!nearest || dist < nearest.distance) {
-              return { obstacle, distance: dist };
-            }
-            return nearest;
-          }, null);
-          
-          if (nearestObstacle && nearestObstacle.distance < 2) {
-            // If approaching head-on, randomly pick a side
-            if (Math.abs(enemy.x - nearestObstacle.obstacle.x) < 0.5) {
-              enemy.avoidanceDirection = Math.random() < 0.5 ? 'left' : 'right';
-            } else {
-              // Otherwise, go to the side that's already closer
-              enemy.avoidanceDirection = enemy.x < nearestObstacle.obstacle.x ? 'left' : 'right';
-            }
+        const simpleOptions = [
+          { x: enemy.x - moveDistance * 2, z: enemy.z + moveDistance }, // Wide left-forward
+          { x: enemy.x + moveDistance * 2, z: enemy.z + moveDistance }, // Wide right-forward  
+          { x: enemy.x - moveDistance * 1.5, z: enemy.z }, // Left
+          { x: enemy.x + moveDistance * 1.5, z: enemy.z }, // Right
+          { x: enemy.x, z: enemy.z + moveDistance * 0.5 }, // Forward
+        ];
+        
+        for (const option of simpleOptions) {
+          if (!isBlocked(option.x, option.z)) {
+            newX = option.x;
+            newZ = option.z;
+            foundPath = true;
+            break;
           }
         }
         
-        // Use the committed avoidance direction
-        if (enemy.avoidanceDirection) {
-          const sideMultiplier = enemy.avoidanceDirection === 'left' ? -1 : 1;
-          
-          // Check if enemy is now alongside an obstacle or has passed it
-          const nearestObstacle = gameState.obstacles.reduce((nearest: any, obstacle: any) => {
-            const dist = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
-            if (!nearest || dist < nearest.distance) {
-              return { obstacle, distance: dist };
-            }
-            return nearest;
-          }, null);
-          
-          let isAlongsideObstacle = false;
-          let shouldGoStraight = false;
-          
-          if (nearestObstacle) {
-            const dx = Math.abs(nearestObstacle.obstacle.x - enemy.x);
-            const dz = nearestObstacle.obstacle.z - enemy.z;
-            
-            // Enemy is alongside if horizontally displaced but at same Z level or ahead
-            isAlongsideObstacle = dx > 1.2 && dx < 2.5 && Math.abs(dz) < 1.2;
-            
-            // Enemy should go straight if it's past the obstacle (higher Z)
-            shouldGoStraight = dz < -0.5 && dx > 1.0;
-          }
-          
-          let avoidanceOptions;
-          if (shouldGoStraight) {
-            // Force straight movement when past obstacle
-            avoidanceOptions = [
-              { x: enemy.x, z: enemy.z + moveDistance * 1.5 }, // Strong forward
-              { x: enemy.x + (dx / distance) * moveDistance, z: enemy.z + (dz / distance) * moveDistance }, // Direct to target
-            ];
-            // Reset avoidance direction when going straight
-            enemy.avoidanceDirection = null;
-          } else if (isAlongsideObstacle) {
-            // Prioritize forward movement when alongside cement
-            avoidanceOptions = [
-              { x: enemy.x, z: enemy.z + moveDistance * 1.2 }, // Strong forward movement
-              { x: enemy.x + sideMultiplier * moveDistance * 0.3, z: enemy.z + moveDistance }, // Slight side with forward
-              { x: enemy.x, z: enemy.z + moveDistance * 0.8 }, // Medium forward
-            ];
-          } else {
-            // Normal avoidance movement
-            avoidanceOptions = [
-              { x: enemy.x + sideMultiplier * moveDistance * 1.5, z: enemy.z + moveDistance * 0.5 }, // Side-forward
-              { x: enemy.x + sideMultiplier * moveDistance, z: enemy.z + moveDistance }, // Side-forward diagonal
-              { x: enemy.x + sideMultiplier * moveDistance * 1.2, z: enemy.z }, // Pure side movement
-              { x: enemy.x, z: enemy.z + moveDistance * 0.3 }, // Small forward step
-            ];
-          }
-          
-          for (const option of avoidanceOptions) {
-            if (!isBlocked(option.x, option.z)) {
-              newX = option.x;
-              newZ = option.z;
-              foundAlternative = true;
-              break;
-            }
-          }
-        }
-        
-        // If still blocked, try the opposite direction and switch
-        if (!foundAlternative && enemy.avoidanceDirection) {
-          const oppositeSide = enemy.avoidanceDirection === 'left' ? 'right' : 'left';
-          const sideMultiplier = oppositeSide === 'left' ? -1 : 1;
-          
-          const oppositeX = enemy.x + sideMultiplier * moveDistance * 1.2;
-          const oppositeZ = enemy.z + moveDistance * 0.5;
-          
-          if (!isBlocked(oppositeX, oppositeZ)) {
-            enemy.avoidanceDirection = oppositeSide; // Switch direction
-            newX = oppositeX;
-            newZ = oppositeZ;
-            foundAlternative = true;
-          }
-        }
-        
-        // Last resort: minimal forward drift
-        if (!foundAlternative) {
+        // If all paths blocked, just stop
+        if (!foundPath) {
           newX = enemy.x;
-          newZ = enemy.z + moveDistance * 0.1;
-        }
-      } else {
-        // Clear path - check if we should reset avoidance direction
-        if (enemy.avoidanceDirection) {
-          // Reset direction if no obstacles are nearby
-          const hasNearbyObstacles = gameState.obstacles.some((obstacle: any) => {
-            const dist = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
-            return dist < 2.5;
-          });
-          
-          if (!hasNearbyObstacles) {
-            enemy.avoidanceDirection = null;
-          }
+          newZ = enemy.z;
         }
       }
       
