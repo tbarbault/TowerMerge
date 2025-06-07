@@ -224,9 +224,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       // Calculate canPlaceTower
       const towerExists = !!existingTower;
-      const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
-      const hasEnoughCoins = state.coins >= towerCost;
-      const canPlace = !towerExists && hasEnoughCoins;
+      const existingObstacle = state.obstacles.find(o => o.x === x && o.z === z);
+      const obstacleExists = !!existingObstacle;
+      const hasEnoughCoins = state.coins >= 10; // Minimum cost for any item
+      const canPlace = !towerExists && !obstacleExists && hasEnoughCoins;
       
       // Calculate canMergeTowers
       let canMerge = false;
@@ -395,25 +396,26 @@ export const useTowerDefense = create<TowerDefenseState>()(
     
     buyObstacle: () => {
       const state = get();
-      if (!state.selectedObstacleSlot || state.coins < 10) return;
+      if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 10) return;
       
       const existingObstacle = state.obstacles.find(
-        o => o.x === state.selectedObstacleSlot!.x && o.z === state.selectedObstacleSlot!.z
+        o => o.x === state.selectedGridCell!.x && o.z === state.selectedGridCell!.z
       );
       if (existingObstacle) return;
       
       const newObstacle: Obstacle = {
         id: Math.random().toString(36).substr(2, 9),
-        x: state.selectedObstacleSlot.x,
-        z: state.selectedObstacleSlot.z,
+        x: state.selectedGridCell!.x,
+        z: state.selectedGridCell!.z,
         type: 'rock',
       };
       
-      set(state => ({
+      set({
         obstacles: [...state.obstacles, newObstacle],
         coins: state.coins - 10,
-        selectedObstacleSlot: null,
-      }));
+        canPlaceTower: false,
+        canMergeTowers: false,
+      });
     },
     
     removeObstacle: (id) => {
