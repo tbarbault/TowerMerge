@@ -75,7 +75,6 @@ export default function Grid() {
             color={cellColor}
             transparent
             opacity={isSelected || canMerge ? 0.8 : 0.3}
-            wireframe={!isSelected && !canMerge}
           />
         </mesh>
       );

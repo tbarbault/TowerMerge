@@ -21,16 +21,16 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
   const [targetRotation, setTargetRotation] = useState(0);
+  
+  // Calculate tower range based on type and level
+  const baseRange = type === 'turret' ? 6.0 : 7.0;
+  const towerRange = baseRange * (1.15 ** (level - 1));
 
   // Find target enemy and calculate rotation
   useEffect(() => {
     // Convert grid position to world position
     const towerWorldX = position[0];
     const towerWorldZ = position[2];
-    
-    // Get tower range based on type and level
-    const baseRange = type === 'turret' ? 6.0 : 7.0;
-    const towerRange = baseRange * (1.2 ** (level - 1));
     
     const enemiesInRange = enemies.filter((enemy) => {
       const dx = enemy.x - towerWorldX;
@@ -396,7 +396,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       {isSelected && (
         <>
           <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[2.5 + level * 0.5 - 0.1, 2.5 + level * 0.5 + 0.1, 32]} />
+            <ringGeometry args={[towerRange - 0.1, towerRange + 0.1, 32]} />
             <meshStandardMaterial 
               color="#22c55e" 
               transparent 
@@ -404,8 +404,6 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               side={THREE.DoubleSide}
             />
           </mesh>
-          
-
         </>
       )}
 
@@ -413,7 +411,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       {isDragging && (
         <>
           <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.8, 16]} />
+            <circleGeometry args={[towerRange, 16]} />
             <meshStandardMaterial 
               color="#fbbf24" 
               transparent 

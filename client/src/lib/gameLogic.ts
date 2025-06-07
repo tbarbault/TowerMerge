@@ -187,10 +187,36 @@ function updateTowers(gameState: any, currentTime: number) {
       const barrelEndX = towerWorldX + normalizedDx * barrelLength;
       const barrelEndZ = towerWorldZ + normalizedDz * barrelLength;
 
+      // Calculate proper firing height based on tower configuration
+      const getTowerHeight = (type: 'turret' | 'mortar', level: number) => {
+        if (type === 'turret') {
+          switch (level) {
+            case 1: return 0.12;
+            case 2: return 0.18;
+            case 3: return 0.26;
+            case 4: return 0.36;
+            case 5: return 0.48;
+            default: return 0.12;
+          }
+        } else { // mortar
+          switch (level) {
+            case 1: return 0.1;
+            case 2: return 0.15;
+            case 3: return 0.22;
+            case 4: return 0.31;
+            case 5: return 0.42;
+            default: return 0.1;
+          }
+        }
+      };
+
+      const towerHeight = getTowerHeight(tower.type, tower.level);
+      const firingHeight = towerHeight + 0.05; // Slightly above tower top
+
       const bullet = {
         id: Math.random().toString(36).substr(2, 9),
         x: barrelEndX,
-        y: 1.2 + tower.level * 0.2, // Height matches tower level
+        y: firingHeight,
         z: barrelEndZ,
         directionX: normalizedDx,
         directionZ: normalizedDz,
