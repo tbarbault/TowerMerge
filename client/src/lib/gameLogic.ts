@@ -165,16 +165,39 @@ function updateEnemies(gameState: any, delta: number) {
         if (enemy.avoidanceDirection) {
           const sideMultiplier = enemy.avoidanceDirection === 'left' ? -1 : 1;
           
-          // Check if enemy is now alongside an obstacle (should prioritize forward movement)
-          const isAlongsideObstacle = gameState.obstacles.some((obstacle: any) => {
-            const dx = Math.abs(obstacle.x - enemy.x);
-            const dz = Math.abs(obstacle.z - enemy.z);
-            // Enemy is alongside if horizontally close but vertically aligned
-            return dx > 1.2 && dx < 2.5 && dz < 1.2;
-          });
+          // Check if enemy is now alongside an obstacle or has passed it
+          const nearestObstacle = gameState.obstacles.reduce((nearest: any, obstacle: any) => {
+            const dist = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
+            if (!nearest || dist < nearest.distance) {
+              return { obstacle, distance: dist };
+            }
+            return nearest;
+          }, null);
+          
+          let isAlongsideObstacle = false;
+          let shouldGoStraight = false;
+          
+          if (nearestObstacle) {
+            const dx = Math.abs(nearestObstacle.obstacle.x - enemy.x);
+            const dz = nearestObstacle.obstacle.z - enemy.z;
+            
+            // Enemy is alongside if horizontally displaced but at same Z level or ahead
+            isAlongsideObstacle = dx > 1.2 && dx < 2.5 && Math.abs(dz) < 1.2;
+            
+            // Enemy should go straight if it's past the obstacle (higher Z)
+            shouldGoStraight = dz < -0.5 && dx > 1.0;
+          }
           
           let avoidanceOptions;
-          if (isAlongsideObstacle) {
+          if (shouldGoStraight) {
+            // Force straight movement when past obstacle
+            avoidanceOptions = [
+              { x: enemy.x, z: enemy.z + moveDistance * 1.5 }, // Strong forward
+              { x: enemy.x + (dx / distance) * moveDistance, z: enemy.z + (dz / distance) * moveDistance }, // Direct to target
+            ];
+            // Reset avoidance direction when going straight
+            enemy.avoidanceDirection = null;
+          } else if (isAlongsideObstacle) {
             // Prioritize forward movement when alongside cement
             avoidanceOptions = [
               { x: enemy.x, z: enemy.z + moveDistance * 1.2 }, // Strong forward movement
