@@ -62,6 +62,7 @@ export interface Explosion {
   z: number;
   radius: number;
   startTime: number;
+  color?: string;
 }
 
 export interface Impact {

@@ -218,7 +218,7 @@ function updateBullets(gameState: any, delta: number) {
           return distanceToExplosion <= bullet.explosionRadius;
         });
 
-        // Add explosion effect at target position
+        // Add explosion effect at target position with mortar color
         gameState.addExplosion({
           id: Math.random().toString(36).substr(2, 9),
           x: bullet.targetX,
@@ -226,6 +226,7 @@ function updateBullets(gameState: any, delta: number) {
           z: bullet.targetZ,
           radius: bullet.explosionRadius,
           startTime: Date.now(),
+          color: bullet.color,
         });
 
         enemiesInRadius.forEach((enemy: any) => {

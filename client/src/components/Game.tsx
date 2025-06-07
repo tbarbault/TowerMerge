@@ -82,6 +82,7 @@ export default function Game() {
           key={explosion.id}
           position={[explosion.x, explosion.y, explosion.z]}
           radius={explosion.radius}
+          color={explosion.color}
           onComplete={() => gameState.removeExplosion(explosion.id)}
         />
       ))}

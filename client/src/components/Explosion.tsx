@@ -6,9 +6,10 @@ interface ExplosionProps {
   position: [number, number, number];
   radius: number;
   onComplete: () => void;
+  color?: string;
 }
 
-export default function Explosion({ position, radius, onComplete }: ExplosionProps) {
+export default function Explosion({ position, radius, onComplete, color = "#ff4500" }: ExplosionProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const startTime = useRef(Date.now());
   const duration = 800; // 800ms explosion animation
@@ -36,8 +37,8 @@ export default function Explosion({ position, radius, onComplete }: ExplosionPro
     <mesh ref={meshRef} position={position}>
       <sphereGeometry args={[1, 16, 16]} />
       <meshStandardMaterial 
-        color="#ff4500"
-        emissive="#ff6b00"
+        color={color}
+        emissive={color}
         emissiveIntensity={0.8}
         transparent
         opacity={1}
