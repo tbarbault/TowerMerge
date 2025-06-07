@@ -143,16 +143,21 @@ function updateTowers(gameState: any, currentTime: number) {
       const distance = Math.sqrt(dx * dx + dz * dz);
       const targetAngle = Math.atan2(dx, dz);
       
+      // Initialize tower rotation if not set
+      if (tower.currentRotation === undefined) {
+        tower.currentRotation = 0;
+      }
+      
       // Check if tower has rotated to face target (within tolerance)
-      const currentRotation = tower.currentRotation || 0;
+      const currentRotation = tower.currentRotation;
       const angleDiff = Math.abs(targetAngle - currentRotation);
       const normalizedAngleDiff = Math.min(angleDiff, 2 * Math.PI - angleDiff);
       
-      // Update tower's target rotation for visual component
+      // Always update tower's target rotation for visual component
       gameState.updateTowerRotation(tower.id, currentRotation, targetAngle);
       
-      // Only fire if tower is aimed at target (within 0.1 radians ~= 5.7 degrees)
-      if (normalizedAngleDiff > 0.1) {
+      // Only fire if tower is aimed at target (within 0.3 radians ~= 17 degrees) - more lenient
+      if (normalizedAngleDiff > 0.3) {
         return; // Don't fire yet, still rotating
       }
 
@@ -173,7 +178,7 @@ function updateTowers(gameState: any, currentTime: number) {
         directionX: normalizedDx,
         directionZ: normalizedDz,
         damage: tower.damage,
-        speed: tower.type === 'mortar' ? 4 : 8, // Mortars are slower
+        speed: tower.type === 'mortar' ? 4 : 12, // Faster turret bullets
         color: tower.type === 'mortar' 
           ? (tower.level === 1 ? "#ff8c00" : tower.level === 2 ? "#ff6347" : "#dc143c")
           : (tower.level === 1 ? "#ff6b6b" : tower.level === 2 ? "#4ecdc4" : "#45b7d1"),

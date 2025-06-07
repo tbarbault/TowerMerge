@@ -86,7 +86,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       const currentRotationValue = turretRef.current.rotation.y;
       const rotationDiff = targetRotation - currentRotationValue;
       const normalizedDiff = Math.atan2(Math.sin(rotationDiff), Math.cos(rotationDiff));
-      const newRotation = currentRotationValue + normalizedDiff * delta * 6;
+      const newRotation = currentRotationValue + normalizedDiff * delta * 12; // Doubled rotation speed
       turretRef.current.rotation.y = newRotation;
       
       // Update tower rotation in store
