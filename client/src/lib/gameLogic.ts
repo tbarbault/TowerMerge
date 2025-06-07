@@ -137,79 +137,67 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Aggressive obstacle avoidance with larger steps
+        // Smart trajectory-based pathfinding
         let foundPath = false;
-        const largeStep = moveDistance * 2; // Take bigger steps around obstacles
         
-        // Try wide movements around obstacles first
-        const moveOptions = [
-          { x: enemy.x - largeStep, z: enemy.z + moveDistance }, // Wide left-forward
-          { x: enemy.x + largeStep, z: enemy.z + moveDistance }, // Wide right-forward
-          { x: enemy.x - largeStep, z: enemy.z + largeStep }, // Wide left-diagonal
-          { x: enemy.x + largeStep, z: enemy.z + largeStep }, // Wide right-diagonal
-          { x: enemy.x, z: enemy.z + largeStep }, // Pure forward jump
-          { x: enemy.x - moveDistance * 1.5, z: enemy.z + moveDistance * 0.5 }, // Medium left-forward
-          { x: enemy.x + moveDistance * 1.5, z: enemy.z + moveDistance * 0.5 }, // Medium right-forward
+        // Calculate direction to target for reference
+        const targetAngle = Math.atan2(dz, dx);
+        
+        // Try smooth curved paths around obstacles
+        const pathAngles = [
+          targetAngle - Math.PI/3,  // 60 degrees left
+          targetAngle + Math.PI/3,  // 60 degrees right
+          targetAngle - Math.PI/2,  // 90 degrees left
+          targetAngle + Math.PI/2,  // 90 degrees right
+          targetAngle - Math.PI/4,  // 45 degrees left
+          targetAngle + Math.PI/4,  // 45 degrees right
+          targetAngle - Math.PI/6,  // 30 degrees left
+          targetAngle + Math.PI/6,  // 30 degrees right
         ];
         
-        for (const option of moveOptions) {
-          if (!isBlocked(option.x, option.z)) {
-            newX = option.x;
-            newZ = option.z;
-            foundPath = true;
-            break;
+        for (const angle of pathAngles) {
+          const testX = enemy.x + Math.cos(angle) * moveDistance;
+          const testZ = enemy.z + Math.sin(angle) * moveDistance;
+          
+          if (!isBlocked(testX, testZ)) {
+            // Verify this path doesn't lead to immediate blocking
+            const nextTestX = testX + Math.cos(angle) * moveDistance * 0.5;
+            const nextTestZ = testZ + Math.sin(angle) * moveDistance * 0.5;
+            
+            // Accept if next step is also clear or if we're making reasonable progress
+            if (!isBlocked(nextTestX, nextTestZ) || testZ >= enemy.z - moveDistance * 0.5) {
+              newX = testX;
+              newZ = testZ;
+              foundPath = true;
+              break;
+            }
           }
         }
         
-        // If wide movements fail, try quick teleport
+        // If angular paths fail, try direct side movements
         if (!foundPath) {
-          if (!enemy.stuckCounter) enemy.stuckCounter = 0;
-          enemy.stuckCounter++;
+          const sideOptions = [
+            { x: enemy.x - moveDistance * 1.2, z: enemy.z }, // Left
+            { x: enemy.x + moveDistance * 1.2, z: enemy.z }, // Right
+            { x: enemy.x - moveDistance * 0.8, z: enemy.z + moveDistance * 0.3 }, // Left-slight forward
+            { x: enemy.x + moveDistance * 0.8, z: enemy.z + moveDistance * 0.3 }, // Right-slight forward
+          ];
           
-          // Faster emergency response
-          if (enemy.stuckCounter > 5) {
-            // Find the nearest clear space in a wider radius
-            let bestPos = null;
-            let bestScore = Infinity;
-            
-            for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
-              for (let radius = 2; radius <= 4; radius += 1) {
-                const testX = enemy.x + Math.cos(angle) * radius;
-                const testZ = enemy.z + Math.sin(angle) * radius;
-                
-                if (!isBlocked(testX, testZ)) {
-                  // Prefer positions that are forward and closer to target
-                  const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
-                  const forwardBonus = testZ > enemy.z ? -2 : 0; // Bonus for forward movement
-                  const score = distToTarget + forwardBonus;
-                  
-                  if (score < bestScore) {
-                    bestScore = score;
-                    bestPos = { x: testX, z: testZ };
-                  }
-                }
-              }
-            }
-            
-            if (bestPos) {
-              newX = bestPos.x;
-              newZ = bestPos.z;
-              enemy.stuckCounter = 0;
+          for (const option of sideOptions) {
+            if (!isBlocked(option.x, option.z)) {
+              newX = option.x;
+              newZ = option.z;
               foundPath = true;
+              break;
             }
           }
-          
-          // Last resort: stay in place
-          if (!foundPath) {
-            newX = enemy.x;
-            newZ = enemy.z;
-          }
-        } else {
-          enemy.stuckCounter = 0;
         }
-      } else {
-        // Reset stuck counter when moving freely
-        if (enemy.stuckCounter) enemy.stuckCounter = 0;
+        
+        // If still no path found, just stop (no teleporting)
+        if (!foundPath) {
+          newX = enemy.x;
+          newZ = enemy.z;
+        }
       }
       
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
