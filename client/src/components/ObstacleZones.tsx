@@ -4,22 +4,28 @@ import * as THREE from "three";
 
 export default function ObstacleZones() {
   const meshRef = useRef<THREE.Group>(null);
-  const { selectedObstacleSlot, selectObstacleSlot, obstacles, obstacleMode } = useTowerDefense();
+  const { selectedObstacleSlot, selectObstacleSlot, obstacles, obstacleMode, buyObstacle, coins } = useTowerDefense();
 
-  // Define 5x3 rock grid behind the tower grid (no overlap)
-  const obstacleSlots = [
-    // Back row (z = -3, behind towers)
-    { x: -4, z: -3 }, { x: -2, z: -3 }, { x: 0, z: -3 }, { x: 2, z: -3 }, { x: 4, z: -3 },
-    
-    // Middle row (z = -4)
-    { x: -4, z: -4 }, { x: -2, z: -4 }, { x: 0, z: -4 }, { x: 2, z: -4 }, { x: 4, z: -4 },
-    
-    // Farthest row (z = -5, closest to enemy spawn)
-    { x: -4, z: -5 }, { x: -2, z: -5 }, { x: 0, z: -5 }, { x: 2, z: -5 }, { x: 4, z: -5 },
-  ];
+  // Define 5x3 rock grid behind the tower grid (matching tower grid layout)
+  const obstacleSlots = [];
+  for (let x = 0; x < 5; x++) {
+    for (let z = 0; z < 3; z++) {
+      obstacleSlots.push({
+        x: x * 2 - 4, // Same spacing as tower grid
+        z: (z * 2 - 2) - 6 // Positioned 6 units behind tower grid
+      });
+    }
+  }
 
   const handleSlotClick = (x: number, z: number) => {
-    selectObstacleSlot(x, z);
+    const hasObstacle = obstacles.some(o => o.x === x && o.z === z);
+    
+    if (!hasObstacle && coins >= 10) {
+      // Directly place rock without needing rock mode
+      selectObstacleSlot(x, z);
+      // Auto-buy after selection
+      setTimeout(() => buyObstacle(), 10);
+    }
   };
 
   // Always show obstacle zones
