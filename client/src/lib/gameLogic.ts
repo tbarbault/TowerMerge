@@ -137,35 +137,26 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Force progress toward red line (z = 3) to prevent circling
+        // Simple but effective obstacle avoidance for linear wall systems
         let foundAlternative = false;
         
-        // Always prioritize movement toward the red line (z = 3)
-        const distanceToGoal = 3 - enemy.z;
+        // Try moving around obstacles by testing simple side movements
+        const sideAngles = [-Math.PI/2, Math.PI/2, -Math.PI/3, Math.PI/3, -Math.PI/4, Math.PI/4];
+        const currentAngle = Math.atan2(dz, dx);
         
-        // Try side movements that still make progress toward the goal
-        const sideOffsets = [-1.5, 1.5, -2.5, 2.5, -1, 1];
-        
-        for (const offset of sideOffsets) {
-          const testX = enemy.x + offset;
-          const testZ = enemy.z + moveDistance; // Always move forward toward goal
+        for (const sideAngle of sideAngles) {
+          const testAngle = currentAngle + sideAngle;
+          const testX = enemy.x + Math.cos(testAngle) * moveDistance;
+          const testZ = enemy.z + Math.sin(testAngle) * moveDistance;
           
-          // Only accept moves that make forward progress and are clear
-          if (testZ > enemy.z && !isBlocked(testX, testZ)) {
-            newX = testX;
-            newZ = testZ;
-            foundAlternative = true;
-            break;
-          }
-        }
-        
-        // If no forward movement possible, try pure sideways movement
-        if (!foundAlternative) {
-          for (const offset of sideOffsets) {
-            const testX = enemy.x + offset;
-            const testZ = enemy.z;
+          // Check if this direction is clear
+          if (!isBlocked(testX, testZ)) {
+            // Also check if we can take a step toward target from this position
+            const nextX = testX + (dx / distance) * moveDistance * 0.5;
+            const nextZ = testZ + (dz / distance) * moveDistance * 0.5;
             
-            if (!isBlocked(testX, testZ)) {
+            // If we can move toward target or at least away from obstacle
+            if (!isBlocked(nextX, nextZ) || Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2) < Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2)) {
               newX = testX;
               newZ = testZ;
               foundAlternative = true;
@@ -174,17 +165,20 @@ function updateEnemies(gameState: any, delta: number) {
           }
         }
         
-        // If completely blocked, allow small backward movement to avoid clustering
+        // If no side movement worked, try stepping back and going around
         if (!foundAlternative) {
-          const testZ = enemy.z - moveDistance * 0.3;
-          if (testZ > -8 && !isBlocked(enemy.x, testZ)) { // Don't go too far back
-            newX = enemy.x;
-            newZ = testZ;
+          const backAngle = currentAngle + Math.PI;
+          const backStepX = enemy.x + Math.cos(backAngle) * moveDistance * 0.5;
+          const backStepZ = enemy.z + Math.sin(backAngle) * moveDistance * 0.5;
+          
+          if (!isBlocked(backStepX, backStepZ)) {
+            newX = backStepX;
+            newZ = backStepZ;
             foundAlternative = true;
           }
         }
         
-        // Last resort: stay in place
+        // Last resort: stop until path clears (walls will create bottlenecks)
         if (!foundAlternative) {
           newX = enemy.x;
           newZ = enemy.z;
