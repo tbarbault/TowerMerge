@@ -137,89 +137,72 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Progressive movement system - always try to move closer to target
-        let foundAlternative = false;
+        // Simple but effective wall avoidance - try left/right movement first
+        let foundPath = false;
         
-        // Priority 1: Try side movements that still progress toward target
-        const currentDistToTarget = Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2);
-        const sideAngles = [-Math.PI/4, Math.PI/4, -Math.PI/2, Math.PI/2];
-        const currentAngle = Math.atan2(dz, dx);
+        // Test left and right movement to go around obstacles
+        const moveOptions = [
+          { x: enemy.x - moveDistance, z: enemy.z + moveDistance * 0.5 }, // Left-forward
+          { x: enemy.x + moveDistance, z: enemy.z + moveDistance * 0.5 }, // Right-forward
+          { x: enemy.x - moveDistance, z: enemy.z }, // Pure left
+          { x: enemy.x + moveDistance, z: enemy.z }, // Pure right
+          { x: enemy.x - moveDistance * 0.5, z: enemy.z + moveDistance }, // Left-forward diagonal
+          { x: enemy.x + moveDistance * 0.5, z: enemy.z + moveDistance }, // Right-forward diagonal
+        ];
         
-        for (const sideAngle of sideAngles) {
-          const testAngle = currentAngle + sideAngle;
-          const testX = enemy.x + Math.cos(testAngle) * moveDistance;
-          const testZ = enemy.z + Math.sin(testAngle) * moveDistance;
-          
-          if (!isBlocked(testX, testZ)) {
-            // Check if this position is closer to target than current position
-            const newDistToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
+        for (const option of moveOptions) {
+          if (!isBlocked(option.x, option.z)) {
+            // Check if this move brings us closer to or maintains progress toward target
+            const currentDist = Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2);
+            const newDist = Math.sqrt((currentTarget.x - option.x) ** 2 + (currentTarget.z - option.z) ** 2);
             
-            // Only accept movements that bring us closer OR maintain similar distance with forward Z progress
-            if (newDistToTarget <= currentDistToTarget || testZ > enemy.z) {
-              newX = testX;
-              newZ = testZ;
-              foundAlternative = true;
+            // Accept if closer to target OR making forward progress
+            if (newDist <= currentDist + 1 || option.z >= enemy.z) {
+              newX = option.x;
+              newZ = option.z;
+              foundPath = true;
               break;
             }
           }
         }
         
-        // Priority 2: If no progress possible, try pure lateral movement (stay at same Z)
-        if (!foundAlternative) {
-          const lateralAngles = [-Math.PI/2, Math.PI/2];
-          
-          for (const lateralAngle of lateralAngles) {
-            const testAngle = currentAngle + lateralAngle;
-            const testX = enemy.x + Math.cos(testAngle) * moveDistance;
-            const testZ = enemy.z; // Keep same Z position
-            
-            if (!isBlocked(testX, testZ)) {
-              newX = testX;
-              newZ = testZ;
-              foundAlternative = true;
-              break;
-            }
-          }
-        }
-        
-        // Priority 3: Force minimal forward progress if possible
-        if (!foundAlternative) {
-          const minForwardZ = enemy.z + moveDistance * 0.3; // Small forward step
-          const testPositions = [
-            { x: enemy.x - moveDistance * 0.5, z: minForwardZ },
-            { x: enemy.x + moveDistance * 0.5, z: minForwardZ },
-            { x: enemy.x, z: minForwardZ }
-          ];
-          
-          for (const pos of testPositions) {
-            if (!isBlocked(pos.x, pos.z)) {
-              newX = pos.x;
-              newZ = pos.z;
-              foundAlternative = true;
-              break;
-            }
-          }
-        }
-        
-        // Last resort: stop but prevent infinite blocking
-        if (!foundAlternative) {
-          // Initialize stuck counter
+        // If still blocked, use emergency teleport
+        if (!foundPath) {
           if (!enemy.stuckCounter) enemy.stuckCounter = 0;
           enemy.stuckCounter++;
           
-          // If stuck too long, teleport forward slightly
-          if (enemy.stuckCounter > 20) {
-            newX = enemy.x + (Math.random() - 0.5) * 2;
-            newZ = enemy.z + 1; // Force forward progress
-            enemy.stuckCounter = 0;
-          } else {
+          if (enemy.stuckCounter > 15) {
+            // Teleport to a clear area closer to target
+            const clearPositions = [
+              { x: currentTarget.x - 2, z: enemy.z + 1 },
+              { x: currentTarget.x + 2, z: enemy.z + 1 },
+              { x: currentTarget.x, z: enemy.z + 2 },
+              { x: enemy.x - 3, z: enemy.z + 1 },
+              { x: enemy.x + 3, z: enemy.z + 1 }
+            ];
+            
+            for (const pos of clearPositions) {
+              if (!isBlocked(pos.x, pos.z)) {
+                newX = pos.x;
+                newZ = pos.z;
+                enemy.stuckCounter = 0;
+                foundPath = true;
+                break;
+              }
+            }
+          }
+          
+          // Last resort: stay in place but increment counter
+          if (!foundPath) {
             newX = enemy.x;
             newZ = enemy.z;
           }
         } else {
-          // Reset stuck counter when moving
           enemy.stuckCounter = 0;
         }
+      } else {
+        // Reset stuck counter when moving freely
+        if (enemy.stuckCounter) enemy.stuckCounter = 0;
       }
       
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
