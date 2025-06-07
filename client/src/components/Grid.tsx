@@ -22,46 +22,11 @@ export default function Grid() {
     }
   };
 
-  // Helper function to check if a tower can merge with selected tower
-  const canMergeWithSelected = (x: number, z: number) => {
-    if (!selectedTower || !selectedGridCell) return false;
-    
-    // Only show merge highlighting when a tower is actually selected
-    if (selectedGridCell.x !== selectedTower.x || selectedGridCell.z !== selectedTower.z) return false;
-    
-    const towerAtPosition = towers.find(t => t.x === x && t.z === z);
-    if (!towerAtPosition) return false;
-    
-    // Don't highlight the selected tower itself
-    if (towerAtPosition.id === selectedTower.id) return false;
-    
-    // Check if adjacent to selected tower
-    const dx = Math.abs(towerAtPosition.x - selectedTower.x);
-    const dz = Math.abs(towerAtPosition.z - selectedTower.z);
-    const isAdjacent = (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
-    
-    // Check if same level, same type, and level < 3
-    const canMerge = isAdjacent && 
-                     towerAtPosition.level === selectedTower.level && 
-                     towerAtPosition.type === selectedTower.type && 
-                     towerAtPosition.level < 3;
-    
-    return canMerge;
-  };
-
-  // Generate grid cells (5x3)
+  // Generate grid cells (5x3) - removed merge highlighting
   const gridCells = [];
   for (let x = 0; x < 5; x++) {
     for (let z = 0; z < 3; z++) {
       const isSelected = selectedGridCell?.x === x && selectedGridCell?.z === z;
-      const canMerge = canMergeWithSelected(x, z);
-      
-      let cellColor = "#374151"; // Default gray
-      if (isSelected) {
-        cellColor = "#4ade80"; // Green for selected
-      } else if (canMerge) {
-        cellColor = "#fbbf24"; // Yellow for mergeable
-      }
       
       gridCells.push(
         <mesh
@@ -72,10 +37,10 @@ export default function Grid() {
         >
           <boxGeometry args={[1.8, 0.02, 1.8]} />
           <meshStandardMaterial
-            color={cellColor}
+            color={isSelected ? "#4ade80" : "#374151"}
             transparent
-            opacity={isSelected || canMerge ? 0.8 : 0.3}
-            wireframe={!isSelected && !canMerge}
+            opacity={isSelected ? 0.8 : 0.3}
+            wireframe={!isSelected}
           />
         </mesh>
       );

@@ -16,42 +16,18 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const meshRef = useRef<THREE.Group>(null);
   const turretRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
-  const { enemies, towers, mergeTowers } = useTowerDefense();
+  const { enemies, towers, mergeTowers, updateTowerRotation } = useTowerDefense();
   const { camera, raycaster, pointer } = useThree();
-  const [targetRotation, setTargetRotation] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
+  
+  // Get current tower data
+  const currentTower = towers.find(t => t.id === towerId);
+  const targetRotation = currentTower?.targetRotation || 0;
+  const currentRotation = currentTower?.currentRotation || 0;
 
-  // Find target enemy and calculate rotation
-  useEffect(() => {
-    // Convert grid position to world position
-    const towerWorldX = position[0] * 2 - 4;
-    const towerWorldZ = position[2] * 2 - 2;
-    
-    // Get tower range based on type and level
-    const baseRange = type === 'turret' ? 6.0 : 7.0;
-    const towerRange = baseRange * (1.2 ** (level - 1));
-    
-    const enemiesInRange = enemies.filter((enemy) => {
-      const dx = enemy.x - towerWorldX;
-      const dz = enemy.z - towerWorldZ;
-      const distance = Math.sqrt(dx * dx + dz * dz);
-      return distance <= towerRange;
-    });
-
-    if (enemiesInRange.length > 0) {
-      // Target the enemy furthest along the path
-      const target = enemiesInRange.reduce((closest, enemy) => 
-        enemy.pathIndex > closest.pathIndex ? enemy : closest
-      );
-      
-      // Calculate angle to target
-      const dx = target.x - towerWorldX;
-      const dz = target.z - towerWorldZ;
-      const angle = Math.atan2(dx, dz);
-      setTargetRotation(angle);
-    }
-  }, [enemies, position, level, type]);
+  // This effect is now handled by the game logic
+  // Rotation is managed through the store's updateTowerRotation function
 
   // Handle drag and drop functionality
   const handlePointerDown = (event: any) => {

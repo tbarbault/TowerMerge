@@ -13,6 +13,8 @@ export interface Tower {
   fireRate: number;
   lastShot: number;
   type: 'turret' | 'mortar';
+  currentRotation?: number;
+  targetRotation?: number;
 }
 
 export interface Enemy {
@@ -108,6 +110,7 @@ interface TowerDefenseState {
   updateBullet: (id: string, x: number, y: number, z: number) => void;
   updateEnemy: (id: string, x: number, z: number, pathIndex: number) => void;
   updateTowerLastShot: (id: string, time: number) => void;
+  updateTowerRotation: (id: string, currentRotation: number, targetRotation?: number) => void;
   takeDamage: (amount: number) => void;
   addCoins: (amount: number) => void;
   nextWave: () => void;
@@ -371,6 +374,18 @@ export const useTowerDefense = create<TowerDefenseState>()(
       set(state => ({
         towers: state.towers.map(tower =>
           tower.id === id ? { ...tower, lastShot: time } : tower
+        )
+      }));
+    },
+    
+    updateTowerRotation: (id, currentRotation, targetRotation) => {
+      set(state => ({
+        towers: state.towers.map(tower => 
+          tower.id === id ? { 
+            ...tower, 
+            currentRotation,
+            ...(targetRotation !== undefined && { targetRotation })
+          } : tower
         )
       }));
     },
