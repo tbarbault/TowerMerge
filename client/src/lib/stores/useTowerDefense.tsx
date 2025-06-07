@@ -150,8 +150,15 @@ export const useTowerDefense = create<TowerDefenseState>()(
     buyTower: () => {
       const state = get();
       if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 10) {
+        console.log("Cannot buy tower:", { 
+          hasSelectedCell: !!state.selectedGridCell, 
+          canPlace: state.canPlaceTower, 
+          coins: state.coins 
+        });
         return;
       }
+      
+      console.log(`Buying tower at grid (${state.selectedGridCell.x}, ${state.selectedGridCell.z})`);
       
       const newTower: Tower = {
         id: Math.random().toString(36).substr(2, 9),

@@ -17,6 +17,7 @@ export default function Grid() {
     event.stopPropagation();
     const userData = event.object.userData;
     if (userData.x !== undefined && userData.z !== undefined) {
+      console.log(`Grid cell clicked: (${userData.x}, ${userData.z})`);
       selectGridCell(userData.x, userData.z);
     }
   };
@@ -49,31 +50,24 @@ export default function Grid() {
     <group ref={meshRef}>
       {gridCells}
       
-      {/* Grid lines for visual clarity */}
-      <lineSegments position={[0, 0.02, 0]}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={48}
-            array={new Float32Array([
-              // Vertical lines
-              -5, 0, -3, -5, 0, 3,
-              -3, 0, -3, -3, 0, 3,
-              -1, 0, -3, -1, 0, 3,
-              1, 0, -3, 1, 0, 3,
-              3, 0, -3, 3, 0, 3,
-              5, 0, -3, 5, 0, 3,
-              // Horizontal lines
-              -5, 0, -3, 5, 0, -3,
-              -5, 0, -1, 5, 0, -1,
-              -5, 0, 1, 5, 0, 1,
-              -5, 0, 3, 5, 0, 3,
-            ])}
-            itemSize={3}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color="#6b7280" opacity={0.5} transparent />
-      </lineSegments>
+      {/* Grid border lines */}
+      <group>
+        {/* Vertical border lines */}
+        {[-5, -3, -1, 1, 3, 5].map((x, i) => (
+          <mesh key={`v-${i}`} position={[x, 0.01, 0]}>
+            <boxGeometry args={[0.02, 0.02, 6]} />
+            <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
+          </mesh>
+        ))}
+        
+        {/* Horizontal border lines */}
+        {[-3, -1, 1, 3].map((z, i) => (
+          <mesh key={`h-${i}`} position={[0, 0.01, z]}>
+            <boxGeometry args={[10, 0.02, 0.02]} />
+            <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
