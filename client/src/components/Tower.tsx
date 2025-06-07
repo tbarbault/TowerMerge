@@ -9,9 +9,10 @@ interface TowerProps {
   level: number;
   isSelected?: boolean;
   towerId: string;
+  type: 'turret' | 'mortar';
 }
 
-export default function Tower({ position, level, isSelected = false, towerId }: TowerProps) {
+export default function Tower({ position, level, isSelected = false, towerId, type }: TowerProps) {
   const meshRef = useRef<THREE.Group>(null);
   const turretRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
@@ -133,49 +134,98 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
     }
   });
 
-  // Tower appearance based on level
-  const getTowerConfig = (level: number) => {
-    switch (level) {
-      case 1:
-        return { 
-          height: 0.8, 
-          baseColor: "#a0aec0", 
-          turretColor: "#718096",
-          segments: 12,
-          barrelLength: 0.6,
-          barrelRadius: 0.04 
-        };
-      case 2:
-        return { 
-          height: 1.0, 
-          baseColor: "#63b3ed", 
-          turretColor: "#4299e1",
-          segments: 16,
-          barrelLength: 0.8,
-          barrelRadius: 0.05 
-        };
-      case 3:
-        return { 
-          height: 1.2, 
-          baseColor: "#fc8181", 
-          turretColor: "#f56565",
-          segments: 20,
-          barrelLength: 1.0,
-          barrelRadius: 0.06 
-        };
-      default:
-        return { 
-          height: 0.8, 
-          baseColor: "#a0aec0", 
-          turretColor: "#718096",
-          segments: 12,
-          barrelLength: 0.6,
-          barrelRadius: 0.04 
-        };
+  // Tower appearance based on type and level
+  const getTowerConfig = (type: 'turret' | 'mortar', level: number) => {
+    if (type === 'turret') {
+      switch (level) {
+        case 1:
+          return { 
+            height: 0.8, 
+            baseColor: "#a0aec0", 
+            turretColor: "#718096",
+            segments: 12,
+            barrelLength: 0.6,
+            barrelRadius: 0.04,
+            isMortar: false
+          };
+        case 2:
+          return { 
+            height: 1.0, 
+            baseColor: "#63b3ed", 
+            turretColor: "#4299e1",
+            segments: 16,
+            barrelLength: 0.8,
+            barrelRadius: 0.05,
+            isMortar: false
+          };
+        case 3:
+          return { 
+            height: 1.2, 
+            baseColor: "#fc8181", 
+            turretColor: "#f56565",
+            segments: 20,
+            barrelLength: 1.0,
+            barrelRadius: 0.06,
+            isMortar: false
+          };
+        default:
+          return { 
+            height: 0.8, 
+            baseColor: "#a0aec0", 
+            turretColor: "#718096",
+            segments: 12,
+            barrelLength: 0.6,
+            barrelRadius: 0.04,
+            isMortar: false
+          };
+      }
+    } else { // mortar
+      switch (level) {
+        case 1:
+          return { 
+            height: 0.6, 
+            baseColor: "#d69e2e", 
+            turretColor: "#b7791f",
+            segments: 8,
+            barrelLength: 0.4,
+            barrelRadius: 0.08,
+            isMortar: true
+          };
+        case 2:
+          return { 
+            height: 0.8, 
+            baseColor: "#f6ad55", 
+            turretColor: "#dd6b20",
+            segments: 10,
+            barrelLength: 0.5,
+            barrelRadius: 0.1,
+            isMortar: true
+          };
+        case 3:
+          return { 
+            height: 1.0, 
+            baseColor: "#fbb6ce", 
+            turretColor: "#e53e3e",
+            segments: 12,
+            barrelLength: 0.6,
+            barrelRadius: 0.12,
+            isMortar: true
+          };
+        default:
+          return { 
+            height: 0.6, 
+            baseColor: "#d69e2e", 
+            turretColor: "#b7791f",
+            segments: 8,
+            barrelLength: 0.4,
+            barrelRadius: 0.08,
+            isMortar: true
+          };
+      }
     }
   };
 
-  const config = getTowerConfig(level);
+  const config = getTowerConfig(type, level);
 
   return (
     <group 
@@ -310,7 +360,7 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
           
           {/* Show mergeable towers when selected */}
           {towers.filter(t => {
-            if (t.id === towerId || t.level !== level || t.level >= 3) return false;
+            if (t.id === towerId || t.level !== level || t.level >= 3 || t.type !== type) return false;
             // Get current tower position from props
             const currentX = (position[0] + 4) / 2;
             const currentZ = (position[2] + 2) / 2;

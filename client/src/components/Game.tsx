@@ -48,6 +48,7 @@ export default function Game() {
           towerId={tower.id}
           position={[tower.x * 2 - 4, 0, tower.z * 2 - 2]}
           level={tower.level}
+          type={tower.type}
           isSelected={tower.id === gameState.selectedTower?.id}
         />
       ))}

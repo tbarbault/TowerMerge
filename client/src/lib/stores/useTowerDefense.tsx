@@ -203,15 +203,25 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       console.log(`Buying tower at grid (${state.selectedGridCell.x}, ${state.selectedGridCell.z})`);
       
+      const getTowerStats = (type: 'turret' | 'mortar') => {
+        if (type === 'turret') {
+          return { damage: 10, range: 2.5, fireRate: 1000 };
+        } else {
+          return { damage: 25, range: 3.5, fireRate: 2000 };
+        }
+      };
+
+      const stats = getTowerStats(state.selectedTowerType);
       const newTower: Tower = {
         id: Math.random().toString(36).substr(2, 9),
         x: state.selectedGridCell.x,
         z: state.selectedGridCell.z,
         level: 1,
-        damage: 10,
-        range: 2.5,
-        fireRate: 1000, // ms between shots
+        damage: stats.damage,
+        range: stats.range,
+        fireRate: stats.fireRate,
         lastShot: 0,
+        type: state.selectedTowerType,
       };
       
       // Recalculate canPlaceTower after placing tower
@@ -232,8 +242,8 @@ export const useTowerDefense = create<TowerDefenseState>()(
         const sourceTower = state.towers.find(t => t.id === sourceTowerId);
         const targetTower = state.towers.find(t => t.id === targetTowerId);
         
-        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 3) {
-          console.log("Cannot merge towers:", { sourceTower, targetTower });
+        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 3 || sourceTower.type !== targetTower.type) {
+          console.log("Cannot merge towers:", { sourceTower, targetTower, reason: "different types or levels" });
           return;
         }
         
