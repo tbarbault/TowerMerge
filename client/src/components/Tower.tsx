@@ -16,18 +16,42 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const meshRef = useRef<THREE.Group>(null);
   const turretRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
-  const { enemies, towers, mergeTowers, updateTowerRotation } = useTowerDefense();
+  const { enemies, towers, mergeTowers } = useTowerDefense();
   const { camera, raycaster, pointer } = useThree();
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
-  
-  // Get current tower data
-  const currentTower = towers.find(t => t.id === towerId);
-  const targetRotation = currentTower?.targetRotation || 0;
-  const currentRotation = currentTower?.currentRotation || 0;
+  const [targetRotation, setTargetRotation] = useState(0);
 
-  // This effect is now handled by the game logic
-  // Rotation is managed through the store's updateTowerRotation function
+  // Find target enemy and calculate rotation
+  useEffect(() => {
+    // Convert grid position to world position
+    const towerWorldX = position[0];
+    const towerWorldZ = position[2];
+    
+    // Get tower range based on type and level
+    const baseRange = type === 'turret' ? 6.0 : 7.0;
+    const towerRange = baseRange * (1.2 ** (level - 1));
+    
+    const enemiesInRange = enemies.filter((enemy) => {
+      const dx = enemy.x - towerWorldX;
+      const dz = enemy.z - towerWorldZ;
+      const distance = Math.sqrt(dx * dx + dz * dz);
+      return distance <= towerRange;
+    });
+
+    if (enemiesInRange.length > 0) {
+      // Target the enemy furthest along the path
+      const target = enemiesInRange.reduce((closest, enemy) => 
+        enemy.pathIndex > closest.pathIndex ? enemy : closest
+      );
+      
+      // Calculate angle to target
+      const dx = target.x - towerWorldX;
+      const dz = target.z - towerWorldZ;
+      const angle = Math.atan2(dx, dz);
+      setTargetRotation(angle);
+    }
+  }, [enemies, position, level, type]);
 
   // Handle drag and drop functionality
   const handlePointerDown = (event: any) => {
@@ -88,9 +112,6 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       const normalizedDiff = Math.atan2(Math.sin(rotationDiff), Math.cos(rotationDiff));
       const newRotation = currentRotationValue + normalizedDiff * delta * 12; // Doubled rotation speed
       turretRef.current.rotation.y = newRotation;
-      
-      // Update tower rotation in store
-      updateTowerRotation(towerId, newRotation, targetRotation);
     }
 
     if (meshRef.current && isSelected && !isDragging) {

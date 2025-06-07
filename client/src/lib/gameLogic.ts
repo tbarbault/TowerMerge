@@ -137,29 +137,10 @@ function updateTowers(gameState: any, currentTime: number) {
         enemy.pathIndex > closest.pathIndex ? enemy : closest
       );
 
-      // Calculate angle to target
+      // Calculate direction to target for bullet firing
       const dx = target.x - towerWorldX;
       const dz = target.z - towerWorldZ;
       const distance = Math.sqrt(dx * dx + dz * dz);
-      const targetAngle = Math.atan2(dx, dz);
-      
-      // Initialize tower rotation if not set
-      if (tower.currentRotation === undefined) {
-        tower.currentRotation = 0;
-      }
-      
-      // Check if tower has rotated to face target (within tolerance)
-      const currentRotation = tower.currentRotation;
-      const angleDiff = Math.abs(targetAngle - currentRotation);
-      const normalizedAngleDiff = Math.min(angleDiff, 2 * Math.PI - angleDiff);
-      
-      // Always update tower's target rotation for visual component
-      gameState.updateTowerRotation(tower.id, currentRotation, targetAngle);
-      
-      // Only fire if tower is aimed at target (within 0.3 radians ~= 17 degrees) - more lenient
-      if (normalizedAngleDiff > 0.3) {
-        return; // Don't fire yet, still rotating
-      }
 
       // Calculate barrel end position for bullet spawn
       const barrelLength = tower.level === 1 ? 0.6 : tower.level === 2 ? 0.8 : 1.0;
