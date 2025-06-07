@@ -147,62 +147,62 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       switch (level) {
         case 1:
           return { 
-            height: 0.8, 
-            baseColor: "#a0aec0", 
-            turretColor: "#718096",
-            segments: 12,
-            barrelLength: 0.6,
-            barrelRadius: 0.04,
+            height: 0.3, 
+            baseColor: "#718096", 
+            turretColor: "#4a5568",
+            segments: 8,
+            barrelLength: 0.4,
+            barrelRadius: 0.03,
             isMortar: false
           };
         case 2:
           return { 
-            height: 1.0, 
-            baseColor: "#63b3ed", 
-            turretColor: "#4299e1",
-            segments: 16,
-            barrelLength: 0.8,
-            barrelRadius: 0.05,
+            height: 0.35, 
+            baseColor: "#4299e1", 
+            turretColor: "#2b6cb0",
+            segments: 10,
+            barrelLength: 0.45,
+            barrelRadius: 0.035,
             isMortar: false
           };
         case 3:
           return { 
-            height: 1.2, 
-            baseColor: "#ffd700", 
-            turretColor: "#ffed4e",
-            segments: 20,
-            barrelLength: 1.0,
-            barrelRadius: 0.06,
+            height: 0.4, 
+            baseColor: "#48bb78", 
+            turretColor: "#2f855a",
+            segments: 12,
+            barrelLength: 0.5,
+            barrelRadius: 0.04,
             isMortar: false
           };
         case 4:
           return { 
-            height: 1.4, 
-            baseColor: "#ffcc02", 
-            turretColor: "#ffd700",
-            segments: 24,
-            barrelLength: 1.2,
-            barrelRadius: 0.07,
+            height: 0.45, 
+            baseColor: "#ed8936", 
+            turretColor: "#c05621",
+            segments: 14,
+            barrelLength: 0.55,
+            barrelRadius: 0.045,
             isMortar: false
           };
         case 5:
           return { 
-            height: 1.6, 
-            baseColor: "#ffb000", 
-            turretColor: "#ffcc02",
-            segments: 32,
-            barrelLength: 1.4,
-            barrelRadius: 0.08,
+            height: 0.5, 
+            baseColor: "#e53e3e", 
+            turretColor: "#c53030",
+            segments: 16,
+            barrelLength: 0.6,
+            barrelRadius: 0.05,
             isMortar: false
           };
         default:
           return { 
-            height: 0.8, 
-            baseColor: "#a0aec0", 
-            turretColor: "#718096",
-            segments: 12,
-            barrelLength: 0.6,
-            barrelRadius: 0.04,
+            height: 0.3, 
+            baseColor: "#718096", 
+            turretColor: "#4a5568",
+            segments: 8,
+            barrelLength: 0.4,
+            barrelRadius: 0.03,
             isMortar: false
           };
       }
@@ -210,62 +210,62 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       switch (level) {
         case 1:
           return { 
-            height: 0.6, 
+            height: 0.25, 
             baseColor: "#d69e2e", 
             turretColor: "#b7791f",
-            segments: 8,
-            barrelLength: 0.4,
-            barrelRadius: 0.08,
+            segments: 6,
+            barrelLength: 0.2,
+            barrelRadius: 0.06,
             isMortar: true
           };
         case 2:
           return { 
-            height: 0.8, 
+            height: 0.3, 
             baseColor: "#f6ad55", 
             turretColor: "#dd6b20",
-            segments: 10,
-            barrelLength: 0.5,
-            barrelRadius: 0.1,
+            segments: 8,
+            barrelLength: 0.25,
+            barrelRadius: 0.07,
             isMortar: true
           };
         case 3:
           return { 
-            height: 1.0, 
-            baseColor: "#ffd700", 
-            turretColor: "#ffed4e",
-            segments: 12,
-            barrelLength: 0.6,
-            barrelRadius: 0.12,
+            height: 0.35, 
+            baseColor: "#9f7aea", 
+            turretColor: "#805ad5",
+            segments: 10,
+            barrelLength: 0.3,
+            barrelRadius: 0.08,
             isMortar: true
           };
         case 4:
           return { 
-            height: 1.2, 
-            baseColor: "#ffcc02", 
-            turretColor: "#ffd700",
-            segments: 14,
-            barrelLength: 0.7,
-            barrelRadius: 0.14,
+            height: 0.4, 
+            baseColor: "#f687b3", 
+            turretColor: "#d53f8c",
+            segments: 12,
+            barrelLength: 0.35,
+            barrelRadius: 0.09,
             isMortar: true
           };
         case 5:
           return { 
-            height: 1.4, 
-            baseColor: "#ffb000", 
-            turretColor: "#ffcc02",
-            segments: 16,
-            barrelLength: 0.8,
-            barrelRadius: 0.16,
+            height: 0.45, 
+            baseColor: "#4fd1c7", 
+            turretColor: "#319795",
+            segments: 14,
+            barrelLength: 0.4,
+            barrelRadius: 0.1,
             isMortar: true
           };
         default:
           return { 
-            height: 0.6, 
+            height: 0.25, 
             baseColor: "#d69e2e", 
             turretColor: "#b7791f",
-            segments: 8,
-            barrelLength: 0.4,
-            barrelRadius: 0.08,
+            segments: 6,
+            barrelLength: 0.2,
+            barrelRadius: 0.06,
             isMortar: true
           };
       }

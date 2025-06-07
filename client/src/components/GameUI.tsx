@@ -180,9 +180,7 @@ export default function GameUI() {
                   </Badge>
                 ) : null}
 
-                <div className="text-xs text-gray-400 mt-2">
-                  Debug: canPlace={canPlaceTower.toString()}, canMerge={canMergeTowers.toString()}, coins={coins}
-                </div>
+
               </div>
             </CardContent>
           </Card>
