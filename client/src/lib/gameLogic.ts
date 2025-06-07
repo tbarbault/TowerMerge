@@ -63,13 +63,13 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 120, speed: 0.8, reward: 3 },
-    fast: { health: 85, speed: 1.3, reward: 4 },
-    heavy: { health: 200, speed: 0.5, reward: 6 },
-    armored: { health: 350, speed: 0.6, reward: 8 },
-    elite: { health: 500, speed: 0.7, reward: 12 },
-    boss: { health: 800, speed: 0.4, reward: 20 },
-    megaboss: { health: 1500, speed: 0.3, reward: 40 }
+    basic: { health: 120, speed: 0.8, reward: 1 },
+    fast: { health: 85, speed: 1.3, reward: 2 },
+    heavy: { health: 200, speed: 0.5, reward: 2 },
+    armored: { health: 350, speed: 0.6, reward: 3 },
+    elite: { health: 500, speed: 0.7, reward: 4 },
+    boss: { health: 800, speed: 0.4, reward: 6 },
+    megaboss: { health: 1500, speed: 0.3, reward: 10 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
@@ -316,7 +316,7 @@ function checkWaveCompletion(gameState: any) {
     if (!gameState.waveCompletionTime) {
       // Mark wave as completed and give bonus coins once
       gameState.setWaveCompletionTime(now);
-      gameState.addCoins(5 + gameState.wave * 2);
+      gameState.addCoins(2 + gameState.wave);
       return;
     }
     

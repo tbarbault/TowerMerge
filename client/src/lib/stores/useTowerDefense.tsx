@@ -201,7 +201,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       // Calculate canPlaceTower
       const towerExists = !!existingTower;
-      const hasEnoughCoins = state.coins >= 15;
+      const hasEnoughCoins = state.coins >= 25;
       const canPlace = !towerExists && hasEnoughCoins;
       
       // Calculate canMergeTowers
@@ -244,9 +244,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       const getTowerStats = (type: 'turret' | 'mortar') => {
         if (type === 'turret') {
-          return { damage: 25, range: 6.0, fireRate: 400 };
+          return { damage: 15, range: 6.0, fireRate: 500 };
         } else {
-          return { damage: 60, range: 7.0, fireRate: 1200 };
+          return { damage: 35, range: 7.0, fireRate: 1400 };
         }
       };
 
@@ -266,7 +266,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       // Recalculate canPlaceTower after placing tower
       set({
         towers: [...state.towers, newTower],
-        coins: state.coins - 15,
+        coins: state.coins - 25,
         selectedTower: newTower,
         canPlaceTower: false, // Can't place another tower on same cell
         canMergeTowers: false, // Reset merge state
@@ -281,7 +281,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         const sourceTower = state.towers.find(t => t.id === sourceTowerId);
         const targetTower = state.towers.find(t => t.id === targetTowerId);
         
-        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 5 || sourceTower.type !== targetTower.type) {
+        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 5 || targetTower.level >= 5 || sourceTower.type !== targetTower.type) {
           console.log("Cannot merge towers:", { sourceTower, targetTower, reason: "different types or levels" });
           return;
         }
