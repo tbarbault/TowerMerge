@@ -27,6 +27,7 @@ export interface Enemy {
   pathIndex: number;
   type: string;
   reward: number;
+  recentPositions?: { x: number; z: number }[];
 }
 
 export interface Bullet {

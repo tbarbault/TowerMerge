@@ -137,42 +137,92 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Hard collision - enemies cannot pass through obstacles
-        // Try alternative movement directions
-        const avoidanceOptions = [
-          // Primary perpendicular movements
-          { x: enemy.x - dz * moveDistance, z: enemy.z + dx * moveDistance }, // Left
-          { x: enemy.x + dz * moveDistance, z: enemy.z - dx * moveDistance }, // Right
-          // Diagonal movements
-          { x: enemy.x + (dx - dz) * moveDistance * 0.7, z: enemy.z + (dz + dx) * moveDistance * 0.7 },
-          { x: enemy.x + (dx + dz) * moveDistance * 0.7, z: enemy.z + (dz - dx) * moveDistance * 0.7 },
-          // Back-step with side movement
-          { x: enemy.x - dx * moveDistance * 0.3 - dz * moveDistance, z: enemy.z - dz * moveDistance * 0.3 + dx * moveDistance },
-          { x: enemy.x - dx * moveDistance * 0.3 + dz * moveDistance, z: enemy.z - dz * moveDistance * 0.3 - dx * moveDistance },
+        // Advanced pathfinding to prevent getting stuck and circling
+        
+        // Store enemy's recent positions to detect circling
+        if (!enemy.recentPositions) {
+          enemy.recentPositions = [];
+        }
+        enemy.recentPositions.push({ x: enemy.x, z: enemy.z });
+        if (enemy.recentPositions.length > 8) {
+          enemy.recentPositions.shift();
+        }
+
+        // Check if enemy is circling (returning to recent positions)
+        const isCircling = enemy.recentPositions.length > 4 && enemy.recentPositions.some(pos => 
+          Math.sqrt((pos.x - enemy.x) ** 2 + (pos.z - enemy.z) ** 2) < 0.5
+        );
+
+        // Find the best clear path using raycasting
+        const raycastOptions = [];
+        const angles = [
+          -Math.PI/2, -Math.PI/3, -Math.PI/4, -Math.PI/6, // Left angles
+          Math.PI/6, Math.PI/4, Math.PI/3, Math.PI/2,     // Right angles
+          Math.PI, -Math.PI * 2/3, Math.PI * 2/3,        // Back angles (if circling)
         ];
 
-        // Find the first unblocked option that moves toward target
-        let foundAlternative = false;
-        for (const option of avoidanceOptions) {
-          if (!isBlocked(option.x, option.z)) {
-            // Check if this option gets us closer to target
-            const currentDistToTarget = Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2);
-            const newDistToTarget = Math.sqrt((currentTarget.x - option.x) ** 2 + (currentTarget.z - option.z) ** 2);
-            
-            // Accept if it doesn't move us significantly farther from target
-            if (newDistToTarget <= currentDistToTarget + 0.5) {
-              newX = option.x;
-              newZ = option.z;
-              foundAlternative = true;
+        for (const angle of angles) {
+          const testDirection = {
+            x: Math.cos(Math.atan2(dz, dx) + angle),
+            z: Math.sin(Math.atan2(dz, dx) + angle)
+          };
+          
+          const testX = enemy.x + testDirection.x * moveDistance * 1.5;
+          const testZ = enemy.z + testDirection.z * moveDistance * 1.5;
+          
+          // Check if path is clear
+          let pathClear = true;
+          for (let i = 0.2; i <= 1.5; i += 0.2) {
+            const checkX = enemy.x + testDirection.x * moveDistance * i;
+            const checkZ = enemy.z + testDirection.z * moveDistance * i;
+            if (isBlocked(checkX, checkZ)) {
+              pathClear = false;
               break;
+            }
+          }
+          
+          if (pathClear) {
+            const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
+            const currentDistToTarget = Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2);
+            
+            // Prefer paths that don't move too far from target, unless circling
+            const maxDistanceIncrease = isCircling ? 2.0 : 0.8;
+            if (distToTarget <= currentDistToTarget + maxDistanceIncrease) {
+              raycastOptions.push({
+                x: testX,
+                z: testZ,
+                score: distToTarget + (isCircling ? -Math.abs(angle) : Math.abs(angle)) // Favor extreme angles if circling
+              });
             }
           }
         }
 
-        // If no good alternative, stop movement (hard collision)
-        if (!foundAlternative) {
-          newX = enemy.x;
-          newZ = enemy.z;
+        if (raycastOptions.length > 0) {
+          // Choose the best scoring option
+          const bestOption = raycastOptions.reduce((best, option) => 
+            option.score < best.score ? option : best
+          );
+          
+          // Move toward the best option
+          const dirX = bestOption.x - enemy.x;
+          const dirZ = bestOption.z - enemy.z;
+          const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
+          
+          if (dirLength > 0) {
+            newX = enemy.x + (dirX / dirLength) * moveDistance;
+            newZ = enemy.z + (dirZ / dirLength) * moveDistance;
+          }
+        } else {
+          // Completely stuck - teleport slightly away from obstacles
+          if (isCircling) {
+            const escapeAngle = Math.random() * Math.PI * 2;
+            newX = enemy.x + Math.cos(escapeAngle) * moveDistance * 2;
+            newZ = enemy.z + Math.sin(escapeAngle) * moveDistance * 2;
+            enemy.recentPositions = []; // Reset position history
+          } else {
+            newX = enemy.x;
+            newZ = enemy.z;
+          }
         }
       }
       
