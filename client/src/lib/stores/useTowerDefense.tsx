@@ -37,6 +37,16 @@ export interface Bullet {
   color: string;
 }
 
+export interface MuzzleFlash {
+  id: string;
+  towerId: string;
+  x: number;
+  y: number;
+  z: number;
+  rotation: number;
+  startTime: number;
+}
+
 export interface GridCell {
   x: number;
   z: number;
@@ -54,6 +64,7 @@ interface TowerDefenseState {
   towers: Tower[];
   enemies: Enemy[];
   bullets: Bullet[];
+  muzzleFlashes: MuzzleFlash[];
   
   // UI state
   selectedGridCell: GridCell | null;
@@ -86,6 +97,8 @@ interface TowerDefenseState {
   nextWave: () => void;
   setWaveProgress: (progress: number) => void;
   setEnemiesSpawned: (count: number) => void;
+  addMuzzleFlash: (flash: MuzzleFlash) => void;
+  removeMuzzleFlash: (id: string) => void;
   
   // Computed properties
   canPlaceTower: boolean;
@@ -104,6 +117,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     towers: [],
     enemies: [],
     bullets: [],
+    muzzleFlashes: [],
     
     selectedGridCell: null,
     selectedTower: null,
@@ -122,6 +136,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         towers: [],
         enemies: [],
         bullets: [],
+        muzzleFlashes: [],
         waveStartTime: Date.now(),
         enemiesSpawned: 0,
         waveProgress: 0,
@@ -325,6 +340,18 @@ export const useTowerDefense = create<TowerDefenseState>()(
     
     setEnemiesSpawned: (count) => {
       set({ enemiesSpawned: count });
+    },
+    
+    addMuzzleFlash: (flash) => {
+      set(state => ({
+        muzzleFlashes: [...state.muzzleFlashes, flash]
+      }));
+    },
+    
+    removeMuzzleFlash: (id) => {
+      set(state => ({
+        muzzleFlashes: state.muzzleFlashes.filter(f => f.id !== id)
+      }));
     },
     
     // Computed properties

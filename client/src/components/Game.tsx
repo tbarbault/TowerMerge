@@ -45,6 +45,7 @@ export default function Game() {
       {gameState.towers.map((tower) => (
         <Tower
           key={tower.id}
+          towerId={tower.id}
           position={[tower.x * 2 - 4, 0, tower.z * 2 - 2]}
           level={tower.level}
           isSelected={tower.id === gameState.selectedTower?.id}
