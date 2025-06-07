@@ -172,6 +172,8 @@ export const useTowerDefense = create<TowerDefenseState>()(
         enemies: [],
         bullets: [],
         muzzleFlashes: [],
+        explosions: [],
+        impacts: [],
         waveStartTime: Date.now(),
         enemiesSpawned: 0,
         waveProgress: 0,

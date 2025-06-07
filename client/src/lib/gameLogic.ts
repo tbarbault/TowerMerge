@@ -186,16 +186,24 @@ function updateBullets(gameState: any, delta: number) {
       return;
     }
 
-    // Check collision with enemies
+    // Check collision with enemies - use current position AND new position to prevent bullets passing through
     const hitEnemy = gameState.enemies.find((enemy: any) => {
-      const dx = enemy.x - newX;
-      const dz = enemy.z - newZ;
-      const distance = Math.sqrt(dx * dx + dz * dz);
-      return distance < 0.3;
+      // Check collision at current bullet position
+      const currentDx = enemy.x - bullet.x;
+      const currentDz = enemy.z - bullet.z;
+      const currentDistance = Math.sqrt(currentDx * currentDx + currentDz * currentDz);
+      
+      // Check collision at new bullet position
+      const newDx = enemy.x - newX;
+      const newDz = enemy.z - newZ;
+      const newDistance = Math.sqrt(newDx * newDx + newDz * newDz);
+      
+      // Hit if either position is within collision radius
+      return currentDistance < 0.4 || newDistance < 0.4;
     });
 
     if (hitEnemy) {
-      // Hit target
+      // Hit target - use enemy position for impact location
       if (bullet.type === 'mortar') {
         // Mortar explosion: damage all enemies in radius
         const enemiesInRadius = gameState.enemies.filter((enemy: any) => {
@@ -232,6 +240,15 @@ function updateBullets(gameState: any, delta: number) {
         });
       } else {
         // Regular bullet: single target damage
+        // Add impact effect for turret bullets
+        gameState.addImpact({
+          id: Math.random().toString(36).substr(2, 9),
+          x: hitEnemy.x,
+          y: 0.5,
+          z: hitEnemy.z,
+          startTime: Date.now(),
+        });
+        
         gameState.damageEnemy(hitEnemy.id, bullet.damage);
         
         if (hitEnemy.health <= bullet.damage) {

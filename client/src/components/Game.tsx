@@ -9,6 +9,7 @@ import Tower from "./Tower";
 import Enemy from "./Enemy";
 import Bullet from "./Bullet";
 import Explosion from "./Explosion";
+import Impact from "./Impact";
 import { updateGameLogic } from "../lib/gameLogic";
 
 export default function Game() {
@@ -82,6 +83,15 @@ export default function Game() {
           position={[explosion.x, explosion.y, explosion.z]}
           radius={explosion.radius}
           onComplete={() => gameState.removeExplosion(explosion.id)}
+        />
+      ))}
+
+      {/* Render impacts */}
+      {gameState.impacts.map((impact) => (
+        <Impact
+          key={impact.id}
+          position={[impact.x, impact.y, impact.z]}
+          onComplete={() => gameState.removeImpact(impact.id)}
         />
       ))}
     </>
