@@ -190,20 +190,15 @@ export default function GameUI() {
                 <div className="grid grid-cols-1 gap-2">
                   <Button
                     onClick={() => {
-                      if (!obstacleMode) {
-                        toggleObstacleMode();
-                      } else if (selectedObstacleSlot && coins >= 10) {
+                      if (selectedObstacleSlot && coins >= 10) {
                         buyObstacle();
                       }
                     }}
-                    className={obstacleMode 
-                      ? "bg-amber-600 hover:bg-amber-700 text-white text-xs p-2 flex items-center gap-1" 
-                      : "bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
-                    }
-                    disabled={obstacleMode && (!selectedObstacleSlot || coins < 10)}
+                    className="bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
+                    disabled={!selectedObstacleSlot || coins < 10}
                   >
                     <Mountain className="w-3 h-3" />
-                    <span>{obstacleMode ? (selectedObstacleSlot ? "Buy Rock - 10" : "Select Position") : "Rock Mode"}</span>
+                    <span>{selectedObstacleSlot ? "Buy Cement - 10" : "Select Tile"}</span>
                   </Button>
                 </div>
               </div>

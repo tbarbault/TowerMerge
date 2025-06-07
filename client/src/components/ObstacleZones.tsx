@@ -18,14 +18,7 @@ export default function ObstacleZones() {
   }
 
   const handleSlotClick = (x: number, z: number) => {
-    const hasObstacle = obstacles.some(o => o.x === x && o.z === z);
-    
-    if (!hasObstacle && coins >= 10) {
-      // Directly place rock without needing rock mode
-      selectObstacleSlot(x, z);
-      // Auto-buy after selection
-      setTimeout(() => buyObstacle(), 10);
-    }
+    selectObstacleSlot(x, z);
   };
 
   // Always show obstacle zones

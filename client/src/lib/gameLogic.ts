@@ -126,13 +126,13 @@ function updateEnemies(gameState: any, delta: number) {
       let newX = enemy.x + (dx / distance) * moveDistance;
       let newZ = enemy.z + (dz / distance) * moveDistance;
       
-      // Proper obstacle collision detection
+      // Box-based collision detection for full-tile cement blocks
       const isBlocked = (x: number, z: number) => {
         return gameState.obstacles.some((obstacle: any) => {
-          const obsDx = obstacle.x - x;
-          const obsDz = obstacle.z - z;
-          const obsDistance = Math.sqrt(obsDx * obsDx + obsDz * obsDz);
-          return obsDistance < 0.9; // Tight collision radius for actual blocking
+          // Check if point is inside the obstacle's tile area (1.8x1.8 block)
+          const halfSize = 0.9; // Half of 1.8
+          return (x >= obstacle.x - halfSize && x <= obstacle.x + halfSize &&
+                  z >= obstacle.z - halfSize && z <= obstacle.z + halfSize);
         });
       };
 

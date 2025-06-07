@@ -21,10 +21,10 @@ export default function Obstacle({ position, type, onRemove }: ObstacleProps) {
     switch (type) {
       case 'rock':
         return {
-          color: "#6b7280",
-          emissive: "#374151",
-          geometry: "sphere",
-          scale: [0.6, 0.4, 0.6] as [number, number, number],
+          color: "#71717a",
+          emissive: "#52525b",
+          geometry: "box",
+          scale: [1.8, 0.4, 1.8] as [number, number, number], // Full tile coverage
         };
       case 'tree':
         return {
