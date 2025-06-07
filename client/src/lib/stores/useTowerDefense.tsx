@@ -84,6 +84,7 @@ interface TowerDefenseState {
   health: number;
   coins: number;
   waveStartTime: number;
+  waveCompletionTime: number | null;
   
   // Game objects
   towers: Tower[];
@@ -145,8 +146,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
     gamePhase: "menu",
     wave: 1,
     health: 20,
-    coins: 50,
+    coins: 75,
     waveStartTime: 0,
+    waveCompletionTime: null,
     
     towers: [],
     enemies: [],
@@ -316,15 +318,19 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       if (!currentTower) return;
       
-      const mergeableTower = adjacentTowers.find(t => t.level === currentTower.level);
+      const mergeableTower = adjacentTowers.find(t => 
+        t.level === currentTower.level && 
+        t.level < 5 && 
+        t.type === currentTower.type
+      );
       if (!mergeableTower) return;
       
       const upgradedTower: Tower = {
         ...currentTower,
         level: currentTower.level + 1,
-        damage: currentTower.damage * 2,
-        range: currentTower.range * 1.2,
-        fireRate: Math.max(currentTower.fireRate * 0.8, 200),
+        damage: Math.floor(currentTower.damage * 2.2),
+        range: currentTower.range * 1.15,
+        fireRate: Math.max(currentTower.fireRate * 0.85, 150),
       };
       
       set({

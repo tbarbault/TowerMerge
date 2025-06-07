@@ -26,7 +26,7 @@ export function updateGameLogic(gameState: any, delta: number) {
 
 function spawnEnemies(gameState: any, currentTime: number) {
   const timeSinceWaveStart = currentTime - gameState.waveStartTime;
-  const spawnInterval = Math.max(1000 - gameState.wave * 50, 300); // Spawn faster as waves progress
+  const spawnInterval = Math.max(1500 - gameState.wave * 50, 500); // Slower spawning with more time between waves
   const expectedSpawned = Math.floor(timeSinceWaveStart / spawnInterval);
   
   if (expectedSpawned > gameState.enemiesSpawned && gameState.enemiesSpawned < gameState.enemiesInWave) {
@@ -63,13 +63,13 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 120, speed: 0.8, reward: 8 },
-    fast: { health: 85, speed: 1.3, reward: 12 },
-    heavy: { health: 200, speed: 0.5, reward: 18 },
-    armored: { health: 350, speed: 0.6, reward: 25 },
-    elite: { health: 500, speed: 0.7, reward: 35 },
-    boss: { health: 800, speed: 0.4, reward: 50 },
-    megaboss: { health: 1500, speed: 0.3, reward: 100 }
+    basic: { health: 120, speed: 0.8, reward: 3 },
+    fast: { health: 85, speed: 1.3, reward: 4 },
+    heavy: { health: 200, speed: 0.5, reward: 6 },
+    armored: { health: 350, speed: 0.6, reward: 8 },
+    elite: { health: 500, speed: 0.7, reward: 12 },
+    boss: { health: 800, speed: 0.4, reward: 20 },
+    megaboss: { health: 1500, speed: 0.3, reward: 40 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
@@ -311,9 +311,19 @@ function updateBullets(gameState: any, delta: number) {
 
 function checkWaveCompletion(gameState: any) {
   if (gameState.enemiesSpawned >= gameState.enemiesInWave && gameState.enemies.length === 0) {
-    // Wave completed
-    gameState.nextWave();
-    gameState.addCoins(10 + gameState.wave * 2); // Wave completion bonus
+    // Wave completed - add 5 second pause before next wave
+    const now = Date.now();
+    if (!gameState.waveCompletionTime) {
+      gameState.waveCompletionTime = now;
+      gameState.addCoins(5 + gameState.wave * 2); // Wave completion bonus
+      return;
+    }
+    
+    // Wait 5 seconds before starting next wave
+    if (now - gameState.waveCompletionTime >= 5000) {
+      gameState.nextWave();
+      gameState.waveCompletionTime = null;
+    }
   }
 }
 

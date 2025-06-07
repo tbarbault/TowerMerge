@@ -86,9 +86,15 @@ export default function GameUI() {
       <div className="absolute top-4 left-4 right-4 flex justify-between items-start z-40">
         <div className="flex gap-4">
           <Card className="bg-black bg-opacity-80 border-gray-700">
-            <CardContent className="p-3 flex items-center gap-2">
-              <Zap className="w-5 h-5 text-yellow-400" />
-              <span className="text-white font-bold">Wave {wave}</span>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Zap className="w-5 h-5 text-yellow-400" />
+                <span className="text-white font-bold">Wave {wave}</span>
+              </div>
+              <div className="text-xs text-gray-300">
+                Enemies: {enemiesSpawned}/{enemiesInWave}
+              </div>
+              <Progress value={waveProgress} className="h-1 mt-1" />
             </CardContent>
           </Card>
 
