@@ -197,12 +197,12 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       // Calculate canPlaceTower
       const towerExists = !!existingTower;
-      const hasEnoughCoins = state.coins >= 10;
+      const hasEnoughCoins = state.coins >= 15;
       const canPlace = !towerExists && hasEnoughCoins;
       
       // Calculate canMergeTowers
       let canMerge = false;
-      if (existingTower && existingTower.level < 3) {
+      if (existingTower && existingTower.level < 5) {
         const adjacentTowers = state.towers.filter(tower => {
           const dx = Math.abs(tower.x - x);
           const dz = Math.abs(tower.z - z);
@@ -227,7 +227,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     
     buyTower: () => {
       const state = get();
-      if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 10) {
+      if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 15) {
         console.log("Cannot buy tower:", { 
           hasSelectedCell: !!state.selectedGridCell, 
           canPlace: state.canPlaceTower, 
@@ -240,9 +240,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       const getTowerStats = (type: 'turret' | 'mortar') => {
         if (type === 'turret') {
-          return { damage: 10, range: 6.0, fireRate: 400 };
+          return { damage: 25, range: 6.0, fireRate: 400 };
         } else {
-          return { damage: 25, range: 7.0, fireRate: 1200 };
+          return { damage: 60, range: 7.0, fireRate: 1200 };
         }
       };
 
@@ -262,7 +262,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       // Recalculate canPlaceTower after placing tower
       set({
         towers: [...state.towers, newTower],
-        coins: state.coins - 10,
+        coins: state.coins - 15,
         selectedTower: newTower,
         canPlaceTower: false, // Can't place another tower on same cell
         canMergeTowers: false, // Reset merge state
@@ -277,7 +277,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         const sourceTower = state.towers.find(t => t.id === sourceTowerId);
         const targetTower = state.towers.find(t => t.id === targetTowerId);
         
-        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 3 || sourceTower.type !== targetTower.type) {
+        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 5 || sourceTower.type !== targetTower.type) {
           console.log("Cannot merge towers:", { sourceTower, targetTower, reason: "different types or levels" });
           return;
         }
@@ -285,9 +285,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
         const upgradedTower: Tower = {
           ...targetTower, // Keep the target tower's position
           level: targetTower.level + 1,
-          damage: targetTower.damage * 2,
-          range: targetTower.range * 1.2,
-          fireRate: Math.max(targetTower.fireRate * 0.8, 200),
+          damage: Math.floor(targetTower.damage * 2.2),
+          range: targetTower.range * 1.15,
+          fireRate: Math.max(targetTower.fireRate * 0.85, 150),
         };
         
         console.log(`Merged towers: ${sourceTowerId} + ${targetTowerId} = Level ${upgradedTower.level}`);

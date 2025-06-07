@@ -30,11 +30,22 @@ function spawnEnemies(gameState: any, currentTime: number) {
   const expectedSpawned = Math.floor(timeSinceWaveStart / spawnInterval);
   
   if (expectedSpawned > gameState.enemiesSpawned && gameState.enemiesSpawned < gameState.enemiesInWave) {
-    const enemyTypes = ["basic", "fast", "heavy"];
+    // Progressive enemy types based on wave
+    let enemyTypes = ["basic", "fast"];
+    
+    if (gameState.wave >= 3) enemyTypes.push("heavy");
+    if (gameState.wave >= 6) enemyTypes.push("armored");
+    if (gameState.wave >= 10) enemyTypes.push("elite");
+    
     const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
     
-    // Boss every 5 waves
-    const finalType = gameState.wave % 5 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1 ? "boss" : type;
+    // Special bosses at milestone waves
+    let finalType = type;
+    if (gameState.wave % 10 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
+      finalType = "megaboss";
+    } else if (gameState.wave % 5 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
+      finalType = "boss";
+    }
     
     const enemy = createEnemy(finalType, gameState.wave);
     gameState.spawnEnemy(enemy);
@@ -52,10 +63,13 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 50, speed: 0.8, reward: 5 },
-    fast: { health: 35, speed: 1.2, reward: 7 },
-    heavy: { health: 100, speed: 0.5, reward: 10 },
-    boss: { health: 250, speed: 0.4, reward: 25 }
+    basic: { health: 120, speed: 0.8, reward: 8 },
+    fast: { health: 85, speed: 1.3, reward: 12 },
+    heavy: { health: 200, speed: 0.5, reward: 18 },
+    armored: { health: 350, speed: 0.6, reward: 25 },
+    elite: { health: 500, speed: 0.7, reward: 35 },
+    boss: { health: 800, speed: 0.4, reward: 50 },
+    megaboss: { health: 1500, speed: 0.3, reward: 100 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
