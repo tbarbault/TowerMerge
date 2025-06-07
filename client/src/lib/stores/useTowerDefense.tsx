@@ -36,6 +36,8 @@ export interface Bullet {
   damage: number;
   speed: number;
   color: string;
+  type: 'bullet' | 'mortar';
+  explosionRadius?: number;
 }
 
 export interface MuzzleFlash {
@@ -45,6 +47,15 @@ export interface MuzzleFlash {
   y: number;
   z: number;
   rotation: number;
+  startTime: number;
+}
+
+export interface Explosion {
+  id: string;
+  x: number;
+  y: number;
+  z: number;
+  radius: number;
   startTime: number;
 }
 

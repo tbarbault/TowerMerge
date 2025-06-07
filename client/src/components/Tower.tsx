@@ -376,11 +376,11 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           {/* Show mergeable towers when selected */}
           {towers.filter(t => {
             if (t.id === towerId || t.level !== level || t.level >= 3 || t.type !== type) return false;
-            // Get current tower position from props
-            const currentX = (position[0] + 4) / 2;
-            const currentZ = (position[2] + 2) / 2;
-            const dx = Math.abs(t.x - currentX);
-            const dz = Math.abs(t.z - currentZ);
+            // Convert world position back to grid coordinates
+            const currentGridX = Math.round((position[0] + 4) / 2);
+            const currentGridZ = Math.round((position[2] + 2) / 2);
+            const dx = Math.abs(t.x - currentGridX);
+            const dz = Math.abs(t.z - currentGridZ);
             return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
           }).map(tower => (
             <mesh 

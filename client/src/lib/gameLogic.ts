@@ -156,8 +156,12 @@ function updateTowers(gameState: any, currentTime: number) {
         z: barrelEndZ,
         targetId: target.id,
         damage: tower.damage,
-        speed: 8,
-        color: tower.level === 1 ? "#ff6b6b" : tower.level === 2 ? "#4ecdc4" : "#45b7d1",
+        speed: tower.type === 'mortar' ? 4 : 8, // Mortars are slower
+        color: tower.type === 'mortar' 
+          ? (tower.level === 1 ? "#ff8c00" : tower.level === 2 ? "#ff6347" : "#dc143c")
+          : (tower.level === 1 ? "#ff6b6b" : tower.level === 2 ? "#4ecdc4" : "#45b7d1"),
+        type: tower.type === 'mortar' ? 'mortar' : 'bullet',
+        explosionRadius: tower.type === 'mortar' ? (0.8 + tower.level * 0.4) : undefined,
       };
 
       gameState.addBullet(bullet);
@@ -184,13 +188,41 @@ function updateBullets(gameState: any, delta: number) {
 
     if (distance < 0.3) {
       // Hit target
-      gameState.damageEnemy(target.id, bullet.damage);
-      gameState.removeBullet(bullet.id);
-      
-      if (target.health <= bullet.damage) {
-        // Enemy will die, award coins
-        gameState.addCoins(target.reward);
+      if (bullet.type === 'mortar') {
+        // Mortar explosion: damage all enemies in radius
+        const enemiesInRadius = gameState.enemies.filter((enemy: any) => {
+          const dx = enemy.x - bullet.x;
+          const dz = enemy.z - bullet.z;
+          const distanceToExplosion = Math.sqrt(dx * dx + dz * dz);
+          return distanceToExplosion <= bullet.explosionRadius;
+        });
+
+        enemiesInRadius.forEach((enemy: any) => {
+          const dx = enemy.x - bullet.x;
+          const dz = enemy.z - bullet.z;
+          const distanceToExplosion = Math.sqrt(dx * dx + dz * dz);
+          // Damage falls off with distance
+          const damageMultiplier = Math.max(0.3, 1 - (distanceToExplosion / bullet.explosionRadius));
+          const finalDamage = Math.floor(bullet.damage * damageMultiplier);
+          
+          gameState.damageEnemy(enemy.id, finalDamage);
+          
+          if (enemy.health <= finalDamage) {
+            // Enemy will die, award coins
+            gameState.addCoins(enemy.reward);
+          }
+        });
+      } else {
+        // Regular bullet: single target damage
+        gameState.damageEnemy(target.id, bullet.damage);
+        
+        if (target.health <= bullet.damage) {
+          // Enemy will die, award coins
+          gameState.addCoins(target.reward);
+        }
       }
+      
+      gameState.removeBullet(bullet.id);
     } else {
       // Move bullet
       const moveDistance = bullet.speed * delta;

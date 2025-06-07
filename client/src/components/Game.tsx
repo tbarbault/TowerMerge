@@ -70,6 +70,7 @@ export default function Game() {
           key={bullet.id}
           position={[bullet.x, bullet.y, bullet.z]}
           color={bullet.color}
+          type={bullet.type}
         />
       ))}
     </>
