@@ -94,12 +94,11 @@ export default function GameUI() {
               </div>
               <div className="text-xs text-gray-300">
                 {waveCompletionTime ? (
-                  `Next wave in ${Math.max(0, Math.ceil((5000 - (Date.now() - waveCompletionTime)) / 1000))}s`
+                  `Next wave in ${Math.max(0, Math.ceil((3000 - (Date.now() - waveCompletionTime)) / 1000))}s`
                 ) : (
                   `Enemies: ${enemiesSpawned}/${enemiesInWave}`
                 )}
               </div>
-              <Progress value={waveCompletionTime ? 100 : waveProgress} className="h-1 mt-1" />
             </CardContent>
           </Card>
 

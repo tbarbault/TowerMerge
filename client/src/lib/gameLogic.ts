@@ -311,18 +311,18 @@ function updateBullets(gameState: any, delta: number) {
 
 function checkWaveCompletion(gameState: any) {
   if (gameState.enemiesSpawned >= gameState.enemiesInWave && gameState.enemies.length === 0) {
-    // Wave completed - add 5 second pause before next wave
+    // Wave completed - add 3 second pause before next wave
     const now = Date.now();
     if (!gameState.waveCompletionTime) {
+      // Mark wave as completed - use direct store update to avoid repeated calls
       gameState.waveCompletionTime = now;
-      gameState.addCoins(5 + gameState.wave * 2); // Wave completion bonus
+      gameState.addCoins(5 + gameState.wave * 2);
       return;
     }
     
-    // Wait 5 seconds before starting next wave
-    if (now - gameState.waveCompletionTime >= 5000) {
+    // Wait 3 seconds before starting next wave
+    if (now - gameState.waveCompletionTime >= 3000) {
       gameState.nextWave();
-      gameState.waveCompletionTime = null;
     }
   }
 }

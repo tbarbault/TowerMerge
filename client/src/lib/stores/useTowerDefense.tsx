@@ -128,6 +128,7 @@ interface TowerDefenseState {
   nextWave: () => void;
   setWaveProgress: (progress: number) => void;
   setEnemiesSpawned: (count: number) => void;
+  setWaveCompletionTime: (time: number | null) => void;
   addMuzzleFlash: (flash: MuzzleFlash) => void;
   removeMuzzleFlash: (id: string) => void;
   addExplosion: (explosion: Explosion) => void;
@@ -434,6 +435,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         enemiesSpawned: 0,
         waveProgress: 0,
         waveStartTime: Date.now(),
+        waveCompletionTime: null,
       }));
     },
     
@@ -443,6 +445,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
     
     setEnemiesSpawned: (count) => {
       set({ enemiesSpawned: count });
+    },
+    
+    setWaveCompletionTime: (time) => {
+      set({ waveCompletionTime: time });
     },
     
     addMuzzleFlash: (flash) => {
