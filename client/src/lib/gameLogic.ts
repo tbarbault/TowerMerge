@@ -137,66 +137,64 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Smart trajectory-based pathfinding
-        let foundPath = false;
+        // Simplified flow-based pathfinding - enemies flow around obstacles
+        let foundAlternative = false;
         
-        // Calculate direction to target for reference
-        const targetAngle = Math.atan2(dz, dx);
+        // Calculate repulsion force from all nearby obstacles
+        let repulsionX = 0;
+        let repulsionZ = 0;
         
-        // Try smooth curved paths around obstacles
-        const pathAngles = [
-          targetAngle - Math.PI/3,  // 60 degrees left
-          targetAngle + Math.PI/3,  // 60 degrees right
-          targetAngle - Math.PI/2,  // 90 degrees left
-          targetAngle + Math.PI/2,  // 90 degrees right
-          targetAngle - Math.PI/4,  // 45 degrees left
-          targetAngle + Math.PI/4,  // 45 degrees right
-          targetAngle - Math.PI/6,  // 30 degrees left
-          targetAngle + Math.PI/6,  // 30 degrees right
-        ];
+        gameState.obstacles.forEach((obstacle: any) => {
+          const obstacleDistance = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
+          if (obstacleDistance < 3) { // Within influence range
+            const repulsionStrength = (3 - obstacleDistance) / 3; // Stronger when closer
+            const repulsionDirection = {
+              x: (enemy.x - obstacle.x) / obstacleDistance,
+              z: (enemy.z - obstacle.z) / obstacleDistance
+            };
+            repulsionX += repulsionDirection.x * repulsionStrength;
+            repulsionZ += repulsionDirection.z * repulsionStrength;
+          }
+        });
         
-        for (const angle of pathAngles) {
-          const testX = enemy.x + Math.cos(angle) * moveDistance;
-          const testZ = enemy.z + Math.sin(angle) * moveDistance;
+        // Combine target attraction with obstacle repulsion
+        const combinedX = dx + repulsionX * 2; // Amplify repulsion
+        const combinedZ = dz + repulsionZ * 2;
+        const combinedLength = Math.sqrt(combinedX ** 2 + combinedZ ** 2);
+        
+        if (combinedLength > 0) {
+          const flowX = enemy.x + (combinedX / combinedLength) * moveDistance;
+          const flowZ = enemy.z + (combinedZ / combinedLength) * moveDistance;
           
-          if (!isBlocked(testX, testZ)) {
-            // Verify this path doesn't lead to immediate blocking
-            const nextTestX = testX + Math.cos(angle) * moveDistance * 0.5;
-            const nextTestZ = testZ + Math.sin(angle) * moveDistance * 0.5;
-            
-            // Accept if next step is also clear or if we're making reasonable progress
-            if (!isBlocked(nextTestX, nextTestZ) || testZ >= enemy.z - moveDistance * 0.5) {
-              newX = testX;
-              newZ = testZ;
-              foundPath = true;
-              break;
-            }
+          if (!isBlocked(flowX, flowZ)) {
+            newX = flowX;
+            newZ = flowZ;
+            foundAlternative = true;
           }
         }
         
-        // If angular paths fail, try direct side movements
-        if (!foundPath) {
-          const sideOptions = [
-            { x: enemy.x - moveDistance * 1.2, z: enemy.z }, // Left
-            { x: enemy.x + moveDistance * 1.2, z: enemy.z }, // Right
-            { x: enemy.x - moveDistance * 0.8, z: enemy.z + moveDistance * 0.3 }, // Left-slight forward
-            { x: enemy.x + moveDistance * 0.8, z: enemy.z + moveDistance * 0.3 }, // Right-slight forward
+        // If flow direction is blocked, try pure lateral movement
+        if (!foundAlternative) {
+          const lateralOptions = [
+            { x: enemy.x - moveDistance * 1.5, z: enemy.z },
+            { x: enemy.x + moveDistance * 1.5, z: enemy.z },
+            { x: enemy.x, z: enemy.z + moveDistance * 0.5 },
           ];
           
-          for (const option of sideOptions) {
+          for (const option of lateralOptions) {
             if (!isBlocked(option.x, option.z)) {
               newX = option.x;
               newZ = option.z;
-              foundPath = true;
+              foundAlternative = true;
               break;
             }
           }
         }
         
-        // If still no path found, just stop (no teleporting)
-        if (!foundPath) {
-          newX = enemy.x;
-          newZ = enemy.z;
+        // If completely stuck, minimal movement
+        if (!foundAlternative) {
+          newX = enemy.x + (Math.random() - 0.5) * moveDistance * 0.1;
+          newZ = enemy.z + moveDistance * 0.1; // Always try to move slightly forward
         }
       }
       
