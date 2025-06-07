@@ -24,23 +24,48 @@ export function updateGameLogic(gameState: any, delta: number) {
   cleanupDeadEnemies(gameState);
 }
 
+export function getAvailableEnemyTypes(wave: number): string[] {
+  // Wave 1: Only basic enemies
+  if (wave === 1) {
+    return ["basic"];
+  }
+  // Wave 2: Introduce fast enemies
+  else if (wave === 2) {
+    return ["basic", "fast"];
+  }
+  // Wave 3-4: Add heavy enemies gradually
+  else if (wave <= 4) {
+    const types = ["basic", "fast"];
+    if (wave >= 3) types.push("heavy");
+    return types;
+  }
+  // Wave 5-7: Introduce armored enemies
+  else if (wave <= 7) {
+    const types = ["basic", "fast", "heavy"];
+    if (wave >= 5) types.push("armored");
+    return types;
+  }
+  // Wave 8+: All enemy types available
+  else {
+    const types = ["basic", "fast", "heavy", "armored"];
+    if (wave >= 8) types.push("elite");
+    return types;
+  }
+}
+
 function spawnEnemies(gameState: any, currentTime: number) {
   const timeSinceWaveStart = currentTime - gameState.waveStartTime;
   const spawnInterval = Math.max(1500 - gameState.wave * 50, 500); // Slower spawning with more time between waves
   const expectedSpawned = Math.floor(timeSinceWaveStart / spawnInterval);
   
   if (expectedSpawned > gameState.enemiesSpawned && gameState.enemiesSpawned < gameState.enemiesInWave) {
-    // Progressive enemy types based on wave
-    let enemyTypes = ["basic", "fast"];
+    // Get available enemy types for this wave
+    const enemyTypes = getAvailableEnemyTypes(gameState.wave);
     
-    if (gameState.wave >= 3) enemyTypes.push("heavy");
-    if (gameState.wave >= 6) enemyTypes.push("armored");
-    if (gameState.wave >= 10) enemyTypes.push("elite");
-    
-    const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+    // Select enemy type with weighted distribution
+    let finalType = selectWeightedEnemyType(enemyTypes, gameState.wave);
     
     // Special bosses at milestone waves
-    let finalType = type;
     if (gameState.wave % 10 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
       finalType = "megaboss";
     } else if (gameState.wave % 5 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
@@ -57,26 +82,77 @@ function spawnEnemies(gameState: any, currentTime: number) {
   gameState.setWaveProgress(progress);
 }
 
+function selectWeightedEnemyType(availableTypes: string[], wave: number) {
+  // Early waves favor weaker enemies
+  if (wave <= 3) {
+    const weights = {
+      basic: 70,
+      fast: 25,
+      heavy: 5
+    };
+    return getWeightedRandomType(availableTypes, weights);
+  }
+  // Mid waves balance enemy types
+  else if (wave <= 7) {
+    const weights = {
+      basic: 40,
+      fast: 30,
+      heavy: 20,
+      armored: 10
+    };
+    return getWeightedRandomType(availableTypes, weights);
+  }
+  // Later waves favor stronger enemies
+  else {
+    const weights = {
+      basic: 20,
+      fast: 25,
+      heavy: 25,
+      armored: 20,
+      elite: 10
+    };
+    return getWeightedRandomType(availableTypes, weights);
+  }
+}
+
+function getWeightedRandomType(types: string[], weights: Record<string, number>) {
+  const availableWeights = types.map(type => weights[type] || 0);
+  const totalWeight = availableWeights.reduce((sum, weight) => sum + weight, 0);
+  
+  if (totalWeight === 0) return types[0];
+  
+  let random = Math.random() * totalWeight;
+  
+  for (let i = 0; i < types.length; i++) {
+    random -= availableWeights[i];
+    if (random <= 0) return types[i];
+  }
+  
+  return types[types.length - 1];
+}
+
 function createEnemy(type: string, wave: number) {
   // Use random path for each enemy
   const path = getRandomPath();
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 120, speed: 0.8, reward: 1 },
-    fast: { health: 85, speed: 1.3, reward: 2 },
-    heavy: { health: 200, speed: 0.5, reward: 2 },
-    armored: { health: 350, speed: 0.6, reward: 3 },
-    elite: { health: 500, speed: 0.7, reward: 4 },
-    boss: { health: 800, speed: 0.4, reward: 6 },
-    megaboss: { health: 1500, speed: 0.3, reward: 10 }
+    basic: { health: 100, speed: 0.8, reward: 1 },
+    fast: { health: 75, speed: 1.2, reward: 2 },
+    heavy: { health: 160, speed: 0.6, reward: 2 },
+    armored: { health: 240, speed: 0.7, reward: 3 },
+    elite: { health: 350, speed: 0.8, reward: 4 },
+    boss: { health: 600, speed: 0.5, reward: 8 },
+    megaboss: { health: 1200, speed: 0.4, reward: 15 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
   
-  // Scale with wave
-  const scaledHealth = Math.floor(config.health + (wave - 1) * config.health * 0.3);
-  const scaledSpeed = config.speed + (wave - 1) * 0.1;
+  // Scale with wave - more gradual scaling
+  const healthScaling = Math.min(0.15, 0.05 + (wave - 1) * 0.01); // Start at 5%, increase by 1% per wave, cap at 15%
+  const scaledHealth = Math.floor(config.health * (1 + (wave - 1) * healthScaling));
+  const speedScaling = Math.min(0.05, (wave - 1) * 0.005); // Very gradual speed increase
+  const scaledSpeed = config.speed * (1 + speedScaling);
 
   return {
     id: Math.random().toString(36).substr(2, 9),

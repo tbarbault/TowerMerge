@@ -2,9 +2,9 @@ import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users } from "lucide-react";
+import { getAvailableEnemyTypes } from "../lib/gameLogic";
 
 export default function GameUI() {
   const {
@@ -23,11 +23,7 @@ export default function GameUI() {
     waveProgress,
     enemiesInWave,
     enemiesSpawned,
-    waveCompletionTime,
-    obstacleMode,
-    selectedObstacleSlot,
-    toggleObstacleMode,
-    buyObstacle
+    waveCompletionTime
   } = useTowerDefense();
 
   const { isMuted, toggleMute } = useAudio();
@@ -117,6 +113,33 @@ export default function GameUI() {
             <CardContent className="p-3 flex items-center gap-2">
               <Coins className="w-5 h-5 text-yellow-400" />
               <span className="text-white font-bold">{coins}</span>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-black bg-opacity-80 border-gray-700">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="w-4 h-4 text-blue-400" />
+                <span className="text-white text-xs font-semibold">Enemy Types</span>
+              </div>
+              <div className="flex gap-1 flex-wrap">
+                {getAvailableEnemyTypes(wave).map((type) => (
+                  <Badge 
+                    key={type} 
+                    variant="outline" 
+                    className={`text-xs px-2 py-0 ${
+                      type === 'basic' ? 'border-green-400 text-green-400' :
+                      type === 'fast' ? 'border-yellow-400 text-yellow-400' :
+                      type === 'heavy' ? 'border-orange-400 text-orange-400' :
+                      type === 'armored' ? 'border-purple-400 text-purple-400' :
+                      type === 'elite' ? 'border-red-400 text-red-400' :
+                      'border-gray-400 text-gray-400'
+                    }`}
+                  >
+                    {type}
+                  </Badge>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </div>
