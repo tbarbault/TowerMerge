@@ -121,10 +121,49 @@ function updateEnemies(gameState: any, delta: number) {
       // Reached waypoint, move to next
       gameState.updateEnemy(enemy.id, currentTarget.x, currentTarget.z, enemy.pathIndex + 1);
     } else {
-      // Move towards waypoint
+      // Move towards waypoint with obstacle avoidance
       const moveDistance = enemy.speed * delta;
-      const newX = enemy.x + (dx / distance) * moveDistance;
-      const newZ = enemy.z + (dz / distance) * moveDistance;
+      let newX = enemy.x + (dx / distance) * moveDistance;
+      let newZ = enemy.z + (dz / distance) * moveDistance;
+      
+      // Check for obstacle collision and simple avoidance
+      const nearbyObstacle = gameState.obstacles.find((obstacle: any) => {
+        const obsDx = obstacle.x - newX;
+        const obsDz = obstacle.z - newZ;
+        const obsDistance = Math.sqrt(obsDx * obsDx + obsDz * obsDz);
+        return obsDistance < 1.0; // Avoidance radius
+      });
+
+      if (nearbyObstacle) {
+        // Simple avoidance: try moving perpendicular to obstacle
+        const obsDx = nearbyObstacle.x - enemy.x;
+        const obsDz = nearbyObstacle.z - enemy.z;
+        const obsDistance = Math.sqrt(obsDx * obsDx + obsDz * obsDz);
+        
+        if (obsDistance > 0) {
+          // Move perpendicular to obstacle direction
+          const perpX = -obsDz / obsDistance;
+          const perpZ = obsDx / obsDistance;
+          
+          // Try both perpendicular directions, choose the one closer to target
+          const option1X = enemy.x + perpX * moveDistance;
+          const option1Z = enemy.z + perpZ * moveDistance;
+          const option2X = enemy.x - perpX * moveDistance;
+          const option2Z = enemy.z - perpZ * moveDistance;
+          
+          const dist1 = Math.sqrt((currentTarget.x - option1X) ** 2 + (currentTarget.z - option1Z) ** 2);
+          const dist2 = Math.sqrt((currentTarget.x - option2X) ** 2 + (currentTarget.z - option2Z) ** 2);
+          
+          if (dist1 < dist2) {
+            newX = option1X;
+            newZ = option1Z;
+          } else {
+            newX = option2X;
+            newZ = option2Z;
+          }
+        }
+      }
+      
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
     }
   });
@@ -246,6 +285,22 @@ function updateBullets(gameState: any, delta: number) {
     if (newX < -15 || newX > 15 || newZ < -10 || newZ > 10) {
       gameState.removeBullet(bullet.id);
       return;
+    }
+
+    // Check collision with obstacles (only for non-mortar bullets)
+    if (bullet.type !== 'mortar') {
+      const hitObstacle = gameState.obstacles.find((obstacle: any) => {
+        const dx = obstacle.x - newX;
+        const dz = obstacle.z - newZ;
+        const distance = Math.sqrt(dx * dx + dz * dz);
+        return distance < 0.8; // Obstacle collision radius
+      });
+
+      if (hitObstacle) {
+        // Remove bullet when it hits obstacle
+        gameState.removeBullet(bullet.id);
+        return;
+      }
     }
 
     // Handle mortars differently - they explode at predetermined target positions

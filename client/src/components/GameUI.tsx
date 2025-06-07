@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Mountain, Target, Bomb } from "lucide-react";
 
 export default function GameUI() {
   const {
@@ -123,18 +123,6 @@ export default function GameUI() {
 
         <div className="flex gap-2">
           <Button
-            onClick={toggleObstacleMode}
-            variant={obstacleMode ? "default" : "outline"}
-            size="sm"
-            className={obstacleMode 
-              ? "bg-amber-600 hover:bg-amber-700 text-white" 
-              : "bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800"
-            }
-          >
-            {obstacleMode ? "Exit Obstacles" : "Place Obstacles"}
-          </Button>
-          
-          <Button
             onClick={toggleMute}
             variant="outline"
             size="sm"
@@ -188,20 +176,33 @@ export default function GameUI() {
                 {canPlaceTower || (!canMergeTowers && (coins >= 15 || coins >= 25)) ? (
                   <div className="space-y-2">
                     <div className="text-sm text-gray-300 mb-2">Choose tower type:</div>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-3 gap-2">
                       <Button 
                         onClick={() => {selectTowerType('turret'); buyTower();}}
-                        className="bg-green-600 hover:bg-green-700 text-xs p-2"
+                        className="bg-green-600 hover:bg-green-700 text-xs p-2 flex items-center gap-1"
                         disabled={coins < 15}
                       >
-                        <span className="block">Turret - 15</span>
+                        <Target className="w-3 h-3" />
+                        <span>15</span>
                       </Button>
                       <Button 
                         onClick={() => {selectTowerType('mortar'); buyTower();}}
-                        className="bg-orange-600 hover:bg-orange-700 text-xs p-2"
+                        className="bg-orange-600 hover:bg-orange-700 text-xs p-2 flex items-center gap-1"
                         disabled={coins < 25}
                       >
-                        <span className="block">Mortar - 25</span>
+                        <Bomb className="w-3 h-3" />
+                        <span>25</span>
+                      </Button>
+                      <Button
+                        onClick={toggleObstacleMode}
+                        variant={obstacleMode ? "default" : "outline"}
+                        className={obstacleMode 
+                          ? "bg-amber-600 hover:bg-amber-700 text-white text-xs p-2 flex items-center gap-1" 
+                          : "bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
+                        }
+                      >
+                        <Mountain className="w-3 h-3" />
+                        <span>10</span>
                       </Button>
                     </div>
                   </div>
