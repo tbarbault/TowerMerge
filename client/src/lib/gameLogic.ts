@@ -126,73 +126,53 @@ function updateEnemies(gameState: any, delta: number) {
       let newX = enemy.x + (dx / distance) * moveDistance;
       let newZ = enemy.z + (dz / distance) * moveDistance;
       
-      // Advanced obstacle avoidance with flow field
+      // Proper obstacle collision detection
       const isBlocked = (x: number, z: number) => {
         return gameState.obstacles.some((obstacle: any) => {
           const obsDx = obstacle.x - x;
           const obsDz = obstacle.z - z;
           const obsDistance = Math.sqrt(obsDx * obsDx + obsDz * obsDz);
-          return obsDistance < 1.2; // Larger avoidance radius
+          return obsDistance < 0.9; // Tight collision radius for actual blocking
         });
       };
 
       if (isBlocked(newX, newZ)) {
-        // Generate flow field around obstacles
-        const flowFieldOptions = [];
-        const searchRadius = 2.0;
-        const angleSteps = 16;
-        
-        for (let i = 0; i < angleSteps; i++) {
-          const angle = (i * 2 * Math.PI) / angleSteps;
-          const testX = enemy.x + Math.cos(angle) * searchRadius;
-          const testZ = enemy.z + Math.sin(angle) * searchRadius;
-          
-          if (!isBlocked(testX, testZ)) {
-            // Calculate score: distance to target + penalty for going backwards
-            const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
-            const forwardProgress = (testX - enemy.x) * (dx / distance) + (testZ - enemy.z) * (dz / distance);
-            const score = distToTarget - forwardProgress * 0.5; // Favor forward movement
+        // Hard collision - enemies cannot pass through obstacles
+        // Try alternative movement directions
+        const avoidanceOptions = [
+          // Primary perpendicular movements
+          { x: enemy.x - dz * moveDistance, z: enemy.z + dx * moveDistance }, // Left
+          { x: enemy.x + dz * moveDistance, z: enemy.z - dx * moveDistance }, // Right
+          // Diagonal movements
+          { x: enemy.x + (dx - dz) * moveDistance * 0.7, z: enemy.z + (dz + dx) * moveDistance * 0.7 },
+          { x: enemy.x + (dx + dz) * moveDistance * 0.7, z: enemy.z + (dz - dx) * moveDistance * 0.7 },
+          // Back-step with side movement
+          { x: enemy.x - dx * moveDistance * 0.3 - dz * moveDistance, z: enemy.z - dz * moveDistance * 0.3 + dx * moveDistance },
+          { x: enemy.x - dx * moveDistance * 0.3 + dz * moveDistance, z: enemy.z - dz * moveDistance * 0.3 - dx * moveDistance },
+        ];
+
+        // Find the first unblocked option that moves toward target
+        let foundAlternative = false;
+        for (const option of avoidanceOptions) {
+          if (!isBlocked(option.x, option.z)) {
+            // Check if this option gets us closer to target
+            const currentDistToTarget = Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2);
+            const newDistToTarget = Math.sqrt((currentTarget.x - option.x) ** 2 + (currentTarget.z - option.z) ** 2);
             
-            flowFieldOptions.push({ x: testX, z: testZ, score });
+            // Accept if it doesn't move us significantly farther from target
+            if (newDistToTarget <= currentDistToTarget + 0.5) {
+              newX = option.x;
+              newZ = option.z;
+              foundAlternative = true;
+              break;
+            }
           }
         }
 
-        if (flowFieldOptions.length > 0) {
-          // Choose the option with best score
-          const bestOption = flowFieldOptions.reduce((best, option) => 
-            option.score < best.score ? option : best
-          );
-          
-          // Move gradually toward the best option
-          const dirX = bestOption.x - enemy.x;
-          const dirZ = bestOption.z - enemy.z;
-          const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
-          
-          if (dirLength > 0) {
-            newX = enemy.x + (dirX / dirLength) * moveDistance;
-            newZ = enemy.z + (dirZ / dirLength) * moveDistance;
-          }
-        } else {
-          // Last resort: try to go around obstacle in both directions
-          const perpX = -dz / distance;
-          const perpZ = dx / distance;
-          
-          const option1X = enemy.x + perpX * moveDistance * 1.5;
-          const option1Z = enemy.z + perpZ * moveDistance * 1.5;
-          const option2X = enemy.x - perpX * moveDistance * 1.5;
-          const option2Z = enemy.z - perpZ * moveDistance * 1.5;
-          
-          if (!isBlocked(option1X, option1Z)) {
-            newX = option1X;
-            newZ = option1Z;
-          } else if (!isBlocked(option2X, option2Z)) {
-            newX = option2X;
-            newZ = option2Z;
-          } else {
-            // Stay in place if completely stuck
-            newX = enemy.x;
-            newZ = enemy.z;
-          }
+        // If no good alternative, stop movement (hard collision)
+        if (!foundAlternative) {
+          newX = enemy.x;
+          newZ = enemy.z;
         }
       }
       

@@ -14,11 +14,10 @@ export default function ObstacleZones() {
   ];
 
   const handleSlotClick = (x: number, z: number) => {
-    if (!obstacleMode) return;
     selectObstacleSlot(x, z);
   };
 
-  if (!obstacleMode) return null;
+  // Always show obstacle zones
 
   return (
     <group ref={meshRef}>
@@ -27,10 +26,13 @@ export default function ObstacleZones() {
         const hasObstacle = obstacles.some(o => o.x === slot.x && o.z === slot.z);
         
         let slotColor = "#374151"; // Default gray
+        let opacity = 0.3; // Always visible
         if (hasObstacle) {
           slotColor = "#7f1d1d"; // Dark red if occupied
+          opacity = 0.8;
         } else if (isSelected) {
           slotColor = "#22c55e"; // Green if selected
+          opacity = 0.6;
         }
 
         return (
@@ -44,7 +46,7 @@ export default function ObstacleZones() {
             <meshStandardMaterial
               color={slotColor}
               transparent
-              opacity={isSelected || hasObstacle ? 0.8 : 0.4}
+              opacity={opacity}
             />
           </mesh>
         );
