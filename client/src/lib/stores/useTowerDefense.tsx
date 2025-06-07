@@ -201,7 +201,8 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       // Calculate canPlaceTower
       const towerExists = !!existingTower;
-      const hasEnoughCoins = state.coins >= 25;
+      const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
+      const hasEnoughCoins = state.coins >= towerCost;
       const canPlace = !towerExists && hasEnoughCoins;
       
       // Calculate canMergeTowers
@@ -266,7 +267,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       // Recalculate canPlaceTower after placing tower
       set({
         towers: [...state.towers, newTower],
-        coins: state.coins - 25,
+        coins: state.coins - (state.selectedTowerType === 'turret' ? 15 : 25),
         selectedTower: newTower,
         canPlaceTower: false, // Can't place another tower on same cell
         canMergeTowers: false, // Reset merge state
