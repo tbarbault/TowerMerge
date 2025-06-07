@@ -83,10 +83,14 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   useFrame((state, delta) => {
     if (turretRef.current && !isDragging) {
       // Smooth rotation towards target
-      const currentRotation = turretRef.current.rotation.y;
-      const rotationDiff = targetRotation - currentRotation;
+      const currentRotationValue = turretRef.current.rotation.y;
+      const rotationDiff = targetRotation - currentRotationValue;
       const normalizedDiff = Math.atan2(Math.sin(rotationDiff), Math.cos(rotationDiff));
-      turretRef.current.rotation.y += normalizedDiff * delta * 6; // Increased rotation speed
+      const newRotation = currentRotationValue + normalizedDiff * delta * 6;
+      turretRef.current.rotation.y = newRotation;
+      
+      // Update tower rotation in store
+      updateTowerRotation(towerId, newRotation, targetRotation);
     }
 
     if (meshRef.current && isSelected && !isDragging) {
