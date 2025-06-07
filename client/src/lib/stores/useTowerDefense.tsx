@@ -364,6 +364,44 @@ export const useTowerDefense = create<TowerDefenseState>()(
       });
     },
     
+    // Obstacle actions
+    toggleObstacleMode: () => {
+      set(state => ({ obstacleMode: !state.obstacleMode, selectedGridCell: null }));
+    },
+    
+    selectObstacleSlot: (x, z) => {
+      set({ selectedObstacleSlot: { x, z } });
+    },
+    
+    buyObstacle: () => {
+      const state = get();
+      if (!state.selectedObstacleSlot || state.coins < 10) return;
+      
+      const existingObstacle = state.obstacles.find(
+        o => o.x === state.selectedObstacleSlot!.x && o.z === state.selectedObstacleSlot!.z
+      );
+      if (existingObstacle) return;
+      
+      const newObstacle: Obstacle = {
+        id: Math.random().toString(36).substr(2, 9),
+        x: state.selectedObstacleSlot.x,
+        z: state.selectedObstacleSlot.z,
+        type: 'rock',
+      };
+      
+      set(state => ({
+        obstacles: [...state.obstacles, newObstacle],
+        coins: state.coins - 10,
+        selectedObstacleSlot: null,
+      }));
+    },
+    
+    removeObstacle: (id) => {
+      set(state => ({
+        obstacles: state.obstacles.filter(o => o.id !== id)
+      }));
+    },
+    
     // Game logic actions
     spawnEnemy: (enemy) => {
       set(state => ({

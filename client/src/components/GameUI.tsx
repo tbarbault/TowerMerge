@@ -23,7 +23,11 @@ export default function GameUI() {
     waveProgress,
     enemiesInWave,
     enemiesSpawned,
-    waveCompletionTime
+    waveCompletionTime,
+    obstacleMode,
+    selectedObstacleSlot,
+    toggleObstacleMode,
+    buyObstacle
   } = useTowerDefense();
 
   const { isMuted, toggleMute } = useAudio();
