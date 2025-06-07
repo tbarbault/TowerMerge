@@ -212,66 +212,78 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             isMortar: false
           };
       }
-    } else { // mortar
+    } else { // mortar - completely different design
       switch (level) {
         case 1:
           return { 
-            height: 0.1, 
+            height: 0.08, 
             baseColor: "#22c55e", 
             turretColor: "#16a34a",
-            segments: 6,
-            cannonLength: 0.12,
-            cannonRadius: 0.04,
+            segments: 8,
+            mortarTubeLength: 0.18,
+            mortarTubeRadius: 0.06,
+            mortarAngle: 0.6, // 35 degrees
+            baseWidth: 0.7,
             isMortar: true
           };
         case 2:
           return { 
-            height: 0.15, 
+            height: 0.12, 
             baseColor: "#3b82f6", 
             turretColor: "#2563eb",
-            segments: 8,
-            cannonLength: 0.16,
-            cannonRadius: 0.05,
+            segments: 10,
+            mortarTubeLength: 0.25,
+            mortarTubeRadius: 0.08,
+            mortarAngle: 0.6,
+            baseWidth: 0.8,
             isMortar: true
           };
         case 3:
           return { 
-            height: 0.22, 
+            height: 0.18, 
             baseColor: "#a855f7", 
             turretColor: "#9333ea",
-            segments: 10,
-            cannonLength: 0.21,
-            cannonRadius: 0.06,
+            segments: 12,
+            mortarTubeLength: 0.32,
+            mortarTubeRadius: 0.1,
+            mortarAngle: 0.6,
+            baseWidth: 0.9,
             isMortar: true
           };
         case 4:
           return { 
-            height: 0.31, 
+            height: 0.26, 
             baseColor: "#ef4444", 
             turretColor: "#dc2626",
-            segments: 12,
-            cannonLength: 0.27,
-            cannonRadius: 0.07,
+            segments: 14,
+            mortarTubeLength: 0.4,
+            mortarTubeRadius: 0.12,
+            mortarAngle: 0.6,
+            baseWidth: 1.0,
             isMortar: true
           };
         case 5:
           return { 
-            height: 0.42, 
+            height: 0.36, 
             baseColor: "#f59e0b", 
             turretColor: "#d97706",
-            segments: 14,
-            cannonLength: 0.34,
-            cannonRadius: 0.08,
+            segments: 16,
+            mortarTubeLength: 0.5,
+            mortarTubeRadius: 0.15,
+            mortarAngle: 0.6,
+            baseWidth: 1.1,
             isMortar: true
           };
         default:
           return { 
-            height: 0.12, 
+            height: 0.1, 
             baseColor: "#d69e2e", 
             turretColor: "#b7791f",
-            segments: 6,
-            cannonLength: 0.15,
-            cannonRadius: 0.05,
+            segments: 8,
+            mortarTubeLength: 0.2,
+            mortarTubeRadius: 0.07,
+            mortarAngle: 0.6,
+            baseWidth: 0.75,
             isMortar: true
           };
       }
@@ -297,37 +309,70 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         />
       </mesh>
 
-      {/* Main tower base */}
-      <mesh position={[0, config.height / 2 + 0.2, 0]}>
-        <cylinderGeometry args={[0.35, 0.45, config.height, config.segments]} />
-        <meshStandardMaterial 
-          color={config.baseColor}
-          metalness={0.7}
-          roughness={0.2}
-          emissive={config.baseColor}
-          emissiveIntensity={0.05}
-        />
-      </mesh>
-
-      {/* Rotating turret */}
-      <group ref={turretRef} position={[0, config.height + 0.2, 0]}>
-        {/* Turret body */}
-        <mesh position={[0, 0.15, 0]}>
-          <boxGeometry args={[0.4, 0.3, 0.6]} />
+      {/* Main tower base - different for mortar vs turret */}
+      {config.isMortar ? (
+        // Mortar: Wide, low platform
+        <mesh position={[0, config.height / 2 + 0.2, 0]}>
+          <cylinderGeometry args={[(config as any).baseWidth / 2, (config as any).baseWidth / 2 + 0.1, config.height, config.segments]} />
           <meshStandardMaterial 
-            color={config.turretColor}
-            metalness={0.8}
-            roughness={0.1}
-            emissive={config.turretColor}
+            color={config.baseColor}
+            metalness={0.5}
+            roughness={0.4}
+            emissive={config.baseColor}
             emissiveIntensity={0.05}
           />
         </mesh>
+      ) : (
+        // Turret: Tall cylindrical base
+        <mesh position={[0, config.height / 2 + 0.2, 0]}>
+          <cylinderGeometry args={[0.35, 0.45, config.height, config.segments]} />
+          <meshStandardMaterial 
+            color={config.baseColor}
+            metalness={0.7}
+            roughness={0.2}
+            emissive={config.baseColor}
+            emissiveIntensity={0.05}
+          />
+        </mesh>
+      )}
+
+      {/* Rotating turret */}
+      <group ref={turretRef} position={[0, config.height + 0.2, 0]}>
+        {/* Turret body - different for mortar vs turret */}
+        {config.isMortar ? (
+          // Mortar: Low, wide mounting platform
+          <mesh position={[0, 0.08, 0]}>
+            <cylinderGeometry args={[0.3, 0.35, 0.16, 8]} />
+            <meshStandardMaterial 
+              color={config.turretColor}
+              metalness={0.6}
+              roughness={0.3}
+              emissive={config.turretColor}
+              emissiveIntensity={0.05}
+            />
+          </mesh>
+        ) : (
+          // Turret: Rectangular gun mount
+          <mesh position={[0, 0.15, 0]}>
+            <boxGeometry args={[0.4, 0.3, 0.6]} />
+            <meshStandardMaterial 
+              color={config.turretColor}
+              metalness={0.8}
+              roughness={0.1}
+              emissive={config.turretColor}
+              emissiveIntensity={0.05}
+            />
+          </mesh>
+        )}
 
         {/* Weapons - different for turret vs mortar */}
         {config.isMortar ? (
-          // Mortar: Single wide cannon angled upward
-          <mesh position={[0, 0.2, (config as any).cannonLength / 2 + 0.15]} rotation={[Math.PI / 4, 0, 0]}>
-            <cylinderGeometry args={[(config as any).cannonRadius, (config as any).cannonRadius - 0.01, (config as any).cannonLength, 8]} />
+          // Mortar: Angled cannon tube
+          <mesh 
+            position={[0, 0.2, (config as any).mortarTubeLength / 2 + 0.1]} 
+            rotation={[(config as any).mortarAngle, 0, 0]}
+          >
+            <cylinderGeometry args={[(config as any).mortarTubeRadius, (config as any).mortarTubeRadius * 0.8, (config as any).mortarTubeLength, 12]} />
             <meshStandardMaterial 
               color="#8b4513"
               metalness={0.6}

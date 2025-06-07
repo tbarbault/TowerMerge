@@ -247,7 +247,20 @@ export const useTowerDefense = create<TowerDefenseState>()(
     },
 
     selectTowerType: (type) => {
-      set({ selectedTowerType: type });
+      const state = get();
+      
+      // Recalculate canPlaceTower with new tower type
+      let canPlace = false;
+      if (state.selectedGridCell) {
+        const existingTower = state.towers.find(t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z);
+        const towerCost = type === 'turret' ? 15 : 25;
+        canPlace = !existingTower && state.coins >= towerCost;
+      }
+      
+      set({ 
+        selectedTowerType: type,
+        canPlaceTower: canPlace,
+      });
     },
     
     buyTower: () => {
