@@ -77,10 +77,18 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
           const currentTower = towers.find(t => t.id === towerId);
           
           if (targetTower && currentTower && targetTower.level === currentTower.level && currentTower.level < 3) {
-            console.log(`Merging tower ${towerId} with ${userData.towerId}`);
-            // Perform merge via game state with specific tower IDs
-            mergeTowers(towerId, userData.towerId);
-            break;
+            // Check if towers are adjacent (no diagonal merging)
+            const dx = Math.abs(targetTower.x - currentTower.x);
+            const dz = Math.abs(targetTower.z - currentTower.z);
+            const isAdjacent = (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+            
+            if (isAdjacent) {
+              console.log(`Merging tower ${towerId} with ${userData.towerId}`);
+              mergeTowers(towerId, userData.towerId);
+              break;
+            } else {
+              console.log("Towers must be adjacent (no diagonal merging)");
+            }
           }
         }
       }
@@ -95,7 +103,7 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       const currentRotation = turretRef.current.rotation.y;
       const rotationDiff = targetRotation - currentRotation;
       const normalizedDiff = Math.atan2(Math.sin(rotationDiff), Math.cos(rotationDiff));
-      turretRef.current.rotation.y += normalizedDiff * delta * 3; // Rotation speed
+      turretRef.current.rotation.y += normalizedDiff * delta * 6; // Increased rotation speed
     }
 
     if (meshRef.current && isSelected && !isDragging) {
@@ -289,15 +297,41 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
 
       {/* Range indicator (when selected) */}
       {isSelected && (
-        <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[2.5 + level * 0.5 - 0.1, 2.5 + level * 0.5 + 0.1, 32]} />
-          <meshStandardMaterial 
-            color="#22c55e" 
-            transparent 
-            opacity={0.3}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
+        <>
+          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[2.5 + level * 0.5 - 0.1, 2.5 + level * 0.5 + 0.1, 32]} />
+            <meshStandardMaterial 
+              color="#22c55e" 
+              transparent 
+              opacity={0.3}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+          
+          {/* Show mergeable towers when selected */}
+          {towers.filter(t => {
+            if (t.id === towerId || t.level !== level || t.level >= 3) return false;
+            const dx = Math.abs(t.x - (position[0] + 4) / 2);
+            const dz = Math.abs(t.z - (position[2] + 2) / 2);
+            return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+          }).map(tower => (
+            <mesh 
+              key={`mergeable-${tower.id}`}
+              position={[tower.x * 2 - 4, 0.05, tower.z * 2 - 2]} 
+              rotation={[-Math.PI / 2, 0, 0]}
+            >
+              <circleGeometry args={[0.7, 16]} />
+              <meshStandardMaterial 
+                color="#fbbf24" 
+                transparent 
+                opacity={0.8}
+                emissive="#fbbf24"
+                emissiveIntensity={0.4}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          ))}
+        </>
       )}
 
       {/* Dragging indicator */}
@@ -313,8 +347,13 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
             />
           </mesh>
           
-          {/* Mergeable tower indicator - find towers of same level */}
-          {towers.filter(t => t.id !== towerId && t.level === level && t.level < 3).map(tower => (
+          {/* Mergeable tower indicator - find towers of same level and adjacent */}
+          {towers.filter(t => {
+            if (t.id === towerId || t.level !== level || t.level >= 3) return false;
+            const dx = Math.abs(t.x - position[0] / 2 + 2);
+            const dz = Math.abs(t.z - position[2] / 2 + 1);
+            return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+          }).map(tower => (
             <mesh 
               key={`merge-indicator-${tower.id}`}
               position={[tower.x * 2 - 4, 0.05, tower.z * 2 - 2]} 

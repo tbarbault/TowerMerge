@@ -52,10 +52,10 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 30, speed: 0.8, reward: 5 },
-    fast: { health: 20, speed: 1.2, reward: 7 },
-    heavy: { health: 60, speed: 0.5, reward: 10 },
-    boss: { health: 150, speed: 0.4, reward: 25 }
+    basic: { health: 50, speed: 0.8, reward: 5 },
+    fast: { health: 35, speed: 1.2, reward: 7 },
+    heavy: { health: 100, speed: 0.5, reward: 10 },
+    boss: { health: 250, speed: 0.4, reward: 25 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
@@ -137,12 +137,23 @@ function updateTowers(gameState: any, currentTime: number) {
         enemy.pathIndex > closest.pathIndex ? enemy : closest
       );
 
-      // Create bullet
+      // Calculate barrel end position for bullet spawn
+      const barrelLength = tower.level === 1 ? 0.6 : tower.level === 2 ? 0.8 : 1.0;
+      const dx = target.x - towerWorldX;
+      const dz = target.z - towerWorldZ;
+      const distance = Math.sqrt(dx * dx + dz * dz);
+      const normalizedDx = dx / distance;
+      const normalizedDz = dz / distance;
+      
+      // Spawn bullet at barrel end
+      const barrelEndX = towerWorldX + normalizedDx * barrelLength;
+      const barrelEndZ = towerWorldZ + normalizedDz * barrelLength;
+
       const bullet = {
         id: Math.random().toString(36).substr(2, 9),
-        x: towerWorldX,
-        y: 1,
-        z: towerWorldZ,
+        x: barrelEndX,
+        y: 1.2 + tower.level * 0.2, // Height matches tower level
+        z: barrelEndZ,
         targetId: target.id,
         damage: tower.damage,
         speed: 8,
