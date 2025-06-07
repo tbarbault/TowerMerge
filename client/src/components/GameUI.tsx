@@ -139,10 +139,7 @@ export default function GameUI() {
                 {enemiesSpawned}/{enemiesInWave}
               </span>
             </div>
-            <Progress 
-              value={waveProgress} 
-              className="h-2"
-            />
+
           </CardContent>
         </Card>
       </div>
