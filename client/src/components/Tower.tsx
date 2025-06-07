@@ -191,8 +191,10 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
         <cylinderGeometry args={[0.35, 0.45, config.height, config.segments]} />
         <meshStandardMaterial 
           color={config.baseColor}
-          metalness={0.3}
-          roughness={0.7}
+          metalness={0.7}
+          roughness={0.2}
+          emissive={config.baseColor}
+          emissiveIntensity={0.05}
         />
       </mesh>
 
@@ -203,8 +205,10 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
           <boxGeometry args={[0.4, 0.3, 0.6]} />
           <meshStandardMaterial 
             color={config.turretColor}
-            metalness={0.5}
-            roughness={0.5}
+            metalness={0.8}
+            roughness={0.1}
+            emissive={config.turretColor}
+            emissiveIntensity={0.05}
           />
         </mesh>
 
@@ -212,9 +216,11 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
         <mesh position={[0, 0.15, config.barrelLength / 2 + 0.3]} rotation={[Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[config.barrelRadius, config.barrelRadius + 0.01, config.barrelLength, 12]} />
           <meshStandardMaterial 
-            color="#1a1a1a"
-            metalness={0.8}
-            roughness={0.2}
+            color="#4a5568"
+            metalness={0.9}
+            roughness={0.1}
+            emissive="#2d3748"
+            emissiveIntensity={0.02}
           />
         </mesh>
 
