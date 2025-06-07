@@ -6,19 +6,16 @@ export default function ObstacleZones() {
   const meshRef = useRef<THREE.Group>(null);
   const { selectedObstacleSlot, selectObstacleSlot, obstacles, obstacleMode } = useTowerDefense();
 
-  // Define strategic wall-building positions across enemy paths
+  // Define 5x3 rock grid behind the tower grid (no overlap)
   const obstacleSlots = [
-    // Front line defense (closest to towers)
-    { x: -6, z: -2 }, { x: -4, z: -2 }, { x: -2, z: -2 }, { x: 0, z: -2 }, { x: 2, z: -2 }, { x: 4, z: -2 }, { x: 6, z: -2 },
+    // Back row (z = -3, behind towers)
+    { x: -4, z: -3 }, { x: -2, z: -3 }, { x: 0, z: -3 }, { x: 2, z: -3 }, { x: 4, z: -3 },
     
-    // Mid-field chokepoints
-    { x: -6, z: -4 }, { x: -4, z: -4 }, { x: -2, z: -4 }, { x: 0, z: -4 }, { x: 2, z: -4 }, { x: 4, z: -4 }, { x: 6, z: -4 },
+    // Middle row (z = -4)
+    { x: -4, z: -4 }, { x: -2, z: -4 }, { x: 0, z: -4 }, { x: 2, z: -4 }, { x: 4, z: -4 },
     
-    // Back line defense (closer to enemy spawn)
-    { x: -6, z: -6 }, { x: -4, z: -6 }, { x: -2, z: -6 }, { x: 0, z: -6 }, { x: 2, z: -6 }, { x: 4, z: -6 }, { x: 6, z: -6 },
-    
-    // Side wall options for advanced strategies
-    { x: -7, z: -3 }, { x: -7, z: -5 }, { x: 7, z: -3 }, { x: 7, z: -5 },
+    // Farthest row (z = -5, closest to enemy spawn)
+    { x: -4, z: -5 }, { x: -2, z: -5 }, { x: 0, z: -5 }, { x: 2, z: -5 }, { x: 4, z: -5 },
   ];
 
   const handleSlotClick = (x: number, z: number) => {
@@ -60,24 +57,17 @@ export default function ObstacleZones() {
         );
       })}
       
-      {/* Zone border indicators for wall-building areas */}
+      {/* Zone border indicators for rock placement area */}
       <group>
-        {/* Horizontal lines marking defense zones */}
-        <mesh position={[0, 0.02, -1.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
-          <meshStandardMaterial color="#fbbf24" transparent opacity={0.4} />
+        {/* Horizontal line separating towers from rocks */}
+        <mesh position={[0, 0.02, -2.5]}>
+          <boxGeometry args={[12, 0.02, 0.1]} />
+          <meshStandardMaterial color="#fbbf24" transparent opacity={0.6} />
         </mesh>
-        <mesh position={[0, 0.02, -3.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
-          <meshStandardMaterial color="#f97316" transparent opacity={0.5} />
-        </mesh>
+        {/* Rock zone boundary */}
         <mesh position={[0, 0.02, -5.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
+          <boxGeometry args={[12, 0.02, 0.1]} />
           <meshStandardMaterial color="#dc2626" transparent opacity={0.6} />
-        </mesh>
-        <mesh position={[0, 0.02, -6.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
-          <meshStandardMaterial color="#7f1d1d" transparent opacity={0.7} />
         </mesh>
       </group>
     </group>
