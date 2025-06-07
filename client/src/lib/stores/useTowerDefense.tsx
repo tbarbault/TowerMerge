@@ -77,6 +77,7 @@ interface TowerDefenseState {
   enemies: Enemy[];
   bullets: Bullet[];
   muzzleFlashes: MuzzleFlash[];
+  explosions: Explosion[];
   
   // UI state
   selectedGridCell: GridCell | null;
@@ -113,6 +114,8 @@ interface TowerDefenseState {
   setEnemiesSpawned: (count: number) => void;
   addMuzzleFlash: (flash: MuzzleFlash) => void;
   removeMuzzleFlash: (id: string) => void;
+  addExplosion: (explosion: Explosion) => void;
+  removeExplosion: (id: string) => void;
   
   // Computed properties
   canPlaceTower: boolean;
@@ -132,6 +135,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     enemies: [],
     bullets: [],
     muzzleFlashes: [],
+    explosions: [],
     
     selectedGridCell: null,
     selectedTower: null,
@@ -411,6 +415,18 @@ export const useTowerDefense = create<TowerDefenseState>()(
     removeMuzzleFlash: (id) => {
       set(state => ({
         muzzleFlashes: state.muzzleFlashes.filter(f => f.id !== id)
+      }));
+    },
+    
+    addExplosion: (explosion) => {
+      set(state => ({
+        explosions: [...state.explosions, explosion]
+      }));
+    },
+    
+    removeExplosion: (id) => {
+      set(state => ({
+        explosions: state.explosions.filter(e => e.id !== id)
       }));
     },
     

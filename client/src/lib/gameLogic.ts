@@ -197,6 +197,16 @@ function updateBullets(gameState: any, delta: number) {
           return distanceToExplosion <= bullet.explosionRadius;
         });
 
+        // Add explosion effect
+        gameState.addExplosion({
+          id: Math.random().toString(36).substr(2, 9),
+          x: bullet.x,
+          y: bullet.y,
+          z: bullet.z,
+          radius: bullet.explosionRadius,
+          startTime: Date.now(),
+        });
+
         enemiesInRadius.forEach((enemy: any) => {
           const dx = enemy.x - bullet.x;
           const dz = enemy.z - bullet.z;

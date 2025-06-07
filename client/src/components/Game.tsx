@@ -8,6 +8,7 @@ import Grid from "./Grid";
 import Tower from "./Tower";
 import Enemy from "./Enemy";
 import Bullet from "./Bullet";
+import Explosion from "./Explosion";
 import { updateGameLogic } from "../lib/gameLogic";
 
 export default function Game() {
@@ -71,6 +72,16 @@ export default function Game() {
           position={[bullet.x, bullet.y, bullet.z]}
           color={bullet.color}
           type={bullet.type}
+        />
+      ))}
+
+      {/* Render explosions */}
+      {gameState.explosions.map((explosion) => (
+        <Explosion
+          key={explosion.id}
+          position={[explosion.x, explosion.y, explosion.z]}
+          radius={explosion.radius}
+          onComplete={() => gameState.removeExplosion(explosion.id)}
         />
       ))}
     </>
