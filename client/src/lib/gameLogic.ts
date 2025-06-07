@@ -137,127 +137,52 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Enhanced obstacle avoidance with wall following
+        // Simple but effective obstacle avoidance for linear wall systems
+        let foundAlternative = false;
         
-        // Initialize stuck counter for this enemy
-        if (!enemy.stuckCounter) {
-          enemy.stuckCounter = 0;
-        }
+        // Try moving around obstacles by testing simple side movements
+        const sideAngles = [-Math.PI/2, Math.PI/2, -Math.PI/3, Math.PI/3, -Math.PI/4, Math.PI/4];
+        const currentAngle = Math.atan2(dz, dx);
         
-        // Check if enemy was moving last frame
-        const lastMovement = Math.sqrt((enemy.x - (enemy.lastX || enemy.x)) ** 2 + (enemy.z - (enemy.lastZ || enemy.z)) ** 2);
-        if (lastMovement < 0.01) {
-          enemy.stuckCounter++;
-        } else {
-          enemy.stuckCounter = 0;
-        }
-        
-        // Store last position
-        enemy.lastX = enemy.x;
-        enemy.lastZ = enemy.z;
-        
-        // If stuck too long, force teleport to clear path
-        if (enemy.stuckCounter > 30) {
-          // Find nearest clear space
-          let bestClearPos = null;
-          let bestDistance = Infinity;
+        for (const sideAngle of sideAngles) {
+          const testAngle = currentAngle + sideAngle;
+          const testX = enemy.x + Math.cos(testAngle) * moveDistance;
+          const testZ = enemy.z + Math.sin(testAngle) * moveDistance;
           
-          for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
-            for (let radius = 2; radius <= 4; radius += 0.5) {
-              const testX = enemy.x + Math.cos(angle) * radius;
-              const testZ = enemy.z + Math.sin(angle) * radius;
-              
-              if (!isBlocked(testX, testZ)) {
-                const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
-                if (distToTarget < bestDistance) {
-                  bestDistance = distToTarget;
-                  bestClearPos = { x: testX, z: testZ };
-                }
-              }
-            }
-          }
-          
-          if (bestClearPos) {
-            newX = bestClearPos.x;
-            newZ = bestClearPos.z;
-            enemy.stuckCounter = 0;
-          }
-        } else {
-          // Wall following algorithm
-          const wallFollowDistance = 1.2;
-          let foundPath = false;
-          
-          // Try to follow wall on the right side first
-          const rightAngle = Math.atan2(dz, dx) - Math.PI/2;
-          const rightX = enemy.x + Math.cos(rightAngle) * wallFollowDistance;
-          const rightZ = enemy.z + Math.sin(rightAngle) * wallFollowDistance;
-          
-          if (!isBlocked(rightX, rightZ)) {
-            // Move along the wall
-            const forwardRightAngle = Math.atan2(dz, dx) + Math.PI/4;
-            const testX = enemy.x + Math.cos(forwardRightAngle) * moveDistance;
-            const testZ = enemy.z + Math.sin(forwardRightAngle) * moveDistance;
+          // Check if this direction is clear
+          if (!isBlocked(testX, testZ)) {
+            // Also check if we can take a step toward target from this position
+            const nextX = testX + (dx / distance) * moveDistance * 0.5;
+            const nextZ = testZ + (dz / distance) * moveDistance * 0.5;
             
-            if (!isBlocked(testX, testZ)) {
+            // If we can move toward target or at least away from obstacle
+            if (!isBlocked(nextX, nextZ) || Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2) < Math.sqrt((currentTarget.x - enemy.x) ** 2 + (currentTarget.z - enemy.z) ** 2)) {
               newX = testX;
               newZ = testZ;
-              foundPath = true;
+              foundAlternative = true;
+              break;
             }
-          }
-          
-          // If right wall following didn't work, try left
-          if (!foundPath) {
-            const leftAngle = Math.atan2(dz, dx) + Math.PI/2;
-            const leftX = enemy.x + Math.cos(leftAngle) * wallFollowDistance;
-            const leftZ = enemy.z + Math.sin(leftAngle) * wallFollowDistance;
-            
-            if (!isBlocked(leftX, leftZ)) {
-              const forwardLeftAngle = Math.atan2(dz, dx) - Math.PI/4;
-              const testX = enemy.x + Math.cos(forwardLeftAngle) * moveDistance;
-              const testZ = enemy.z + Math.sin(forwardLeftAngle) * moveDistance;
-              
-              if (!isBlocked(testX, testZ)) {
-                newX = testX;
-                newZ = testZ;
-                foundPath = true;
-              }
-            }
-          }
-          
-          // Fallback: try pure perpendicular movement
-          if (!foundPath) {
-            const perpAngles = [Math.PI/2, -Math.PI/2, Math.PI, Math.PI/3, -Math.PI/3];
-            const currentAngle = Math.atan2(dz, dx);
-            
-            for (const perpAngle of perpAngles) {
-              const testAngle = currentAngle + perpAngle;
-              const testX = enemy.x + Math.cos(testAngle) * moveDistance * 1.5;
-              const testZ = enemy.z + Math.sin(testAngle) * moveDistance * 1.5;
-              
-              if (!isBlocked(testX, testZ)) {
-                const dirX = testX - enemy.x;
-                const dirZ = testZ - enemy.z;
-                const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
-                
-                if (dirLength > 0) {
-                  newX = enemy.x + (dirX / dirLength) * moveDistance;
-                  newZ = enemy.z + (dirZ / dirLength) * moveDistance;
-                  foundPath = true;
-                  break;
-                }
-              }
-            }
-          }
-          
-          // Last resort: stop movement
-          if (!foundPath) {
-            newX = enemy.x;
-            newZ = enemy.z;
           }
         }
-      } else {
-        // Reset stuck counter when moving freely
-        enemy.stuckCounter = 0;
+        
+        // If no side movement worked, try stepping back and going around
+        if (!foundAlternative) {
+          const backAngle = currentAngle + Math.PI;
+          const backStepX = enemy.x + Math.cos(backAngle) * moveDistance * 0.5;
+          const backStepZ = enemy.z + Math.sin(backAngle) * moveDistance * 0.5;
+          
+          if (!isBlocked(backStepX, backStepZ)) {
+            newX = backStepX;
+            newZ = backStepZ;
+            foundAlternative = true;
+          }
+        }
+        
+        // Last resort: stop until path clears (walls will create bottlenecks)
+        if (!foundAlternative) {
+          newX = enemy.x;
+          newZ = enemy.z;
+        }
       }
       
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
