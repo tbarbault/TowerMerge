@@ -24,10 +24,16 @@ export default function Grid() {
 
   // Helper function to check if a tower can merge with selected tower
   const canMergeWithSelected = (x: number, z: number) => {
-    if (!selectedTower) return false;
+    if (!selectedTower || !selectedGridCell) return false;
+    
+    // Only show merge highlighting when a tower is actually selected
+    if (selectedGridCell.x !== selectedTower.x || selectedGridCell.z !== selectedTower.z) return false;
     
     const towerAtPosition = towers.find(t => t.x === x && t.z === z);
     if (!towerAtPosition) return false;
+    
+    // Don't highlight the selected tower itself
+    if (towerAtPosition.id === selectedTower.id) return false;
     
     // Check if adjacent to selected tower
     const dx = Math.abs(towerAtPosition.x - selectedTower.x);

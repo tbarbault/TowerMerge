@@ -24,13 +24,19 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
 
   // Find target enemy and calculate rotation
   useEffect(() => {
-    const tower = { x: position[0], z: position[2], range: 2.5 + level * 0.5 };
+    // Convert grid position to world position
+    const towerWorldX = position[0] * 2 - 4;
+    const towerWorldZ = position[2] * 2 - 2;
+    
+    // Get tower range based on type and level
+    const baseRange = type === 'turret' ? 6.0 : 7.0;
+    const towerRange = baseRange * (1.2 ** (level - 1));
     
     const enemiesInRange = enemies.filter((enemy) => {
-      const dx = enemy.x - tower.x;
-      const dz = enemy.z - tower.z;
+      const dx = enemy.x - towerWorldX;
+      const dz = enemy.z - towerWorldZ;
       const distance = Math.sqrt(dx * dx + dz * dz);
-      return distance <= tower.range;
+      return distance <= towerRange;
     });
 
     if (enemiesInRange.length > 0) {
@@ -40,12 +46,12 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       );
       
       // Calculate angle to target
-      const dx = target.x - tower.x;
-      const dz = target.z - tower.z;
+      const dx = target.x - towerWorldX;
+      const dz = target.z - towerWorldZ;
       const angle = Math.atan2(dx, dz);
       setTargetRotation(angle);
     }
-  }, [enemies, position, level]);
+  }, [enemies, position, level, type]);
 
   // Handle drag and drop functionality
   const handlePointerDown = (event: any) => {
