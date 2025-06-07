@@ -314,8 +314,8 @@ function checkWaveCompletion(gameState: any) {
     // Wave completed - add 3 second pause before next wave
     const now = Date.now();
     if (!gameState.waveCompletionTime) {
-      // Mark wave as completed - use direct store update to avoid repeated calls
-      gameState.waveCompletionTime = now;
+      // Mark wave as completed and give bonus coins once
+      gameState.setWaveCompletionTime(now);
       gameState.addCoins(5 + gameState.wave * 2);
       return;
     }
