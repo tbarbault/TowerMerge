@@ -126,48 +126,7 @@ function updateEnemies(gameState: any, delta: number) {
       let newX = enemy.x + (dx / distance) * moveDistance;
       let newZ = enemy.z + (dz / distance) * moveDistance;
       
-      // Box-based collision detection for full-tile cement blocks
-      const isBlocked = (x: number, z: number) => {
-        return gameState.obstacles.some((obstacle: any) => {
-          // Check if point is inside the obstacle's tile area (1.8x1.8 block)
-          const halfSize = 0.9; // Half of 1.8
-          return (x >= obstacle.x - halfSize && x <= obstacle.x + halfSize &&
-                  z >= obstacle.z - halfSize && z <= obstacle.z + halfSize);
-        });
-      };
-
-      if (isBlocked(newX, newZ)) {
-        // Ultra-simple obstacle avoidance with randomization to prevent alignment issues
-        let foundPath = false;
-        
-        // Add small random offset to prevent perfect alignment
-        const randomOffset = (Math.random() - 0.5) * 0.3;
-        
-        const simpleOptions = [
-          { x: enemy.x - moveDistance * 2 + randomOffset, z: enemy.z + moveDistance }, // Wide left-forward
-          { x: enemy.x + moveDistance * 2 + randomOffset, z: enemy.z + moveDistance }, // Wide right-forward  
-          { x: enemy.x - moveDistance * 1.5, z: enemy.z + moveDistance * 0.3 }, // Left with slight forward
-          { x: enemy.x + moveDistance * 1.5, z: enemy.z + moveDistance * 0.3 }, // Right with slight forward
-          { x: enemy.x + randomOffset, z: enemy.z + moveDistance * 0.5 }, // Forward with offset
-          { x: enemy.x - moveDistance, z: enemy.z }, // Pure left
-          { x: enemy.x + moveDistance, z: enemy.z }, // Pure right
-        ];
-        
-        for (const option of simpleOptions) {
-          if (!isBlocked(option.x, option.z)) {
-            newX = option.x;
-            newZ = option.z;
-            foundPath = true;
-            break;
-          }
-        }
-        
-        // If all paths blocked, add tiny random movement to prevent permanent sticking
-        if (!foundPath) {
-          newX = enemy.x + (Math.random() - 0.5) * 0.1;
-          newZ = enemy.z + moveDistance * 0.1;
-        }
-      }
+      // No obstacle collision - enemies move freely
       
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
     }

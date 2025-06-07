@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Mountain, Target, Bomb } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb } from "lucide-react";
 
 export default function GameUI() {
   const {
@@ -181,27 +181,7 @@ export default function GameUI() {
                 )}
               </div>
 
-              {/* Objects Section */}
-              <div>
-                <div className="text-sm text-gray-300 mb-2 font-semibold flex items-center gap-2">
-                  <Mountain className="w-4 h-4" />
-                  Objects
-                </div>
-                <div className="grid grid-cols-1 gap-2">
-                  <Button
-                    onClick={() => {
-                      if (selectedObstacleSlot && coins >= 10) {
-                        buyObstacle();
-                      }
-                    }}
-                    className="bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
-                    disabled={!selectedObstacleSlot || coins < 10}
-                  >
-                    <Mountain className="w-3 h-3" />
-                    <span>{selectedObstacleSlot ? "Buy Cement - 10" : "Select Tile"}</span>
-                  </Button>
-                </div>
-              </div>
+
             </div>
           </CardContent>
         </Card>

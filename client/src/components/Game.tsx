@@ -11,7 +11,7 @@ import Bullet from "./Bullet";
 import Explosion from "./Explosion";
 import Impact from "./Impact";
 import Obstacle from "./Obstacle";
-import ObstacleZones from "./ObstacleZones";
+
 import { updateGameLogic } from "../lib/gameLogic";
 
 export default function Game() {
@@ -98,18 +98,7 @@ export default function Game() {
         />
       ))}
 
-      {/* Render obstacles */}
-      {gameState.obstacles.map((obstacle) => (
-        <Obstacle
-          key={obstacle.id}
-          position={[obstacle.x, 0, obstacle.z]}
-          type={obstacle.type}
-          onRemove={() => gameState.removeObstacle(obstacle.id)}
-        />
-      ))}
 
-      {/* Render obstacle placement zones */}
-      <ObstacleZones />
     </>
   );
 }
