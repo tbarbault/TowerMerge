@@ -137,30 +137,7 @@ export default function GameUI() {
 
       {/* Bottom Controls */}
       <div className="absolute bottom-4 left-4 right-4 flex justify-center z-40">
-        {obstacleMode && selectedObstacleSlot ? (
-          <Card className="bg-black bg-opacity-90 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="text-white">
-                  <p className="text-sm text-gray-300">
-                    Obstacle Slot ({selectedObstacleSlot.x}, {selectedObstacleSlot.z})
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Place defensive obstacles to slow enemies
-                  </p>
-                </div>
-
-                <Button 
-                  onClick={buyObstacle}
-                  className="bg-amber-600 hover:bg-amber-700"
-                  disabled={coins < 10}
-                >
-                  <span className="block">Rock Obstacle - 10</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : selectedGridCell && !obstacleMode && (
+        {selectedGridCell && (
           <Card className="bg-black bg-opacity-90 border-gray-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
@@ -194,12 +171,20 @@ export default function GameUI() {
                         <span>25</span>
                       </Button>
                       <Button
-                        onClick={toggleObstacleMode}
-                        variant={obstacleMode ? "default" : "outline"}
+                        onClick={() => {
+                          if (!obstacleMode) {
+                            toggleObstacleMode();
+                          } else if (selectedObstacleSlot) {
+                            buyObstacle();
+                          } else {
+                            toggleObstacleMode();
+                          }
+                        }}
                         className={obstacleMode 
                           ? "bg-amber-600 hover:bg-amber-700 text-white text-xs p-2 flex items-center gap-1" 
                           : "bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
                         }
+                        disabled={obstacleMode && (!selectedObstacleSlot || coins < 10)}
                       >
                         <Mountain className="w-3 h-3" />
                         <span>10</span>
