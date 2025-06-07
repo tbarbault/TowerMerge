@@ -173,27 +173,32 @@ function updateTowers(gameState: any, currentTime: number) {
 
 function updateBullets(gameState: any, delta: number) {
   gameState.bullets.forEach((bullet: any) => {
-    const target = gameState.enemies.find((e: any) => e.id === bullet.targetId);
-    
-    if (!target) {
-      // Target is gone, remove bullet
+    // Move bullet in straight line using direction vector
+    const moveDistance = bullet.speed * delta;
+    const newX = bullet.x + bullet.directionX * moveDistance;
+    const newZ = bullet.z + bullet.directionZ * moveDistance;
+
+    // Check if bullet is out of bounds (extended map bounds)
+    if (newX < -15 || newX > 15 || newZ < -10 || newZ > 10) {
       gameState.removeBullet(bullet.id);
       return;
     }
 
-    // Move bullet towards target
-    const dx = target.x - bullet.x;
-    const dy = 0.5 - bullet.y; // Aim slightly above target
-    const dz = target.z - bullet.z;
-    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+    // Check collision with enemies
+    const hitEnemy = gameState.enemies.find((enemy: any) => {
+      const dx = enemy.x - newX;
+      const dz = enemy.z - newZ;
+      const distance = Math.sqrt(dx * dx + dz * dz);
+      return distance < 0.3;
+    });
 
-    if (distance < 0.3) {
+    if (hitEnemy) {
       // Hit target
       if (bullet.type === 'mortar') {
         // Mortar explosion: damage all enemies in radius
         const enemiesInRadius = gameState.enemies.filter((enemy: any) => {
-          const dx = enemy.x - bullet.x;
-          const dz = enemy.z - bullet.z;
+          const dx = enemy.x - newX;
+          const dz = enemy.z - newZ;
           const distanceToExplosion = Math.sqrt(dx * dx + dz * dz);
           return distanceToExplosion <= bullet.explosionRadius;
         });
@@ -201,16 +206,16 @@ function updateBullets(gameState: any, delta: number) {
         // Add explosion effect
         gameState.addExplosion({
           id: Math.random().toString(36).substr(2, 9),
-          x: bullet.x,
+          x: newX,
           y: bullet.y,
-          z: bullet.z,
+          z: newZ,
           radius: bullet.explosionRadius,
           startTime: Date.now(),
         });
 
         enemiesInRadius.forEach((enemy: any) => {
-          const dx = enemy.x - bullet.x;
-          const dz = enemy.z - bullet.z;
+          const dx = enemy.x - newX;
+          const dz = enemy.z - newZ;
           const distanceToExplosion = Math.sqrt(dx * dx + dz * dz);
           // Damage falls off with distance
           const damageMultiplier = Math.max(0.3, 1 - (distanceToExplosion / bullet.explosionRadius));
@@ -225,22 +230,18 @@ function updateBullets(gameState: any, delta: number) {
         });
       } else {
         // Regular bullet: single target damage
-        gameState.damageEnemy(target.id, bullet.damage);
+        gameState.damageEnemy(hitEnemy.id, bullet.damage);
         
-        if (target.health <= bullet.damage) {
+        if (hitEnemy.health <= bullet.damage) {
           // Enemy will die, award coins
-          gameState.addCoins(target.reward);
+          gameState.addCoins(hitEnemy.reward);
         }
       }
       
       gameState.removeBullet(bullet.id);
     } else {
-      // Move bullet
-      const moveDistance = bullet.speed * delta;
-      const newX = bullet.x + (dx / distance) * moveDistance;
-      const newY = bullet.y + (dy / distance) * moveDistance;
-      const newZ = bullet.z + (dz / distance) * moveDistance;
-      gameState.updateBullet(bullet.id, newX, newY, newZ);
+      // Continue moving in straight line
+      gameState.updateBullet(bullet.id, newX, bullet.y, newZ);
     }
   });
 }

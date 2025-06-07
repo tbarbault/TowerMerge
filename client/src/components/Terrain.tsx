@@ -9,9 +9,9 @@ export default function Terrain() {
 
   return (
     <>
-      {/* Main terrain */}
-      <mesh position={[0, -0.5, 0]} receiveShadow>
-        <boxGeometry args={[20, 1, 16]} />
+      {/* Main terrain - extended for longer combat zone */}
+      <mesh position={[0, -0.5, -5]} receiveShadow>
+        <boxGeometry args={[30, 1, 35]} />
         <meshStandardMaterial 
           map={grassTexture}
           color="#4ade80"
@@ -30,8 +30,8 @@ export default function Terrain() {
         />
       </mesh>
       
-      {/* Enemy spawn indicator at back */}
-      <mesh position={[0, 0.02, -6]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Enemy spawn indicator at far back */}
+      <mesh position={[0, 0.02, -15]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[12, 0.2]} />
         <meshStandardMaterial 
           color="#22c55e" 
