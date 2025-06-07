@@ -137,15 +137,20 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Ultra-simple obstacle avoidance: just try left, right, or forward
+        // Ultra-simple obstacle avoidance with randomization to prevent alignment issues
         let foundPath = false;
         
+        // Add small random offset to prevent perfect alignment
+        const randomOffset = (Math.random() - 0.5) * 0.3;
+        
         const simpleOptions = [
-          { x: enemy.x - moveDistance * 2, z: enemy.z + moveDistance }, // Wide left-forward
-          { x: enemy.x + moveDistance * 2, z: enemy.z + moveDistance }, // Wide right-forward  
-          { x: enemy.x - moveDistance * 1.5, z: enemy.z }, // Left
-          { x: enemy.x + moveDistance * 1.5, z: enemy.z }, // Right
-          { x: enemy.x, z: enemy.z + moveDistance * 0.5 }, // Forward
+          { x: enemy.x - moveDistance * 2 + randomOffset, z: enemy.z + moveDistance }, // Wide left-forward
+          { x: enemy.x + moveDistance * 2 + randomOffset, z: enemy.z + moveDistance }, // Wide right-forward  
+          { x: enemy.x - moveDistance * 1.5, z: enemy.z + moveDistance * 0.3 }, // Left with slight forward
+          { x: enemy.x + moveDistance * 1.5, z: enemy.z + moveDistance * 0.3 }, // Right with slight forward
+          { x: enemy.x + randomOffset, z: enemy.z + moveDistance * 0.5 }, // Forward with offset
+          { x: enemy.x - moveDistance, z: enemy.z }, // Pure left
+          { x: enemy.x + moveDistance, z: enemy.z }, // Pure right
         ];
         
         for (const option of simpleOptions) {
@@ -157,10 +162,10 @@ function updateEnemies(gameState: any, delta: number) {
           }
         }
         
-        // If all paths blocked, just stop
+        // If all paths blocked, add tiny random movement to prevent permanent sticking
         if (!foundPath) {
-          newX = enemy.x;
-          newZ = enemy.z;
+          newX = enemy.x + (Math.random() - 0.5) * 0.1;
+          newZ = enemy.z + moveDistance * 0.1;
         }
       }
       
