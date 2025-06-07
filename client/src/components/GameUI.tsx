@@ -2,7 +2,7 @@ import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Progress } from "./ui/progress";
+
 import { Badge } from "./ui/badge";
 import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw } from "lucide-react";
 
