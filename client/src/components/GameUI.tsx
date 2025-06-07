@@ -123,6 +123,18 @@ export default function GameUI() {
 
         <div className="flex gap-2">
           <Button
+            onClick={toggleObstacleMode}
+            variant={obstacleMode ? "default" : "outline"}
+            size="sm"
+            className={obstacleMode 
+              ? "bg-amber-600 hover:bg-amber-700 text-white" 
+              : "bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800"
+            }
+          >
+            {obstacleMode ? "Exit Obstacles" : "Place Obstacles"}
+          </Button>
+          
+          <Button
             onClick={toggleMute}
             variant="outline"
             size="sm"
@@ -137,7 +149,30 @@ export default function GameUI() {
 
       {/* Bottom Controls */}
       <div className="absolute bottom-4 left-4 right-4 flex justify-center z-40">
-        {selectedGridCell && (
+        {obstacleMode && selectedObstacleSlot ? (
+          <Card className="bg-black bg-opacity-90 border-gray-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-4">
+                <div className="text-white">
+                  <p className="text-sm text-gray-300">
+                    Obstacle Slot ({selectedObstacleSlot.x}, {selectedObstacleSlot.z})
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    Place defensive obstacles to slow enemies
+                  </p>
+                </div>
+
+                <Button 
+                  onClick={buyObstacle}
+                  className="bg-amber-600 hover:bg-amber-700"
+                  disabled={coins < 10}
+                >
+                  <span className="block">Rock Obstacle - 10</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : selectedGridCell && !obstacleMode && (
           <Card className="bg-black bg-opacity-90 border-gray-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-4">
