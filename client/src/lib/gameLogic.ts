@@ -165,6 +165,8 @@ function updateTowers(gameState: any, currentTime: number) {
           : (tower.level === 1 ? "#ff6b6b" : tower.level === 2 ? "#4ecdc4" : "#45b7d1"),
         type: tower.type === 'mortar' ? 'mortar' : 'bullet',
         explosionRadius: tower.type === 'mortar' ? (0.8 + tower.level * 0.4) : undefined,
+        targetX: tower.type === 'mortar' ? target.x : undefined,
+        targetZ: tower.type === 'mortar' ? target.z : undefined,
       };
 
       gameState.addBullet(bullet);
@@ -186,46 +188,35 @@ function updateBullets(gameState: any, delta: number) {
       return;
     }
 
-    // Check collision with enemies - use current position AND new position to prevent bullets passing through
-    const hitEnemy = gameState.enemies.find((enemy: any) => {
-      // Check collision at current bullet position
-      const currentDx = enemy.x - bullet.x;
-      const currentDz = enemy.z - bullet.z;
-      const currentDistance = Math.sqrt(currentDx * currentDx + currentDz * currentDz);
+    // Handle mortars differently - they explode at predetermined target positions
+    if (bullet.type === 'mortar' && bullet.targetX !== undefined && bullet.targetZ !== undefined) {
+      // Check if mortar has reached its target position
+      const distanceToTarget = Math.sqrt(
+        (newX - bullet.targetX) ** 2 + (newZ - bullet.targetZ) ** 2
+      );
       
-      // Check collision at new bullet position
-      const newDx = enemy.x - newX;
-      const newDz = enemy.z - newZ;
-      const newDistance = Math.sqrt(newDx * newDx + newDz * newDz);
-      
-      // Hit if either position is within collision radius
-      return currentDistance < 0.4 || newDistance < 0.4;
-    });
-
-    if (hitEnemy) {
-      // Hit target - use enemy position for impact location
-      if (bullet.type === 'mortar') {
-        // Mortar explosion: damage all enemies in radius
+      if (distanceToTarget <= 0.5) {
+        // Mortar reaches target - explode at predetermined position
         const enemiesInRadius = gameState.enemies.filter((enemy: any) => {
-          const dx = enemy.x - newX;
-          const dz = enemy.z - newZ;
+          const dx = enemy.x - bullet.targetX!;
+          const dz = enemy.z - bullet.targetZ!;
           const distanceToExplosion = Math.sqrt(dx * dx + dz * dz);
           return distanceToExplosion <= bullet.explosionRadius;
         });
 
-        // Add explosion effect
+        // Add explosion effect at target position
         gameState.addExplosion({
           id: Math.random().toString(36).substr(2, 9),
-          x: newX,
+          x: bullet.targetX,
           y: bullet.y,
-          z: newZ,
+          z: bullet.targetZ,
           radius: bullet.explosionRadius,
           startTime: Date.now(),
         });
 
         enemiesInRadius.forEach((enemy: any) => {
-          const dx = enemy.x - newX;
-          const dz = enemy.z - newZ;
+          const dx = enemy.x - bullet.targetX!;
+          const dz = enemy.z - bullet.targetZ!;
           const distanceToExplosion = Math.sqrt(dx * dx + dz * dz);
           // Damage falls off with distance
           const damageMultiplier = Math.max(0.3, 1 - (distanceToExplosion / bullet.explosionRadius));
@@ -238,14 +229,40 @@ function updateBullets(gameState: any, delta: number) {
             gameState.addCoins(enemy.reward);
           }
         });
-      } else {
+        
+        gameState.removeBullet(bullet.id);
+        return;
+      }
+    } else {
+      // Handle turret bullets - check collision with enemies
+      const hitEnemy = gameState.enemies.find((enemy: any) => {
+        // Check collision at current bullet position
+        const currentDx = enemy.x - bullet.x;
+        const currentDz = enemy.z - bullet.z;
+        const currentDistance = Math.sqrt(currentDx * currentDx + currentDz * currentDz);
+        
+        // Check collision at new bullet position
+        const newDx = enemy.x - newX;
+        const newDz = enemy.z - newZ;
+        const newDistance = Math.sqrt(newDx * newDx + newDz * newDz);
+        
+        // Hit if either position is within collision radius - larger radius for bigger enemies
+        const hitRadius = enemy.type === 'small' ? 0.4 : enemy.type === 'medium' ? 0.6 : 0.8;
+        return currentDistance < hitRadius || newDistance < hitRadius;
+      });
+
+      if (hitEnemy) {
+        // Calculate impact position at contact point (front of enemy facing bullet direction)
+        const impactX = hitEnemy.x - (bullet.directionX * 0.3);
+        const impactZ = hitEnemy.z - (bullet.directionZ * 0.3);
+        
         // Regular bullet: single target damage
-        // Add impact effect for turret bullets
+        // Add impact effect for turret bullets at contact point
         gameState.addImpact({
           id: Math.random().toString(36).substr(2, 9),
-          x: hitEnemy.x,
+          x: impactX,
           y: 0.5,
-          z: hitEnemy.z,
+          z: impactZ,
           startTime: Date.now(),
         });
         
@@ -255,13 +272,14 @@ function updateBullets(gameState: any, delta: number) {
           // Enemy will die, award coins
           gameState.addCoins(hitEnemy.reward);
         }
+        
+        gameState.removeBullet(bullet.id);
+        return;
       }
-      
-      gameState.removeBullet(bullet.id);
-    } else {
-      // Continue moving in straight line
-      gameState.updateBullet(bullet.id, newX, bullet.y, newZ);
     }
+
+    // Continue moving in straight line
+    gameState.updateBullet(bullet.id, newX, bullet.y, newZ);
   });
 }
 

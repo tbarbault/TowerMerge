@@ -41,6 +41,8 @@ export interface Bullet {
   color: string;
   type: 'bullet' | 'mortar';
   explosionRadius?: number;
+  targetX?: number;
+  targetZ?: number;
 }
 
 export interface MuzzleFlash {
