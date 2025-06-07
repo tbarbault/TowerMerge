@@ -165,13 +165,31 @@ function updateEnemies(gameState: any, delta: number) {
         if (enemy.avoidanceDirection) {
           const sideMultiplier = enemy.avoidanceDirection === 'left' ? -1 : 1;
           
-          // Try moving in the committed direction with forward progress
-          const avoidanceOptions = [
-            { x: enemy.x + sideMultiplier * moveDistance * 1.5, z: enemy.z + moveDistance * 0.5 }, // Side-forward
-            { x: enemy.x + sideMultiplier * moveDistance, z: enemy.z + moveDistance }, // Side-forward diagonal
-            { x: enemy.x + sideMultiplier * moveDistance * 1.2, z: enemy.z }, // Pure side movement
-            { x: enemy.x, z: enemy.z + moveDistance * 0.3 }, // Small forward step
-          ];
+          // Check if enemy is now alongside an obstacle (should prioritize forward movement)
+          const isAlongsideObstacle = gameState.obstacles.some((obstacle: any) => {
+            const dx = Math.abs(obstacle.x - enemy.x);
+            const dz = Math.abs(obstacle.z - enemy.z);
+            // Enemy is alongside if horizontally close but vertically aligned
+            return dx > 1.2 && dx < 2.5 && dz < 1.2;
+          });
+          
+          let avoidanceOptions;
+          if (isAlongsideObstacle) {
+            // Prioritize forward movement when alongside cement
+            avoidanceOptions = [
+              { x: enemy.x, z: enemy.z + moveDistance * 1.2 }, // Strong forward movement
+              { x: enemy.x + sideMultiplier * moveDistance * 0.3, z: enemy.z + moveDistance }, // Slight side with forward
+              { x: enemy.x, z: enemy.z + moveDistance * 0.8 }, // Medium forward
+            ];
+          } else {
+            // Normal avoidance movement
+            avoidanceOptions = [
+              { x: enemy.x + sideMultiplier * moveDistance * 1.5, z: enemy.z + moveDistance * 0.5 }, // Side-forward
+              { x: enemy.x + sideMultiplier * moveDistance, z: enemy.z + moveDistance }, // Side-forward diagonal
+              { x: enemy.x + sideMultiplier * moveDistance * 1.2, z: enemy.z }, // Pure side movement
+              { x: enemy.x, z: enemy.z + moveDistance * 0.3 }, // Small forward step
+            ];
+          }
           
           for (const option of avoidanceOptions) {
             if (!isBlocked(option.x, option.z)) {
