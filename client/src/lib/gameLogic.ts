@@ -261,7 +261,19 @@ function updateBullets(gameState: any, delta: number) {
         const newDistance = Math.sqrt(newDx * newDx + newDz * newDz);
         
         // Hit if either position is within collision radius - larger radius for bigger enemies
-        const hitRadius = enemy.type === 'small' ? 0.4 : enemy.type === 'medium' ? 0.6 : 0.8;
+        const getHitRadius = (type: string) => {
+          switch (type) {
+            case 'basic': return 0.35;
+            case 'fast': return 0.3;
+            case 'heavy': return 0.45;
+            case 'armored': return 0.5;
+            case 'elite': return 0.55;
+            case 'boss': return 0.65;
+            case 'megaboss': return 0.85;
+            default: return 0.4;
+          }
+        };
+        const hitRadius = getHitRadius(enemy.type);
         return currentDistance < hitRadius || newDistance < hitRadius;
       });
 

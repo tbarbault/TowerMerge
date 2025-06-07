@@ -38,13 +38,31 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
         return { 
           color: "#3b82f6", 
           size: 0.4,
+          segments: 10 
+        };
+      case "armored":
+        return { 
+          color: "#8b5cf6", 
+          size: 0.45,
           segments: 12 
+        };
+      case "elite":
+        return { 
+          color: "#f59e0b", 
+          size: 0.5,
+          segments: 14 
         };
       case "boss":
         return { 
-          color: "#8b5cf6", 
+          color: "#dc2626", 
           size: 0.6,
           segments: 16 
+        };
+      case "megaboss":
+        return { 
+          color: "#7c3aed", 
+          size: 0.8,
+          segments: 20 
         };
       default:
         return { 

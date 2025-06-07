@@ -169,7 +169,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         gamePhase: "playing",
         wave: 1,
         health: 20,
-        coins: 50,
+        coins: 75,
         towers: [],
         enemies: [],
         bullets: [],

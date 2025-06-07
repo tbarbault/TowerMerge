@@ -175,6 +175,26 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             barrelRadius: 0.06,
             isMortar: false
           };
+        case 4:
+          return { 
+            height: 1.4, 
+            baseColor: "#9f7aea", 
+            turretColor: "#805ad5",
+            segments: 24,
+            barrelLength: 1.2,
+            barrelRadius: 0.07,
+            isMortar: false
+          };
+        case 5:
+          return { 
+            height: 1.6, 
+            baseColor: "#f6ad55", 
+            turretColor: "#ed8936",
+            segments: 32,
+            barrelLength: 1.4,
+            barrelRadius: 0.08,
+            isMortar: false
+          };
         default:
           return { 
             height: 0.8, 
@@ -216,6 +236,26 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             segments: 12,
             barrelLength: 0.6,
             barrelRadius: 0.12,
+            isMortar: true
+          };
+        case 4:
+          return { 
+            height: 1.2, 
+            baseColor: "#a78bfa", 
+            turretColor: "#8b5cf6",
+            segments: 14,
+            barrelLength: 0.7,
+            barrelRadius: 0.14,
+            isMortar: true
+          };
+        case 5:
+          return { 
+            height: 1.4, 
+            baseColor: "#34d399", 
+            turretColor: "#10b981",
+            segments: 16,
+            barrelLength: 0.8,
+            barrelRadius: 0.16,
             isMortar: true
           };
         default:
