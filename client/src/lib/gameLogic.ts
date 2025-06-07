@@ -148,10 +148,17 @@ function updateEnemies(gameState: any, delta: number) {
           const obstacleDistance = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
           if (obstacleDistance < 3) { // Within influence range
             const repulsionStrength = (3 - obstacleDistance) / 3; // Stronger when closer
-            const repulsionDirection = {
+            let repulsionDirection = {
               x: (enemy.x - obstacle.x) / obstacleDistance,
               z: (enemy.z - obstacle.z) / obstacleDistance
             };
+            
+            // If enemy is approaching head-on (very small X difference), add random lateral bias
+            if (Math.abs(enemy.x - obstacle.x) < 0.5 && obstacleDistance < 1.5) {
+              const randomSide = Math.random() < 0.5 ? -1 : 1;
+              repulsionDirection.x += randomSide * 0.8; // Push strongly to one side
+            }
+            
             repulsionX += repulsionDirection.x * repulsionStrength;
             repulsionZ += repulsionDirection.z * repulsionStrength;
           }
