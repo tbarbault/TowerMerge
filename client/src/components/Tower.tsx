@@ -83,7 +83,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           const targetTower = towers.find(t => t.id === userData.towerId);
           const currentTower = towers.find(t => t.id === towerId);
           
-          if (targetTower && currentTower && targetTower.level === currentTower.level && currentTower.level < 3) {
+          if (targetTower && currentTower && targetTower.level === currentTower.level && currentTower.level < 5 && targetTower.type === currentTower.type) {
             // Check if towers are adjacent (no diagonal merging)
             const dx = Math.abs(targetTower.x - currentTower.x);
             const dz = Math.abs(targetTower.z - currentTower.z);
@@ -168,8 +168,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 3:
           return { 
             height: 1.2, 
-            baseColor: "#fc8181", 
-            turretColor: "#f56565",
+            baseColor: "#ffd700", 
+            turretColor: "#ffed4e",
             segments: 20,
             barrelLength: 1.0,
             barrelRadius: 0.06,
@@ -178,8 +178,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 4:
           return { 
             height: 1.4, 
-            baseColor: "#9f7aea", 
-            turretColor: "#805ad5",
+            baseColor: "#ffcc02", 
+            turretColor: "#ffd700",
             segments: 24,
             barrelLength: 1.2,
             barrelRadius: 0.07,
@@ -188,8 +188,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 5:
           return { 
             height: 1.6, 
-            baseColor: "#f6ad55", 
-            turretColor: "#ed8936",
+            baseColor: "#ffb000", 
+            turretColor: "#ffcc02",
             segments: 32,
             barrelLength: 1.4,
             barrelRadius: 0.08,
@@ -231,8 +231,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 3:
           return { 
             height: 1.0, 
-            baseColor: "#fbb6ce", 
-            turretColor: "#e53e3e",
+            baseColor: "#ffd700", 
+            turretColor: "#ffed4e",
             segments: 12,
             barrelLength: 0.6,
             barrelRadius: 0.12,
@@ -241,8 +241,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 4:
           return { 
             height: 1.2, 
-            baseColor: "#a78bfa", 
-            turretColor: "#8b5cf6",
+            baseColor: "#ffcc02", 
+            turretColor: "#ffd700",
             segments: 14,
             barrelLength: 0.7,
             barrelRadius: 0.14,
@@ -251,8 +251,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         case 5:
           return { 
             height: 1.4, 
-            baseColor: "#34d399", 
-            turretColor: "#10b981",
+            baseColor: "#ffb000", 
+            turretColor: "#ffcc02",
             segments: 16,
             barrelLength: 0.8,
             barrelRadius: 0.16,

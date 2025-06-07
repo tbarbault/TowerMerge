@@ -153,21 +153,18 @@ export default function GameUI() {
                       <Button 
                         onClick={() => {selectTowerType('turret'); buyTower();}}
                         className="bg-green-600 hover:bg-green-700 text-xs p-2"
-                        disabled={coins < 10}
+                        disabled={coins < 15}
                       >
-                        <span className="block">Turret</span>
-                        <span className="block text-xs opacity-80">Fast, Low Damage</span>
+                        <span className="block">Turret - 15</span>
                       </Button>
                       <Button 
                         onClick={() => {selectTowerType('mortar'); buyTower();}}
                         className="bg-orange-600 hover:bg-orange-700 text-xs p-2"
-                        disabled={coins < 10}
+                        disabled={coins < 25}
                       >
-                        <span className="block">Mortar</span>
-                        <span className="block text-xs opacity-80">Slow, High Damage</span>
+                        <span className="block">Mortar - 25</span>
                       </Button>
                     </div>
-                    <div className="text-xs text-gray-400">Cost: 10 coins each</div>
                   </div>
                 ) : canMergeTowers ? (
                   <Button 
@@ -177,15 +174,11 @@ export default function GameUI() {
                     <Zap className="w-4 h-4 mr-2" />
                     Merge Towers
                   </Button>
-                ) : coins < 10 ? (
-                  <Badge variant="destructive">
-                    Need 10 coins to buy tower
-                  </Badge>
-                ) : (
+                ) : selectedGridCell && !canPlaceTower && !canMergeTowers ? (
                   <Badge variant="secondary" className="bg-gray-700 text-gray-300">
-                    Cell occupied
+                    {coins < 15 ? "Need more coins" : "Cell occupied"}
                   </Badge>
-                )}
+                ) : null}
 
                 <div className="text-xs text-gray-400 mt-2">
                   Debug: canPlace={canPlaceTower.toString()}, canMerge={canMergeTowers.toString()}, coins={coins}
