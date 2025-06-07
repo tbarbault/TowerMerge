@@ -187,7 +187,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     selectedObstacleSlot: null,
     obstacleMode: false,
     
-    enemiesInWave: 6,
+    enemiesInWave: 5,
     enemiesSpawned: 0,
     waveProgress: 0,
     
@@ -199,8 +199,8 @@ export const useTowerDefense = create<TowerDefenseState>()(
       set({
         gamePhase: "playing",
         wave: 1,
-        health: 18,
-        coins: 60,
+        health: 20,
+        coins: 75,
         towers: [],
         enemies: [],
         bullets: [],
@@ -293,7 +293,6 @@ export const useTowerDefense = create<TowerDefenseState>()(
       };
 
       const stats = getTowerStats(state.selectedTowerType);
-      const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
       const newTower: Tower = {
         id: Math.random().toString(36).substr(2, 9),
         x: state.selectedGridCell.x,
@@ -306,10 +305,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
         type: state.selectedTowerType,
       };
       
-      // Update state in a single batch to prevent flash
+      // Update state after placing tower
       set({
         towers: [...state.towers, newTower],
-        coins: state.coins - towerCost,
+        coins: state.coins - (state.selectedTowerType === 'turret' ? 15 : 25),
         selectedTower: newTower,
         canPlaceTower: false,
         canMergeTowers: false,
@@ -516,7 +515,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     nextWave: () => {
       set(state => ({
         wave: state.wave + 1,
-        enemiesInWave: Math.floor(6 + state.wave * 1.8),
+        enemiesInWave: Math.floor(5 + state.wave * 1.5),
         enemiesSpawned: 0,
         waveProgress: 0,
         waveStartTime: Date.now(),

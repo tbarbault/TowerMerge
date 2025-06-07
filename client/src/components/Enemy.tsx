@@ -52,12 +52,6 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
           size: 0.5,
           segments: 14 
         };
-      case "phantom":
-        return { 
-          color: "#a855f7", 
-          size: 0.35,
-          segments: 8 
-        };
       case "boss":
         return { 
           color: "#dc2626", 
@@ -90,25 +84,9 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
         <meshStandardMaterial 
           color={config.color}
           emissive={config.color}
-          emissiveIntensity={type === "phantom" ? 0.4 : 0.2}
-          transparent={type === "phantom"}
-          opacity={type === "phantom" ? 0.8 : 1.0}
+          emissiveIntensity={0.2}
         />
       </mesh>
-
-      {/* Phantom glow effect */}
-      {type === "phantom" && (
-        <mesh>
-          <sphereGeometry args={[config.size * 1.3, 8, 8]} />
-          <meshStandardMaterial 
-            color="#a855f7"
-            transparent
-            opacity={0.2}
-            emissive="#a855f7"
-            emissiveIntensity={0.3}
-          />
-        </mesh>
-      )}
 
       {/* Health bar background */}
       <mesh position={[0, config.size + 0.3, 0]} rotation={[-Math.PI / 2, 0, 0]}>

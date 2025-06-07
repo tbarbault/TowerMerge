@@ -11,7 +11,6 @@ import Bullet from "./Bullet";
 import Explosion from "./Explosion";
 import Impact from "./Impact";
 import Obstacle from "./Obstacle";
-import Decorations from "./Decorations";
 
 import { updateGameLogic } from "../lib/gameLogic";
 
@@ -99,8 +98,7 @@ export default function Game() {
         />
       ))}
 
-      {/* Decorative elements */}
-      <Decorations />
+
     </>
   );
 }

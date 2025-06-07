@@ -2,55 +2,35 @@ export default function Lights() {
   return (
     <>
       {/* Ambient light for general illumination */}
-      <ambientLight intensity={0.3} color="#ffffff" />
+      <ambientLight intensity={0.4} />
       
-      {/* Main directional light (dramatic sun) */}
+      {/* Main directional light (sun) */}
       <directionalLight
-        position={[15, 12, 8]}
-        intensity={1.2}
-        color="#fff5e6"
+        position={[10, 10, 5]}
+        intensity={1}
         castShadow
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-far={50}
-        shadow-camera-left={-25}
-        shadow-camera-right={25}
-        shadow-camera-top={25}
-        shadow-camera-bottom={-25}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
       />
       
-      {/* Cool fill light from opposite side */}
+      {/* Fill light from opposite side */}
       <directionalLight
-        position={[-8, 6, -10]}
-        intensity={0.4}
-        color="#a3c7ff"
+        position={[-5, 5, -5]}
+        intensity={0.3}
+        color="#b4d8ff"
       />
       
-      {/* Atmospheric point light over battlefield */}
+      {/* Point light for dynamic lighting */}
       <pointLight
-        position={[0, 10, -5]}
-        intensity={0.6}
-        distance={25}
-        decay={1.5}
-        color="#fff9e6"
-      />
-      
-      {/* Red glow over life line */}
-      <pointLight
-        position={[0, 3, 5]}
-        intensity={0.8}
-        distance={8}
-        decay={2}
-        color="#ff4444"
-      />
-      
-      {/* Ominous green glow at spawn */}
-      <pointLight
-        position={[0, 2, -15]}
+        position={[0, 8, 0]}
         intensity={0.5}
-        distance={6}
+        distance={20}
         decay={2}
-        color="#44ff44"
       />
     </>
   );

@@ -85,7 +85,24 @@ export default function Grid() {
     <group ref={meshRef}>
       {gridCells}
       
-
+      {/* Grid border lines */}
+      <group>
+        {/* Vertical border lines */}
+        {[-5, -3, -1, 1, 3, 5].map((x, i) => (
+          <mesh key={`v-${i}`} position={[x, 0.01, 0]}>
+            <boxGeometry args={[0.02, 0.02, 6]} />
+            <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
+          </mesh>
+        ))}
+        
+        {/* Horizontal border lines */}
+        {[-3, -1, 1, 3].map((z, i) => (
+          <mesh key={`h-${i}`} position={[0, 0.01, z]}>
+            <boxGeometry args={[10, 0.02, 0.02]} />
+            <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
+          </mesh>
+        ))}
+      </group>
     </group>
   );
 }
