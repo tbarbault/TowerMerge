@@ -150,12 +150,7 @@ export default function GameUI() {
                   <Button 
                     onClick={() => {
                       selectTowerType('turret');
-                      if (selectedGridCell) {
-                        const existingTower = towers.find(t => t.x === selectedGridCell.x && t.z === selectedGridCell.z);
-                        if (!existingTower && coins >= 15) {
-                          buyTower();
-                        }
-                      }
+                      buyTower();
                     }}
                     className="bg-green-600 hover:bg-green-700 text-xs p-2 flex items-center gap-1"
                     disabled={coins < 15}
@@ -166,12 +161,7 @@ export default function GameUI() {
                   <Button 
                     onClick={() => {
                       selectTowerType('mortar');
-                      if (selectedGridCell) {
-                        const existingTower = towers.find(t => t.x === selectedGridCell.x && t.z === selectedGridCell.z);
-                        if (!existingTower && coins >= 25) {
-                          buyTower();
-                        }
-                      }
+                      buyTower();
                     }}
                     className="bg-orange-600 hover:bg-orange-700 text-xs p-2 flex items-center gap-1"
                     disabled={coins < 25}
