@@ -311,8 +311,11 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
           {/* Show mergeable towers when selected */}
           {towers.filter(t => {
             if (t.id === towerId || t.level !== level || t.level >= 3) return false;
-            const dx = Math.abs(t.x - (position[0] + 4) / 2);
-            const dz = Math.abs(t.z - (position[2] + 2) / 2);
+            // Get current tower position from props
+            const currentX = (position[0] + 4) / 2;
+            const currentZ = (position[2] + 2) / 2;
+            const dx = Math.abs(t.x - currentX);
+            const dz = Math.abs(t.z - currentZ);
             return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
           }).map(tower => (
             <mesh 

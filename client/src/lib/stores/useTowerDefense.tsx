@@ -12,6 +12,7 @@ export interface Tower {
   range: number;
   fireRate: number;
   lastShot: number;
+  type: 'turret' | 'mortar';
 }
 
 export interface Enemy {
@@ -69,6 +70,7 @@ interface TowerDefenseState {
   // UI state
   selectedGridCell: GridCell | null;
   selectedTower: Tower | null;
+  selectedTowerType: 'turret' | 'mortar';
   
   // Wave management
   enemiesInWave: number;
@@ -80,6 +82,7 @@ interface TowerDefenseState {
   restartGame: () => void;
   endGame: () => void;
   selectGridCell: (x: number, z: number) => void;
+  selectTowerType: (type: 'turret' | 'mortar') => void;
   buyTower: () => void;
   mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => void;
   
@@ -121,6 +124,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     
     selectedGridCell: null,
     selectedTower: null,
+    selectedTowerType: 'turret',
     
     enemiesInWave: 5,
     enemiesSpawned: 0,
@@ -180,6 +184,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
         canPlaceTower: canPlace,
         canMergeTowers: canMerge,
       });
+    },
+
+    selectTowerType: (type) => {
+      set({ selectedTowerType: type });
     },
     
     buyTower: () => {
