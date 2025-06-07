@@ -19,6 +19,7 @@ export default function GameUI() {
     restartGame,
     buyTower,
     mergeTowers,
+    selectTowerType,
     waveProgress,
     enemiesInWave,
     enemiesSpawned
@@ -152,14 +153,28 @@ export default function GameUI() {
                 </div>
 
                 {canPlaceTower ? (
-                  <Button 
-                    onClick={buyTower}
-                    className="bg-green-600 hover:bg-green-700"
-                    disabled={coins < 10}
-                  >
-                    <Coins className="w-4 h-4 mr-2" />
-                    Buy Tower (10 coins)
-                  </Button>
+                  <div className="space-y-2">
+                    <div className="text-sm text-gray-300 mb-2">Choose tower type:</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        onClick={() => {selectTowerType('turret'); buyTower();}}
+                        className="bg-green-600 hover:bg-green-700 text-xs p-2"
+                        disabled={coins < 10}
+                      >
+                        <span className="block">Turret</span>
+                        <span className="block text-xs opacity-80">Fast, Low Damage</span>
+                      </Button>
+                      <Button 
+                        onClick={() => {selectTowerType('mortar'); buyTower();}}
+                        className="bg-orange-600 hover:bg-orange-700 text-xs p-2"
+                        disabled={coins < 10}
+                      >
+                        <span className="block">Mortar</span>
+                        <span className="block text-xs opacity-80">Slow, High Damage</span>
+                      </Button>
+                    </div>
+                    <div className="text-xs text-gray-400">Cost: 10 coins each</div>
+                  </div>
                 ) : canMergeTowers ? (
                   <Button 
                     onClick={() => mergeTowers()}

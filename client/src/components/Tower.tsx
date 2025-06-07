@@ -270,17 +270,32 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           />
         </mesh>
 
-        {/* Main barrel */}
-        <mesh position={[0, 0.15, config.barrelLength / 2 + 0.3]} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[config.barrelRadius, config.barrelRadius + 0.01, config.barrelLength, 12]} />
-          <meshStandardMaterial 
-            color="#4a5568"
-            metalness={0.9}
-            roughness={0.1}
-            emissive="#2d3748"
-            emissiveIntensity={0.02}
-          />
-        </mesh>
+        {/* Main barrel - different styles for turret vs mortar */}
+        {config.isMortar ? (
+          // Mortar: Short, wide barrel angled upward
+          <mesh position={[0, 0.2, config.barrelLength / 2 + 0.2]} rotation={[Math.PI / 3, 0, 0]}>
+            <cylinderGeometry args={[config.barrelRadius, config.barrelRadius - 0.02, config.barrelLength, 8]} />
+            <meshStandardMaterial 
+              color="#8b4513"
+              metalness={0.6}
+              roughness={0.3}
+              emissive="#654321"
+              emissiveIntensity={0.05}
+            />
+          </mesh>
+        ) : (
+          // Turret: Long, narrow barrel horizontal
+          <mesh position={[0, 0.15, config.barrelLength / 2 + 0.3]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[config.barrelRadius, config.barrelRadius + 0.01, config.barrelLength, 12]} />
+            <meshStandardMaterial 
+              color="#4a5568"
+              metalness={0.9}
+              roughness={0.1}
+              emissive="#2d3748"
+              emissiveIntensity={0.02}
+            />
+          </mesh>
+        )}
 
         {/* Barrel tip */}
         <mesh position={[0, 0.15, config.barrelLength + 0.3]}>
