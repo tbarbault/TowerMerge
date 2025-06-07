@@ -137,58 +137,43 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Simplified flow-based pathfinding - enemies flow around obstacles
+        // Persistent direction pathfinding - pick a side and stick with it
         let foundAlternative = false;
         
-        // Calculate repulsion force from all nearby obstacles
-        let repulsionX = 0;
-        let repulsionZ = 0;
-        
-        gameState.obstacles.forEach((obstacle: any) => {
-          const obstacleDistance = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
-          if (obstacleDistance < 3) { // Within influence range
-            const repulsionStrength = (3 - obstacleDistance) / 3; // Stronger when closer
-            let repulsionDirection = {
-              x: (enemy.x - obstacle.x) / obstacleDistance,
-              z: (enemy.z - obstacle.z) / obstacleDistance
-            };
-            
-            // If enemy is approaching head-on (very small X difference), add random lateral bias
-            if (Math.abs(enemy.x - obstacle.x) < 0.5 && obstacleDistance < 1.5) {
-              const randomSide = Math.random() < 0.5 ? -1 : 1;
-              repulsionDirection.x += randomSide * 0.8; // Push strongly to one side
+        // If no avoidance direction is set, pick one based on obstacle position
+        if (!enemy.avoidanceDirection) {
+          const nearestObstacle = gameState.obstacles.reduce((nearest: any, obstacle: any) => {
+            const dist = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
+            if (!nearest || dist < nearest.distance) {
+              return { obstacle, distance: dist };
             }
-            
-            repulsionX += repulsionDirection.x * repulsionStrength;
-            repulsionZ += repulsionDirection.z * repulsionStrength;
-          }
-        });
-        
-        // Combine target attraction with obstacle repulsion
-        const combinedX = dx + repulsionX * 2; // Amplify repulsion
-        const combinedZ = dz + repulsionZ * 2;
-        const combinedLength = Math.sqrt(combinedX ** 2 + combinedZ ** 2);
-        
-        if (combinedLength > 0) {
-          const flowX = enemy.x + (combinedX / combinedLength) * moveDistance;
-          const flowZ = enemy.z + (combinedZ / combinedLength) * moveDistance;
+            return nearest;
+          }, null);
           
-          if (!isBlocked(flowX, flowZ)) {
-            newX = flowX;
-            newZ = flowZ;
-            foundAlternative = true;
+          if (nearestObstacle && nearestObstacle.distance < 2) {
+            // If approaching head-on, randomly pick a side
+            if (Math.abs(enemy.x - nearestObstacle.obstacle.x) < 0.5) {
+              enemy.avoidanceDirection = Math.random() < 0.5 ? 'left' : 'right';
+            } else {
+              // Otherwise, go to the side that's already closer
+              enemy.avoidanceDirection = enemy.x < nearestObstacle.obstacle.x ? 'left' : 'right';
+            }
           }
         }
         
-        // If flow direction is blocked, try pure lateral movement
-        if (!foundAlternative) {
-          const lateralOptions = [
-            { x: enemy.x - moveDistance * 1.5, z: enemy.z },
-            { x: enemy.x + moveDistance * 1.5, z: enemy.z },
-            { x: enemy.x, z: enemy.z + moveDistance * 0.5 },
+        // Use the committed avoidance direction
+        if (enemy.avoidanceDirection) {
+          const sideMultiplier = enemy.avoidanceDirection === 'left' ? -1 : 1;
+          
+          // Try moving in the committed direction with forward progress
+          const avoidanceOptions = [
+            { x: enemy.x + sideMultiplier * moveDistance * 1.5, z: enemy.z + moveDistance * 0.5 }, // Side-forward
+            { x: enemy.x + sideMultiplier * moveDistance, z: enemy.z + moveDistance }, // Side-forward diagonal
+            { x: enemy.x + sideMultiplier * moveDistance * 1.2, z: enemy.z }, // Pure side movement
+            { x: enemy.x, z: enemy.z + moveDistance * 0.3 }, // Small forward step
           ];
           
-          for (const option of lateralOptions) {
+          for (const option of avoidanceOptions) {
             if (!isBlocked(option.x, option.z)) {
               newX = option.x;
               newZ = option.z;
@@ -198,10 +183,39 @@ function updateEnemies(gameState: any, delta: number) {
           }
         }
         
-        // If completely stuck, minimal movement
+        // If still blocked, try the opposite direction and switch
+        if (!foundAlternative && enemy.avoidanceDirection) {
+          const oppositeSide = enemy.avoidanceDirection === 'left' ? 'right' : 'left';
+          const sideMultiplier = oppositeSide === 'left' ? -1 : 1;
+          
+          const oppositeX = enemy.x + sideMultiplier * moveDistance * 1.2;
+          const oppositeZ = enemy.z + moveDistance * 0.5;
+          
+          if (!isBlocked(oppositeX, oppositeZ)) {
+            enemy.avoidanceDirection = oppositeSide; // Switch direction
+            newX = oppositeX;
+            newZ = oppositeZ;
+            foundAlternative = true;
+          }
+        }
+        
+        // Last resort: minimal forward drift
         if (!foundAlternative) {
-          newX = enemy.x + (Math.random() - 0.5) * moveDistance * 0.1;
-          newZ = enemy.z + moveDistance * 0.1; // Always try to move slightly forward
+          newX = enemy.x;
+          newZ = enemy.z + moveDistance * 0.1;
+        }
+      } else {
+        // Clear path - check if we should reset avoidance direction
+        if (enemy.avoidanceDirection) {
+          // Reset direction if no obstacles are nearby
+          const hasNearbyObstacles = gameState.obstacles.some((obstacle: any) => {
+            const dist = Math.sqrt((obstacle.x - enemy.x) ** 2 + (obstacle.z - enemy.z) ** 2);
+            return dist < 2.5;
+          });
+          
+          if (!hasNearbyObstacles) {
+            enemy.avoidanceDirection = null;
+          }
         }
       }
       

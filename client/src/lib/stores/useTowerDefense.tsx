@@ -31,6 +31,7 @@ export interface Enemy {
   stuckCounter?: number;
   lastX?: number;
   lastZ?: number;
+  avoidanceDirection?: 'left' | 'right' | null;
 }
 
 export interface Bullet {
