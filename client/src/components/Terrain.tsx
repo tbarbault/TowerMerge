@@ -14,8 +14,8 @@ export default function Terrain() {
         <boxGeometry args={[32, 1.2, 40]} />
         <meshStandardMaterial 
           map={grassTexture}
-          color="#2d5016"
-          roughness={0.8}
+          color="#22c55e"
+          roughness={0.6}
         />
       </mesh>
       
@@ -23,9 +23,9 @@ export default function Terrain() {
       <mesh position={[0, -0.15, 0]} receiveShadow>
         <boxGeometry args={[12, 0.3, 8]} />
         <meshStandardMaterial 
-          color="#4a5568"
-          roughness={0.4}
-          metalness={0.2}
+          color="#94a3b8"
+          roughness={0.3}
+          metalness={0.4}
         />
       </mesh>
       
@@ -33,9 +33,9 @@ export default function Terrain() {
       <mesh position={[0, -0.05, -5]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[8, 25]} />
         <meshStandardMaterial 
-          color="#8b4513"
-          roughness={0.9}
-          opacity={0.8}
+          color="#d97706"
+          roughness={0.7}
+          opacity={0.9}
           transparent
         />
       </mesh>
@@ -44,7 +44,7 @@ export default function Terrain() {
       {[-6, 6].map((x, i) => (
         <mesh key={i} position={[x, -0.1, 0]} receiveShadow>
           <boxGeometry args={[0.5, 0.4, 8]} />
-          <meshStandardMaterial color="#2d3748" roughness={0.6} />
+          <meshStandardMaterial color="#64748b" roughness={0.4} />
         </mesh>
       ))}
       
@@ -64,11 +64,11 @@ export default function Terrain() {
       <mesh position={[0, -0.03, -15]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[10, 3]} />
         <meshStandardMaterial 
-          color="#1f2937" 
+          color="#475569" 
           transparent 
-          opacity={0.7}
-          emissive="#374151"
-          emissiveIntensity={0.2}
+          opacity={0.8}
+          emissive="#64748b"
+          emissiveIntensity={0.3}
         />
       </mesh>
       

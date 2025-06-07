@@ -55,9 +55,9 @@ export default function Decorations() {
         >
           <dodecahedronGeometry args={[0.5]} />
           <meshStandardMaterial 
-            color="#4a5568" 
-            roughness={0.8}
-            metalness={0.1}
+            color="#94a3b8" 
+            roughness={0.6}
+            metalness={0.3}
           />
         </mesh>
       ))}
@@ -68,15 +68,15 @@ export default function Decorations() {
           {/* Tree trunk */}
           <mesh position={[0, 0.5, 0]}>
             <cylinderGeometry args={[0.1, 0.15, 1]} />
-            <meshStandardMaterial color="#8b4513" roughness={0.9} />
+            <meshStandardMaterial color="#a3a3a3" roughness={0.7} />
           </mesh>
           
           {/* Tree foliage */}
           <mesh position={[0, 1.2, 0]} rotation={[0, tree.rotation, 0]}>
             <coneGeometry args={[0.6, 1.2, 8]} />
             <meshStandardMaterial 
-              color="#2d5016" 
-              roughness={0.7}
+              color="#16a34a" 
+              roughness={0.5}
             />
           </mesh>
         </group>

@@ -199,8 +199,8 @@ export const useTowerDefense = create<TowerDefenseState>()(
       set({
         gamePhase: "playing",
         wave: 1,
-        health: 15,
-        coins: 50,
+        health: 18,
+        coins: 60,
         towers: [],
         enemies: [],
         bullets: [],
@@ -293,6 +293,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       };
 
       const stats = getTowerStats(state.selectedTowerType);
+      const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
       const newTower: Tower = {
         id: Math.random().toString(36).substr(2, 9),
         x: state.selectedGridCell.x,
@@ -305,15 +306,14 @@ export const useTowerDefense = create<TowerDefenseState>()(
         type: state.selectedTowerType,
       };
       
-      // Update state after placing tower
-      set((state) => ({
+      // Update state in a single batch to prevent flash
+      set({
         towers: [...state.towers, newTower],
-        coins: state.coins - (state.selectedTowerType === 'turret' ? 15 : 25),
+        coins: state.coins - towerCost,
         selectedTower: newTower,
         canPlaceTower: false,
         canMergeTowers: false,
-        selectedGridCell: state.selectedGridCell, // Preserve selection
-      }));
+      });
     },
     
     mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => {
