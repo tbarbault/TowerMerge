@@ -156,12 +156,34 @@ function updateTowers(gameState: any, currentTime: number) {
       const dz = target.z - towerWorldZ;
       const distance = Math.sqrt(dx * dx + dz * dz);
 
-      // Calculate barrel end position for bullet spawn
-      const barrelLength = tower.level === 1 ? 0.6 : tower.level === 2 ? 0.8 : 1.0;
+      // Calculate barrel/cannon end position for bullet spawn based on tower type and level
+      const getBarrelLength = (type: 'turret' | 'mortar', level: number) => {
+        if (type === 'turret') {
+          switch (level) {
+            case 1: return 0.25;
+            case 2: return 0.32;
+            case 3: return 0.4;
+            case 4: return 0.5;
+            case 5: return 0.62;
+            default: return 0.25;
+          }
+        } else { // mortar
+          switch (level) {
+            case 1: return 0.12;
+            case 2: return 0.16;
+            case 3: return 0.21;
+            case 4: return 0.27;
+            case 5: return 0.34;
+            default: return 0.12;
+          }
+        }
+      };
+      
+      const barrelLength = getBarrelLength(tower.type, tower.level);
       const normalizedDx = dx / distance;
       const normalizedDz = dz / distance;
       
-      // Spawn bullet at barrel end
+      // Spawn bullet at barrel/cannon end
       const barrelEndX = towerWorldX + normalizedDx * barrelLength;
       const barrelEndZ = towerWorldZ + normalizedDz * barrelLength;
 
@@ -178,7 +200,7 @@ function updateTowers(gameState: any, currentTime: number) {
           ? (tower.level === 1 ? "#d69e2e" : tower.level === 2 ? "#f6ad55" : tower.level === 3 ? "#9f7aea" : tower.level === 4 ? "#f687b3" : "#4fd1c7")
           : (tower.level === 1 ? "#718096" : tower.level === 2 ? "#4299e1" : tower.level === 3 ? "#48bb78" : tower.level === 4 ? "#ed8936" : "#e53e3e"),
         type: tower.type === 'mortar' ? 'mortar' : 'bullet',
-        explosionRadius: tower.type === 'mortar' ? (0.8 + tower.level * 0.4) : undefined,
+        explosionRadius: tower.type === 'mortar' ? (0.6 + tower.level * 0.25) : undefined,
         targetX: tower.type === 'mortar' ? target.x : undefined,
         targetZ: tower.type === 'mortar' ? target.z : undefined,
       };

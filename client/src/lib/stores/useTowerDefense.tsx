@@ -248,7 +248,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         if (type === 'turret') {
           return { damage: 15, range: 6.0, fireRate: 500 };
         } else {
-          return { damage: 35, range: 7.0, fireRate: 1400 };
+          return { damage: 55, range: 7.0, fireRate: 1400 };
         }
       };
 
