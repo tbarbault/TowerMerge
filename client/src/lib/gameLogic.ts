@@ -126,54 +126,73 @@ function updateEnemies(gameState: any, delta: number) {
       let newX = enemy.x + (dx / distance) * moveDistance;
       let newZ = enemy.z + (dz / distance) * moveDistance;
       
-      // Check for obstacle collision with improved pathfinding
+      // Advanced obstacle avoidance with flow field
       const isBlocked = (x: number, z: number) => {
         return gameState.obstacles.some((obstacle: any) => {
           const obsDx = obstacle.x - x;
           const obsDz = obstacle.z - z;
           const obsDistance = Math.sqrt(obsDx * obsDx + obsDz * obsDz);
-          return obsDistance < 0.8; // Collision radius
+          return obsDistance < 1.2; // Larger avoidance radius
         });
       };
 
       if (isBlocked(newX, newZ)) {
-        // Try multiple avoidance options
-        const avoidanceOptions = [
-          // Perpendicular movements
-          { x: enemy.x + moveDistance * 0.7, z: enemy.z },
-          { x: enemy.x - moveDistance * 0.7, z: enemy.z },
-          { x: enemy.x, z: enemy.z + moveDistance * 0.7 },
-          { x: enemy.x, z: enemy.z - moveDistance * 0.7 },
-          // Diagonal movements
-          { x: enemy.x + moveDistance * 0.5, z: enemy.z + moveDistance * 0.5 },
-          { x: enemy.x + moveDistance * 0.5, z: enemy.z - moveDistance * 0.5 },
-          { x: enemy.x - moveDistance * 0.5, z: enemy.z + moveDistance * 0.5 },
-          { x: enemy.x - moveDistance * 0.5, z: enemy.z - moveDistance * 0.5 },
-        ];
-
-        // Find the best unblocked option that moves toward target
-        let bestOption = null;
-        let bestScore = Infinity;
-
-        for (const option of avoidanceOptions) {
-          if (!isBlocked(option.x, option.z)) {
-            const distToTarget = Math.sqrt(
-              (currentTarget.x - option.x) ** 2 + (currentTarget.z - option.z) ** 2
-            );
-            if (distToTarget < bestScore) {
-              bestScore = distToTarget;
-              bestOption = option;
-            }
+        // Generate flow field around obstacles
+        const flowFieldOptions = [];
+        const searchRadius = 2.0;
+        const angleSteps = 16;
+        
+        for (let i = 0; i < angleSteps; i++) {
+          const angle = (i * 2 * Math.PI) / angleSteps;
+          const testX = enemy.x + Math.cos(angle) * searchRadius;
+          const testZ = enemy.z + Math.sin(angle) * searchRadius;
+          
+          if (!isBlocked(testX, testZ)) {
+            // Calculate score: distance to target + penalty for going backwards
+            const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
+            const forwardProgress = (testX - enemy.x) * (dx / distance) + (testZ - enemy.z) * (dz / distance);
+            const score = distToTarget - forwardProgress * 0.5; // Favor forward movement
+            
+            flowFieldOptions.push({ x: testX, z: testZ, score });
           }
         }
 
-        if (bestOption) {
-          newX = bestOption.x;
-          newZ = bestOption.z;
+        if (flowFieldOptions.length > 0) {
+          // Choose the option with best score
+          const bestOption = flowFieldOptions.reduce((best, option) => 
+            option.score < best.score ? option : best
+          );
+          
+          // Move gradually toward the best option
+          const dirX = bestOption.x - enemy.x;
+          const dirZ = bestOption.z - enemy.z;
+          const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
+          
+          if (dirLength > 0) {
+            newX = enemy.x + (dirX / dirLength) * moveDistance;
+            newZ = enemy.z + (dirZ / dirLength) * moveDistance;
+          }
         } else {
-          // If all options blocked, stay in place
-          newX = enemy.x;
-          newZ = enemy.z;
+          // Last resort: try to go around obstacle in both directions
+          const perpX = -dz / distance;
+          const perpZ = dx / distance;
+          
+          const option1X = enemy.x + perpX * moveDistance * 1.5;
+          const option1Z = enemy.z + perpZ * moveDistance * 1.5;
+          const option2X = enemy.x - perpX * moveDistance * 1.5;
+          const option2Z = enemy.z - perpZ * moveDistance * 1.5;
+          
+          if (!isBlocked(option1X, option1Z)) {
+            newX = option1X;
+            newZ = option1Z;
+          } else if (!isBlocked(option2X, option2Z)) {
+            newX = option2X;
+            newZ = option2Z;
+          } else {
+            // Stay in place if completely stuck
+            newX = enemy.x;
+            newZ = enemy.z;
+          }
         }
       }
       

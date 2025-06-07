@@ -135,81 +135,91 @@ export default function GameUI() {
 
 
 
-      {/* Bottom Controls */}
+      {/* Bottom Controls - Always Visible */}
       <div className="absolute bottom-4 left-4 right-4 flex justify-center z-40">
-        {selectedGridCell && (
-          <Card className="bg-black bg-opacity-90 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="text-white">
-                  <p className="text-sm text-gray-300">
-                    Grid Cell ({selectedGridCell.x}, {selectedGridCell.z})
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Click to interact with this cell
-                  </p>
+        <Card className="bg-black bg-opacity-90 border-gray-700">
+          <CardContent className="p-4">
+            <div className="space-y-4">
+              {/* Towers Section */}
+              <div>
+                <div className="text-sm text-gray-300 mb-2 font-semibold flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Towers
                 </div>
-
-                {canPlaceTower || (!canMergeTowers && (coins >= 15 || coins >= 25)) ? (
-                  <div className="space-y-2">
-                    <div className="text-sm text-gray-300 mb-2">Choose tower type:</div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <Button 
-                        onClick={() => {selectTowerType('turret'); buyTower();}}
-                        className="bg-green-600 hover:bg-green-700 text-xs p-2 flex items-center gap-1"
-                        disabled={coins < 15}
-                      >
-                        <Target className="w-3 h-3" />
-                        <span>15</span>
-                      </Button>
-                      <Button 
-                        onClick={() => {selectTowerType('mortar'); buyTower();}}
-                        className="bg-orange-600 hover:bg-orange-700 text-xs p-2 flex items-center gap-1"
-                        disabled={coins < 25}
-                      >
-                        <Bomb className="w-3 h-3" />
-                        <span>25</span>
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          if (!obstacleMode) {
-                            toggleObstacleMode();
-                          } else if (selectedObstacleSlot) {
-                            buyObstacle();
-                          } else {
-                            toggleObstacleMode();
-                          }
-                        }}
-                        className={obstacleMode 
-                          ? "bg-amber-600 hover:bg-amber-700 text-white text-xs p-2 flex items-center gap-1" 
-                          : "bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={() => {
+                      selectTowerType('turret');
+                      if (selectedGridCell) {
+                        const existingTower = towers.find(t => t.x === selectedGridCell.x && t.z === selectedGridCell.z);
+                        if (!existingTower && coins >= 15) {
+                          buyTower();
                         }
-                        disabled={obstacleMode && (!selectedObstacleSlot || coins < 10)}
-                      >
-                        <Mountain className="w-3 h-3" />
-                        <span>10</span>
-                      </Button>
-                    </div>
-                  </div>
-                ) : canMergeTowers ? (
+                      }
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-xs p-2 flex items-center gap-1"
+                    disabled={coins < 15}
+                  >
+                    <Target className="w-3 h-3" />
+                    <span>Turret - 15</span>
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      selectTowerType('mortar');
+                      if (selectedGridCell) {
+                        const existingTower = towers.find(t => t.x === selectedGridCell.x && t.z === selectedGridCell.z);
+                        if (!existingTower && coins >= 25) {
+                          buyTower();
+                        }
+                      }
+                    }}
+                    className="bg-orange-600 hover:bg-orange-700 text-xs p-2 flex items-center gap-1"
+                    disabled={coins < 25}
+                  >
+                    <Bomb className="w-3 h-3" />
+                    <span>Mortar - 25</span>
+                  </Button>
+                </div>
+                {canMergeTowers && (
                   <Button 
                     onClick={() => mergeTowers()}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-blue-600 hover:bg-blue-700 w-full mt-2 text-xs p-2"
                   >
-                    <Zap className="w-4 h-4 mr-2" />
+                    <Zap className="w-3 h-3 mr-1" />
                     Merge Towers
                   </Button>
-                ) : selectedGridCell && !canPlaceTower && !canMergeTowers ? (
-                  <Badge variant="secondary" className="bg-gray-700 text-gray-300">
-                    {coins < 15 ? "Need more coins" : "Cell occupied"}
-                  </Badge>
-                ) : null}
-
-
+                )}
               </div>
-            </CardContent>
-          </Card>
-        )}
+
+              {/* Objects Section */}
+              <div>
+                <div className="text-sm text-gray-300 mb-2 font-semibold flex items-center gap-2">
+                  <Mountain className="w-4 h-4" />
+                  Objects
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <Button
+                    onClick={() => {
+                      if (!obstacleMode) {
+                        toggleObstacleMode();
+                      } else if (selectedObstacleSlot && coins >= 10) {
+                        buyObstacle();
+                      }
+                    }}
+                    className={obstacleMode 
+                      ? "bg-amber-600 hover:bg-amber-700 text-white text-xs p-2 flex items-center gap-1" 
+                      : "bg-gray-600 hover:bg-gray-700 text-white text-xs p-2 flex items-center gap-1"
+                    }
+                    disabled={obstacleMode && (!selectedObstacleSlot || coins < 10)}
+                  >
+                    <Mountain className="w-3 h-3" />
+                    <span>{obstacleMode ? (selectedObstacleSlot ? "Buy Rock - 10" : "Select Position") : "Rock Mode"}</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </>
   );
