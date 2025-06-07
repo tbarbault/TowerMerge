@@ -1,4 +1,3 @@
-import { TowerDefenseState } from "./stores/useTowerDefense";
 import { getPath } from "./pathfinding";
 
 export function updateGameLogic(gameState: any, delta: number) {
@@ -81,8 +80,16 @@ function updateEnemies(gameState: any, delta: number) {
   const path = getPath();
   
   gameState.enemies.forEach((enemy: any) => {
+    // Check if enemy has crossed the life line (z < -4.5)
+    if (enemy.z < -4.5) {
+      // Enemy reached the end, crossed life line
+      gameState.removeEnemy(enemy.id);
+      gameState.takeDamage(1);
+      return;
+    }
+
     if (enemy.pathIndex >= path.length - 1) {
-      // Enemy reached the end
+      // Enemy reached the end of path
       gameState.removeEnemy(enemy.id);
       gameState.takeDamage(1);
       return;
@@ -110,26 +117,29 @@ function updateTowers(gameState: any, currentTime: number) {
   gameState.towers.forEach((tower: any) => {
     if (currentTime - tower.lastShot < tower.fireRate) return;
 
-    // Find enemies in range
+    // Find enemies in range (tower world position conversion)
+    const towerWorldX = tower.x * 2 - 4;
+    const towerWorldZ = tower.z * 2 - 2;
+    
     const enemiesInRange = gameState.enemies.filter((enemy: any) => {
-      const dx = enemy.x - (tower.x * 2 - 4);
-      const dz = enemy.z - (tower.z * 2 - 2);
+      const dx = enemy.x - towerWorldX;
+      const dz = enemy.z - towerWorldZ;
       const distance = Math.sqrt(dx * dx + dz * dz);
       return distance <= tower.range;
     });
 
     if (enemiesInRange.length > 0) {
-      // Target the first enemy (closest to goal)
-      const target = enemiesInRange.reduce((closest, enemy) => 
+      // Target the enemy furthest along the path (closest to goal)
+      const target = enemiesInRange.reduce((closest: any, enemy: any) => 
         enemy.pathIndex > closest.pathIndex ? enemy : closest
       );
 
       // Create bullet
       const bullet = {
         id: Math.random().toString(36).substr(2, 9),
-        x: tower.x * 2 - 4,
+        x: towerWorldX,
         y: 1,
-        z: tower.z * 2 - 2,
+        z: towerWorldZ,
         targetId: target.id,
         damage: tower.damage,
         speed: 8,

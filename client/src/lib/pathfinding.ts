@@ -1,14 +1,15 @@
 // Simple predefined path for enemies to follow
-// Path goes from left side of the grid to the right side
+// Path goes from front (positive Z) toward the back (negative Z)
 export function getPath() {
   return [
-    { x: -6, z: 0 },    // Start position (off-grid left)
-    { x: -4, z: 0 },    // Enter grid
-    { x: -2, z: 0 },    // Move right
-    { x: 0, z: 0 },     // Center
-    { x: 2, z: 0 },     // Continue right
-    { x: 4, z: 0 },     // Almost at end
-    { x: 6, z: 0 },     // End position (off-grid right)
+    { x: 0, z: 8 },     // Start position (in front of player)
+    { x: 0, z: 6 },     // Move toward grid
+    { x: 0, z: 4 },     // Enter grid front
+    { x: 0, z: 2 },     // Move through grid
+    { x: 0, z: 0 },     // Center of grid
+    { x: 0, z: -2 },    // Continue toward back
+    { x: 0, z: -4 },    // Exit grid back
+    { x: 0, z: -6 },    // End position (behind player - life lost)
   ];
 }
 

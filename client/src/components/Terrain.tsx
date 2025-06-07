@@ -8,12 +8,39 @@ export default function Terrain() {
   grassTexture.repeat.set(8, 6);
 
   return (
-    <mesh position={[0, -0.5, 0]} receiveShadow>
-      <boxGeometry args={[20, 1, 16]} />
-      <meshStandardMaterial 
-        map={grassTexture}
-        color="#4ade80"
-      />
-    </mesh>
+    <>
+      {/* Main terrain */}
+      <mesh position={[0, -0.5, 0]} receiveShadow>
+        <boxGeometry args={[20, 1, 16]} />
+        <meshStandardMaterial 
+          map={grassTexture}
+          color="#4ade80"
+        />
+      </mesh>
+      
+      {/* Life line at the back of the grid - enemies crossing this lose player life */}
+      <mesh position={[0, 0.02, -5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[12, 0.2]} />
+        <meshStandardMaterial 
+          color="#ef4444" 
+          transparent 
+          opacity={0.8}
+          emissive="#ef4444"
+          emissiveIntensity={0.3}
+        />
+      </mesh>
+      
+      {/* Enemy spawn indicator at front */}
+      <mesh position={[0, 0.02, 6]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[12, 0.2]} />
+        <meshStandardMaterial 
+          color="#22c55e" 
+          transparent 
+          opacity={0.6}
+          emissive="#22c55e"
+          emissiveIntensity={0.2}
+        />
+      </mesh>
+    </>
   );
 }

@@ -8,23 +8,10 @@ export default function Grid() {
   const { camera, raycaster, pointer } = useThree();
   const { selectedGridCell, selectGridCell } = useTowerDefense();
 
-  // Handle grid cell selection
-  useFrame(() => {
-    if (meshRef.current) {
-      raycaster.setFromCamera(pointer, camera);
-      const intersects = raycaster.intersectObjects(meshRef.current.children);
-      
-      if (intersects.length > 0) {
-        const intersect = intersects[0];
-        const userData = intersect.object.userData;
-        if (userData.x !== undefined && userData.z !== undefined) {
-          // Visual feedback for hover
-          const material = intersect.object.material as THREE.MeshStandardMaterial;
-          material.opacity = selectedGridCell?.x === userData.x && selectedGridCell?.z === userData.z ? 0.8 : 0.6;
-        }
-      }
-    }
-  });
+  // Handle grid cell selection - simplified version without hover effects
+  const handlePointerEvents = () => {
+    // Grid selection is now handled purely through onClick events
+  };
 
   const handleClick = (event: any) => {
     event.stopPropagation();
@@ -67,7 +54,7 @@ export default function Grid() {
         <bufferGeometry>
           <bufferAttribute
             attach="attributes-position"
-            count={24}
+            count={48}
             array={new Float32Array([
               // Vertical lines
               -5, 0, -3, -5, 0, 3,

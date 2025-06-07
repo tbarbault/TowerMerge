@@ -136,14 +136,21 @@ export default function GameUI() {
         </Card>
       </div>
 
-      {/* Bottom Controls */}
-      <div className="absolute bottom-4 left-4 right-4 flex justify-center z-40">
-        {selectedGridCell && (
-          <Card className="bg-black bg-opacity-90 border-gray-700">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-4">
-                <div className="text-white">
-                  <p className="text-sm text-gray-300">
+      {/* Tower Placement UI - appears on selected grid cell */}
+      {selectedGridCell && (
+        <div 
+          className="absolute z-50 pointer-events-none"
+          style={{
+            left: '50%',
+            top: '50%',
+            transform: `translate(-50%, -50%) translate(${(selectedGridCell.x * 2 - 4) * 25}px, ${-(selectedGridCell.z * 2 - 2) * 25}px)`
+          }}
+        >
+          <Card className="bg-black bg-opacity-95 border-yellow-400 border-2 pointer-events-auto">
+            <CardContent className="p-3">
+              <div className="flex flex-col items-center gap-2 min-w-[150px]">
+                <div className="text-white text-center">
+                  <p className="text-xs text-gray-300 mb-1">
                     Grid ({selectedGridCell.x}, {selectedGridCell.z})
                   </p>
                 </div>
@@ -151,19 +158,22 @@ export default function GameUI() {
                 {canPlaceTower && (
                   <Button 
                     onClick={buyTower}
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 w-full"
+                    size="sm"
                   >
-                    <Coins className="w-4 h-4 mr-2" />
-                    Buy Tower (10 coins)
+                    <Coins className="w-3 h-3 mr-1" />
+                    Buy Tower
+                    <span className="text-xs ml-1">(10 coins)</span>
                   </Button>
                 )}
 
                 {canMergeTowers && (
                   <Button 
                     onClick={mergeTowers}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-blue-600 hover:bg-blue-700 w-full"
+                    size="sm"
                   >
-                    <Zap className="w-4 h-4 mr-2" />
+                    <Zap className="w-3 h-3 mr-1" />
                     Merge Towers
                   </Button>
                 )}
@@ -176,8 +186,8 @@ export default function GameUI() {
               </div>
             </CardContent>
           </Card>
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 }
