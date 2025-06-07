@@ -5,40 +5,80 @@ export default function Terrain() {
   
   // Configure texture repeat
   grassTexture.wrapS = grassTexture.wrapT = 1000; // RepeatWrapping
-  grassTexture.repeat.set(8, 6);
+  grassTexture.repeat.set(10, 8);
 
   return (
     <>
-      {/* Main terrain - extended for longer combat zone */}
-      <mesh position={[0, -0.5, -5]} receiveShadow>
-        <boxGeometry args={[30, 1, 35]} />
+      {/* Main battlefield base */}
+      <mesh position={[0, -0.6, -5]} receiveShadow>
+        <boxGeometry args={[32, 1.2, 40]} />
         <meshStandardMaterial 
           map={grassTexture}
-          color="#4ade80"
+          color="#2d5016"
+          roughness={0.8}
         />
       </mesh>
       
-      {/* Life line at the front of the grid - enemies crossing this lose player life */}
-      <mesh position={[0, 0.02, 5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[12, 0.2]} />
+      {/* Tower platform - elevated stone platform */}
+      <mesh position={[0, -0.15, 0]} receiveShadow>
+        <boxGeometry args={[12, 0.3, 8]} />
         <meshStandardMaterial 
-          color="#ef4444" 
-          transparent 
+          color="#4a5568"
+          roughness={0.4}
+          metalness={0.2}
+        />
+      </mesh>
+      
+      {/* Battle path - worn dirt path from spawn to life line */}
+      <mesh position={[0, -0.05, -5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[8, 25]} />
+        <meshStandardMaterial 
+          color="#8b4513"
+          roughness={0.9}
           opacity={0.8}
-          emissive="#ef4444"
-          emissiveIntensity={0.3}
+          transparent
         />
       </mesh>
       
-      {/* Enemy spawn indicator at far back */}
-      <mesh position={[0, 0.02, -15]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[12, 0.2]} />
+      {/* Defensive perimeter - decorative stone borders */}
+      {[-6, 6].map((x, i) => (
+        <mesh key={i} position={[x, -0.1, 0]} receiveShadow>
+          <boxGeometry args={[0.5, 0.4, 8]} />
+          <meshStandardMaterial color="#2d3748" roughness={0.6} />
+        </mesh>
+      ))}
+      
+      {/* Life line - glowing danger zone */}
+      <mesh position={[0, 0.02, 5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[14, 0.3]} />
         <meshStandardMaterial 
-          color="#22c55e" 
+          color="#dc2626" 
           transparent 
-          opacity={0.6}
-          emissive="#22c55e"
+          opacity={0.9}
+          emissive="#b91c1c"
+          emissiveIntensity={0.4}
+        />
+      </mesh>
+      
+      {/* Enemy spawn zone - ominous dark area */}
+      <mesh position={[0, -0.03, -15]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[10, 3]} />
+        <meshStandardMaterial 
+          color="#1f2937" 
+          transparent 
+          opacity={0.7}
+          emissive="#374151"
           emissiveIntensity={0.2}
+        />
+      </mesh>
+      
+      {/* Atmospheric fog planes for depth */}
+      <mesh position={[0, 1, -20]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[20, 8]} />
+        <meshStandardMaterial 
+          color="#9ca3af" 
+          transparent 
+          opacity={0.1}
         />
       </mesh>
     </>

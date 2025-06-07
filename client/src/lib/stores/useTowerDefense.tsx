@@ -306,13 +306,14 @@ export const useTowerDefense = create<TowerDefenseState>()(
       };
       
       // Update state after placing tower
-      set({
+      set((state) => ({
         towers: [...state.towers, newTower],
         coins: state.coins - (state.selectedTowerType === 'turret' ? 15 : 25),
         selectedTower: newTower,
         canPlaceTower: false,
         canMergeTowers: false,
-      });
+        selectedGridCell: state.selectedGridCell, // Preserve selection
+      }));
     },
     
     mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => {
