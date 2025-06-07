@@ -62,6 +62,14 @@ export interface Explosion {
   startTime: number;
 }
 
+export interface Impact {
+  id: string;
+  x: number;
+  y: number;
+  z: number;
+  startTime: number;
+}
+
 export interface GridCell {
   x: number;
   z: number;
@@ -81,6 +89,7 @@ interface TowerDefenseState {
   bullets: Bullet[];
   muzzleFlashes: MuzzleFlash[];
   explosions: Explosion[];
+  impacts: Impact[];
   
   // UI state
   selectedGridCell: GridCell | null;
@@ -120,6 +129,8 @@ interface TowerDefenseState {
   removeMuzzleFlash: (id: string) => void;
   addExplosion: (explosion: Explosion) => void;
   removeExplosion: (id: string) => void;
+  addImpact: (impact: Impact) => void;
+  removeImpact: (id: string) => void;
   
   // Computed properties
   canPlaceTower: boolean;
@@ -140,6 +151,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     bullets: [],
     muzzleFlashes: [],
     explosions: [],
+    impacts: [],
     
     selectedGridCell: null,
     selectedTower: null,
@@ -443,6 +455,18 @@ export const useTowerDefense = create<TowerDefenseState>()(
     removeExplosion: (id) => {
       set(state => ({
         explosions: state.explosions.filter(e => e.id !== id)
+      }));
+    },
+    
+    addImpact: (impact) => {
+      set(state => ({
+        impacts: [...state.impacts, impact]
+      }));
+    },
+    
+    removeImpact: (id) => {
+      set(state => ({
+        impacts: state.impacts.filter(i => i.id !== id)
       }));
     },
     
