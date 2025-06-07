@@ -490,7 +490,42 @@ export const useTowerDefense = create<TowerDefenseState>()(
     },
     
     // Computed properties
-    canPlaceTower: false,
-    canMergeTowers: false,
+    get canPlaceTower() {
+      const state = get();
+      if (!state.selectedGridCell) return false;
+      
+      // Check if cell is already occupied
+      const existingTower = state.towers.find(
+        t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z
+      );
+      if (existingTower) return false;
+      
+      // Check if player has enough coins for selected tower type
+      const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
+      return state.coins >= towerCost;
+    },
+    
+    get canMergeTowers() {
+      const state = get();
+      if (!state.selectedGridCell) return false;
+      
+      const currentTower = state.towers.find(
+        t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z
+      );
+      if (!currentTower || currentTower.level >= 5) return false;
+      
+      // Find adjacent towers that can merge
+      const adjacentTowers = state.towers.filter(tower => {
+        const dx = Math.abs(tower.x - state.selectedGridCell!.x);
+        const dz = Math.abs(tower.z - state.selectedGridCell!.z);
+        return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+      });
+      
+      return adjacentTowers.some(t => 
+        t.level === currentTower.level && 
+        t.level < 5 && 
+        t.type === currentTower.type
+      );
+    },
   }))
 );
