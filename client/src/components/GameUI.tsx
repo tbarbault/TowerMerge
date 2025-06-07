@@ -146,7 +146,7 @@ export default function GameUI() {
                   </p>
                 </div>
 
-                {canPlaceTower ? (
+                {canPlaceTower || (!canMergeTowers && (coins >= 15 || coins >= 25)) ? (
                   <div className="space-y-2">
                     <div className="text-sm text-gray-300 mb-2">Choose tower type:</div>
                     <div className="grid grid-cols-2 gap-2">

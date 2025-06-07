@@ -147,62 +147,68 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       switch (level) {
         case 1:
           return { 
-            height: 0.3, 
+            height: 0.15, 
             baseColor: "#718096", 
             turretColor: "#4a5568",
             segments: 8,
-            barrelLength: 0.4,
-            barrelRadius: 0.03,
+            barrelLength: 0.3,
+            barrelRadius: 0.025,
+            barrelCount: 1,
             isMortar: false
           };
         case 2:
           return { 
-            height: 0.35, 
+            height: 0.2, 
             baseColor: "#4299e1", 
             turretColor: "#2b6cb0",
             segments: 10,
-            barrelLength: 0.45,
-            barrelRadius: 0.035,
+            barrelLength: 0.35,
+            barrelRadius: 0.03,
+            barrelCount: 2,
             isMortar: false
           };
         case 3:
           return { 
-            height: 0.4, 
+            height: 0.25, 
             baseColor: "#48bb78", 
             turretColor: "#2f855a",
             segments: 12,
-            barrelLength: 0.5,
-            barrelRadius: 0.04,
+            barrelLength: 0.4,
+            barrelRadius: 0.03,
+            barrelCount: 3,
             isMortar: false
           };
         case 4:
           return { 
-            height: 0.45, 
+            height: 0.3, 
             baseColor: "#ed8936", 
             turretColor: "#c05621",
             segments: 14,
-            barrelLength: 0.55,
-            barrelRadius: 0.045,
+            barrelLength: 0.45,
+            barrelRadius: 0.035,
+            barrelCount: 4,
             isMortar: false
           };
         case 5:
           return { 
-            height: 0.5, 
+            height: 0.35, 
             baseColor: "#e53e3e", 
             turretColor: "#c53030",
             segments: 16,
-            barrelLength: 0.6,
-            barrelRadius: 0.05,
+            barrelLength: 0.5,
+            barrelRadius: 0.04,
+            barrelCount: 5,
             isMortar: false
           };
         default:
           return { 
-            height: 0.3, 
+            height: 0.15, 
             baseColor: "#718096", 
             turretColor: "#4a5568",
             segments: 8,
-            barrelLength: 0.4,
-            barrelRadius: 0.03,
+            barrelLength: 0.3,
+            barrelRadius: 0.025,
+            barrelCount: 1,
             isMortar: false
           };
       }
@@ -210,62 +216,62 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       switch (level) {
         case 1:
           return { 
-            height: 0.25, 
+            height: 0.12, 
             baseColor: "#d69e2e", 
             turretColor: "#b7791f",
             segments: 6,
-            barrelLength: 0.2,
-            barrelRadius: 0.06,
+            cannonLength: 0.15,
+            cannonRadius: 0.05,
             isMortar: true
           };
         case 2:
           return { 
-            height: 0.3, 
+            height: 0.15, 
             baseColor: "#f6ad55", 
             turretColor: "#dd6b20",
             segments: 8,
-            barrelLength: 0.25,
-            barrelRadius: 0.07,
+            cannonLength: 0.18,
+            cannonRadius: 0.06,
             isMortar: true
           };
         case 3:
           return { 
-            height: 0.35, 
+            height: 0.18, 
             baseColor: "#9f7aea", 
             turretColor: "#805ad5",
             segments: 10,
-            barrelLength: 0.3,
-            barrelRadius: 0.08,
+            cannonLength: 0.21,
+            cannonRadius: 0.07,
             isMortar: true
           };
         case 4:
           return { 
-            height: 0.4, 
+            height: 0.21, 
             baseColor: "#f687b3", 
             turretColor: "#d53f8c",
             segments: 12,
-            barrelLength: 0.35,
-            barrelRadius: 0.09,
+            cannonLength: 0.24,
+            cannonRadius: 0.08,
             isMortar: true
           };
         case 5:
           return { 
-            height: 0.45, 
+            height: 0.24, 
             baseColor: "#4fd1c7", 
             turretColor: "#319795",
             segments: 14,
-            barrelLength: 0.4,
-            barrelRadius: 0.1,
+            cannonLength: 0.27,
+            cannonRadius: 0.09,
             isMortar: true
           };
         default:
           return { 
-            height: 0.25, 
+            height: 0.12, 
             baseColor: "#d69e2e", 
             turretColor: "#b7791f",
             segments: 6,
-            barrelLength: 0.2,
-            barrelRadius: 0.06,
+            cannonLength: 0.15,
+            cannonRadius: 0.05,
             isMortar: true
           };
       }
@@ -317,11 +323,11 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           />
         </mesh>
 
-        {/* Main barrel - different styles for turret vs mortar */}
+        {/* Weapons - different for turret vs mortar */}
         {config.isMortar ? (
-          // Mortar: Short, wide barrel angled upward
-          <mesh position={[0, 0.2, config.barrelLength / 2 + 0.2]} rotation={[Math.PI / 3, 0, 0]}>
-            <cylinderGeometry args={[config.barrelRadius, config.barrelRadius - 0.02, config.barrelLength, 8]} />
+          // Mortar: Single wide cannon angled upward
+          <mesh position={[0, 0.2, (config as any).cannonLength / 2 + 0.15]} rotation={[Math.PI / 4, 0, 0]}>
+            <cylinderGeometry args={[(config as any).cannonRadius, (config as any).cannonRadius - 0.01, (config as any).cannonLength, 8]} />
             <meshStandardMaterial 
               color="#8b4513"
               metalness={0.6}
@@ -331,56 +337,35 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
         ) : (
-          // Turret: Long, narrow barrel horizontal
-          <mesh position={[0, 0.15, config.barrelLength / 2 + 0.3]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[config.barrelRadius, config.barrelRadius + 0.01, config.barrelLength, 12]} />
-            <meshStandardMaterial 
-              color="#4a5568"
-              metalness={0.9}
-              roughness={0.1}
-              emissive="#2d3748"
-              emissiveIntensity={0.02}
-            />
-          </mesh>
-        )}
-
-        {/* Barrel tip */}
-        <mesh position={[0, 0.15, config.barrelLength + 0.3]}>
-          <sphereGeometry args={[config.barrelRadius + 0.01, 8, 8]} />
-          <meshStandardMaterial 
-            color="#0a0a0a"
-            metalness={0.9}
-            roughness={0.1}
-          />
-        </mesh>
-
-        {/* Additional barrels for higher levels */}
-        {level >= 2 && (
+          // Turret: Multiple barrels based on level
           <>
-            <mesh position={[-0.15, 0.1, config.barrelLength / 2 + 0.25]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[config.barrelRadius * 0.8, config.barrelRadius * 0.8, config.barrelLength * 0.8, 8]} />
-              <meshStandardMaterial color="#2a2a2a" metalness={0.7} roughness={0.3} />
-            </mesh>
-            <mesh position={[0.15, 0.1, config.barrelLength / 2 + 0.25]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[config.barrelRadius * 0.8, config.barrelRadius * 0.8, config.barrelLength * 0.8, 8]} />
-              <meshStandardMaterial color="#2a2a2a" metalness={0.7} roughness={0.3} />
-            </mesh>
+            {Array.from({ length: (config as any).barrelCount }, (_, i) => {
+              const angle = (i * 2 * Math.PI) / (config as any).barrelCount;
+              const radius = (config as any).barrelCount === 1 ? 0 : 0.1;
+              const x = Math.sin(angle) * radius;
+              const z = Math.cos(angle) * radius;
+              
+              return (
+                <mesh 
+                  key={i}
+                  position={[x, 0.15, z + (config as any).barrelLength / 2 + 0.25]} 
+                  rotation={[Math.PI / 2, 0, 0]}
+                >
+                  <cylinderGeometry args={[(config as any).barrelRadius, (config as any).barrelRadius, (config as any).barrelLength, 8]} />
+                  <meshStandardMaterial 
+                    color="#4a5568"
+                    metalness={0.9}
+                    roughness={0.1}
+                    emissive="#2d3748"
+                    emissiveIntensity={0.02}
+                  />
+                </mesh>
+              );
+            })}
           </>
         )}
 
-        {/* Missile pods for level 3 */}
-        {level === 3 && (
-          <>
-            <mesh position={[-0.25, 0.25, 0.1]}>
-              <boxGeometry args={[0.1, 0.1, 0.4]} />
-              <meshStandardMaterial color="#8b0000" metalness={0.4} roughness={0.6} />
-            </mesh>
-            <mesh position={[0.25, 0.25, 0.1]}>
-              <boxGeometry args={[0.1, 0.1, 0.4]} />
-              <meshStandardMaterial color="#8b0000" metalness={0.4} roughness={0.6} />
-            </mesh>
-          </>
-        )}
+
       </group>
 
       {/* Selection indicator */}
