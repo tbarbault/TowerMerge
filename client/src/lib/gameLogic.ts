@@ -137,119 +137,127 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Grid-based pathfinding to handle complex obstacle clusters
-        const gridSize = 0.5;
-        const searchRadius = 6;
+        // Enhanced obstacle avoidance with wall following
         
-        // Convert world positions to grid coordinates
-        const startGridX = Math.round(enemy.x / gridSize);
-        const startGridZ = Math.round(enemy.z / gridSize);
-        const targetGridX = Math.round(currentTarget.x / gridSize);
-        const targetGridZ = Math.round(currentTarget.z / gridSize);
-        
-        // Simple A* pathfinding
-        type PathNode = { x: number; z: number; g: number; h: number; f: number; parent: PathNode | null };
-        const openSet: PathNode[] = [{ x: startGridX, z: startGridZ, g: 0, h: 0, f: 0, parent: null }];
-        const closedSet = new Set<string>();
-        const visited = new Map<string, PathNode>();
-        
-        while (openSet.length > 0) {
-          // Find node with lowest f score
-          openSet.sort((a, b) => a.f - b.f);
-          const current = openSet.shift()!;
-          const currentKey = `${current.x},${current.z}`;
-          
-          if (closedSet.has(currentKey)) continue;
-          closedSet.add(currentKey);
-          
-          // Check if we reached target or got close enough
-          const distToTarget = Math.sqrt((current.x - targetGridX) ** 2 + (current.z - targetGridZ) ** 2);
-          if (distToTarget < 3) {
-            // Reconstruct path and take first step
-            let pathNode: PathNode = current;
-            while (pathNode.parent && pathNode.parent.parent) {
-              pathNode = pathNode.parent;
-            }
-            
-            const worldX = pathNode.x * gridSize;
-            const worldZ = pathNode.z * gridSize;
-            const dirToNext = {
-              x: worldX - enemy.x,
-              z: worldZ - enemy.z
-            };
-            const dirLength = Math.sqrt(dirToNext.x ** 2 + dirToNext.z ** 2);
-            
-            if (dirLength > 0) {
-              newX = enemy.x + (dirToNext.x / dirLength) * moveDistance;
-              newZ = enemy.z + (dirToNext.z / dirLength) * moveDistance;
-            }
-            break;
-          }
-          
-          // Explore neighbors
-          const neighbors = [
-            { x: current.x + 1, z: current.z },
-            { x: current.x - 1, z: current.z },
-            { x: current.x, z: current.z + 1 },
-            { x: current.x, z: current.z - 1 },
-            // Diagonal moves for better pathfinding
-            { x: current.x + 1, z: current.z + 1 },
-            { x: current.x + 1, z: current.z - 1 },
-            { x: current.x - 1, z: current.z + 1 },
-            { x: current.x - 1, z: current.z - 1 }
-          ];
-          
-          for (const neighbor of neighbors) {
-            const neighborKey = `${neighbor.x},${neighbor.z}`;
-            if (closedSet.has(neighborKey)) continue;
-            
-            // Check if neighbor is too far from start
-            const distFromStart = Math.sqrt((neighbor.x - startGridX) ** 2 + (neighbor.z - startGridZ) ** 2);
-            if (distFromStart > searchRadius) continue;
-            
-            // Check if neighbor is blocked
-            const worldNeighborX = neighbor.x * gridSize;
-            const worldNeighborZ = neighbor.z * gridSize;
-            if (isBlocked(worldNeighborX, worldNeighborZ)) continue;
-            
-            const isDiagonal = neighbor.x !== current.x && neighbor.z !== current.z;
-            const moveCost = isDiagonal ? 1.414 : 1;
-            const g = current.g + moveCost;
-            const h = Math.sqrt((neighbor.x - targetGridX) ** 2 + (neighbor.z - targetGridZ) ** 2);
-            const f = g + h;
-            
-            const existingNode = visited.get(neighborKey);
-            if (!existingNode || g < existingNode.g) {
-              const node: PathNode = { x: neighbor.x, z: neighbor.z, g, h, f, parent: current };
-              visited.set(neighborKey, node);
-              openSet.push(node);
-            }
-          }
-          
-          // Limit search to prevent performance issues
-          if (closedSet.size > 100) break;
+        // Initialize stuck counter for this enemy
+        if (!enemy.stuckCounter) {
+          enemy.stuckCounter = 0;
         }
         
-        // If pathfinding failed, use simple avoidance
-        if (newX === enemy.x + (dx / distance) * moveDistance && newZ === enemy.z + (dz / distance) * moveDistance) {
-          const avoidanceAngles = [-Math.PI/2, Math.PI/2, -Math.PI/4, Math.PI/4, Math.PI];
-          for (const angle of avoidanceAngles) {
-            const testX = enemy.x + Math.cos(Math.atan2(dz, dx) + angle) * moveDistance * 1.5;
-            const testZ = enemy.z + Math.sin(Math.atan2(dz, dx) + angle) * moveDistance * 1.5;
-            
-            if (!isBlocked(testX, testZ)) {
-              const dirX = testX - enemy.x;
-              const dirZ = testZ - enemy.z;
-              const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
+        // Check if enemy was moving last frame
+        const lastMovement = Math.sqrt((enemy.x - (enemy.lastX || enemy.x)) ** 2 + (enemy.z - (enemy.lastZ || enemy.z)) ** 2);
+        if (lastMovement < 0.01) {
+          enemy.stuckCounter++;
+        } else {
+          enemy.stuckCounter = 0;
+        }
+        
+        // Store last position
+        enemy.lastX = enemy.x;
+        enemy.lastZ = enemy.z;
+        
+        // If stuck too long, force teleport to clear path
+        if (enemy.stuckCounter > 30) {
+          // Find nearest clear space
+          let bestClearPos = null;
+          let bestDistance = Infinity;
+          
+          for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 8) {
+            for (let radius = 2; radius <= 4; radius += 0.5) {
+              const testX = enemy.x + Math.cos(angle) * radius;
+              const testZ = enemy.z + Math.sin(angle) * radius;
               
-              if (dirLength > 0) {
-                newX = enemy.x + (dirX / dirLength) * moveDistance;
-                newZ = enemy.z + (dirZ / dirLength) * moveDistance;
-                break;
+              if (!isBlocked(testX, testZ)) {
+                const distToTarget = Math.sqrt((currentTarget.x - testX) ** 2 + (currentTarget.z - testZ) ** 2);
+                if (distToTarget < bestDistance) {
+                  bestDistance = distToTarget;
+                  bestClearPos = { x: testX, z: testZ };
+                }
               }
             }
           }
+          
+          if (bestClearPos) {
+            newX = bestClearPos.x;
+            newZ = bestClearPos.z;
+            enemy.stuckCounter = 0;
+          }
+        } else {
+          // Wall following algorithm
+          const wallFollowDistance = 1.2;
+          let foundPath = false;
+          
+          // Try to follow wall on the right side first
+          const rightAngle = Math.atan2(dz, dx) - Math.PI/2;
+          const rightX = enemy.x + Math.cos(rightAngle) * wallFollowDistance;
+          const rightZ = enemy.z + Math.sin(rightAngle) * wallFollowDistance;
+          
+          if (!isBlocked(rightX, rightZ)) {
+            // Move along the wall
+            const forwardRightAngle = Math.atan2(dz, dx) + Math.PI/4;
+            const testX = enemy.x + Math.cos(forwardRightAngle) * moveDistance;
+            const testZ = enemy.z + Math.sin(forwardRightAngle) * moveDistance;
+            
+            if (!isBlocked(testX, testZ)) {
+              newX = testX;
+              newZ = testZ;
+              foundPath = true;
+            }
+          }
+          
+          // If right wall following didn't work, try left
+          if (!foundPath) {
+            const leftAngle = Math.atan2(dz, dx) + Math.PI/2;
+            const leftX = enemy.x + Math.cos(leftAngle) * wallFollowDistance;
+            const leftZ = enemy.z + Math.sin(leftAngle) * wallFollowDistance;
+            
+            if (!isBlocked(leftX, leftZ)) {
+              const forwardLeftAngle = Math.atan2(dz, dx) - Math.PI/4;
+              const testX = enemy.x + Math.cos(forwardLeftAngle) * moveDistance;
+              const testZ = enemy.z + Math.sin(forwardLeftAngle) * moveDistance;
+              
+              if (!isBlocked(testX, testZ)) {
+                newX = testX;
+                newZ = testZ;
+                foundPath = true;
+              }
+            }
+          }
+          
+          // Fallback: try pure perpendicular movement
+          if (!foundPath) {
+            const perpAngles = [Math.PI/2, -Math.PI/2, Math.PI, Math.PI/3, -Math.PI/3];
+            const currentAngle = Math.atan2(dz, dx);
+            
+            for (const perpAngle of perpAngles) {
+              const testAngle = currentAngle + perpAngle;
+              const testX = enemy.x + Math.cos(testAngle) * moveDistance * 1.5;
+              const testZ = enemy.z + Math.sin(testAngle) * moveDistance * 1.5;
+              
+              if (!isBlocked(testX, testZ)) {
+                const dirX = testX - enemy.x;
+                const dirZ = testZ - enemy.z;
+                const dirLength = Math.sqrt(dirX * dirX + dirZ * dirZ);
+                
+                if (dirLength > 0) {
+                  newX = enemy.x + (dirX / dirLength) * moveDistance;
+                  newZ = enemy.z + (dirZ / dirLength) * moveDistance;
+                  foundPath = true;
+                  break;
+                }
+              }
+            }
+          }
+          
+          // Last resort: stop movement
+          if (!foundPath) {
+            newX = enemy.x;
+            newZ = enemy.z;
+          }
         }
+      } else {
+        // Reset stuck counter when moving freely
+        enemy.stuckCounter = 0;
       }
       
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);

@@ -28,6 +28,9 @@ export interface Enemy {
   type: string;
   reward: number;
   recentPositions?: { x: number; z: number }[];
+  stuckCounter?: number;
+  lastX?: number;
+  lastZ?: number;
 }
 
 export interface Bullet {
