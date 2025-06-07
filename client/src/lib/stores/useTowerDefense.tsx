@@ -179,6 +179,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         explosions: [],
         impacts: [],
         waveStartTime: Date.now(),
+        waveCompletionTime: null,
         enemiesSpawned: 0,
         waveProgress: 0,
       });

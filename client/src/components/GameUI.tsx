@@ -22,7 +22,8 @@ export default function GameUI() {
     selectTowerType,
     waveProgress,
     enemiesInWave,
-    enemiesSpawned
+    enemiesSpawned,
+    waveCompletionTime
   } = useTowerDefense();
 
   const { isMuted, toggleMute } = useAudio();
@@ -92,9 +93,13 @@ export default function GameUI() {
                 <span className="text-white font-bold">Wave {wave}</span>
               </div>
               <div className="text-xs text-gray-300">
-                Enemies: {enemiesSpawned}/{enemiesInWave}
+                {waveCompletionTime ? (
+                  `Next wave in ${Math.max(0, Math.ceil((5000 - (Date.now() - waveCompletionTime)) / 1000))}s`
+                ) : (
+                  `Enemies: ${enemiesSpawned}/${enemiesInWave}`
+                )}
               </div>
-              <Progress value={waveProgress} className="h-1 mt-1" />
+              <Progress value={waveCompletionTime ? 100 : waveProgress} className="h-1 mt-1" />
             </CardContent>
           </Card>
 
