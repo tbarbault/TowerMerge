@@ -26,17 +26,25 @@ export function updateGameLogic(gameState: any, delta: number) {
 
 function spawnEnemies(gameState: any, currentTime: number) {
   const timeSinceWaveStart = currentTime - gameState.waveStartTime;
-  const spawnInterval = Math.max(1200 - gameState.wave * 80, 300); // Faster spawning, more aggressive
-  const expectedSpawned = Math.floor(timeSinceWaveStart / spawnInterval);
+  
+  // Add 8 second delay before first wave starts
+  const waveDelay = gameState.wave === 1 ? 8000 : 3000;
+  if (timeSinceWaveStart < waveDelay) {
+    return;
+  }
+  
+  const adjustedTime = timeSinceWaveStart - waveDelay;
+  const spawnInterval = Math.max(1500 - gameState.wave * 60, 400); // Slightly slower spawning
+  const expectedSpawned = Math.floor(adjustedTime / spawnInterval);
   
   if (expectedSpawned > gameState.enemiesSpawned && gameState.enemiesSpawned < gameState.enemiesInWave) {
     // More aggressive enemy progression
     let enemyTypes = ["basic", "fast"];
     
-    if (gameState.wave >= 2) enemyTypes.push("heavy"); // Earlier heavy enemies
-    if (gameState.wave >= 4) enemyTypes.push("armored"); // Earlier armored enemies
-    if (gameState.wave >= 7) enemyTypes.push("elite"); // Earlier elite enemies
-    if (gameState.wave >= 12) enemyTypes.push("phantom"); // New phantom type
+    if (gameState.wave >= 3) enemyTypes.push("heavy"); // Delayed heavy enemies
+    if (gameState.wave >= 5) enemyTypes.push("armored"); // Delayed armored enemies
+    if (gameState.wave >= 8) enemyTypes.push("elite"); // Delayed elite enemies
+    if (gameState.wave >= 15) enemyTypes.push("phantom"); // Much later phantom type
     
     const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
     
@@ -76,9 +84,9 @@ function createEnemy(type: string, wave: number) {
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
   
-  // More aggressive scaling with wave
-  const scaledHealth = Math.floor(config.health + (wave - 1) * config.health * 0.45);
-  const scaledSpeed = config.speed + (wave - 1) * 0.15;
+  // Moderate scaling with wave
+  const scaledHealth = Math.floor(config.health + (wave - 1) * config.health * 0.35);
+  const scaledSpeed = config.speed + (wave - 1) * 0.12;
 
   return {
     id: Math.random().toString(36).substr(2, 9),
