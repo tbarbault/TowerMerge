@@ -6,19 +6,18 @@ export default function ObstacleZones() {
   const meshRef = useRef<THREE.Group>(null);
   const { selectedObstacleSlot, selectObstacleSlot, obstacles, obstacleMode } = useTowerDefense();
 
-  // Define strategic wall-building positions across enemy paths
+  // Define rock placement positions behind the 5x3 tower grid
+  // Tower grid: x from -4 to 4, z from 0 to 2
+  // Rock tiles: behind the towers, z from -2 to -6
   const obstacleSlots = [
-    // Front line defense (closest to towers)
-    { x: -6, z: -2 }, { x: -4, z: -2 }, { x: -2, z: -2 }, { x: 0, z: -2 }, { x: 2, z: -2 }, { x: 4, z: -2 }, { x: 6, z: -2 },
+    // Line 1: Just behind towers (z = -2)
+    { x: -4, z: -2 }, { x: -2, z: -2 }, { x: 0, z: -2 }, { x: 2, z: -2 }, { x: 4, z: -2 },
     
-    // Mid-field chokepoints
-    { x: -6, z: -4 }, { x: -4, z: -4 }, { x: -2, z: -4 }, { x: 0, z: -4 }, { x: 2, z: -4 }, { x: 4, z: -4 }, { x: 6, z: -4 },
+    // Line 2: Mid-field defense (z = -4)
+    { x: -4, z: -4 }, { x: -2, z: -4 }, { x: 0, z: -4 }, { x: 2, z: -4 }, { x: 4, z: -4 },
     
-    // Back line defense (closer to enemy spawn)
-    { x: -6, z: -6 }, { x: -4, z: -6 }, { x: -2, z: -6 }, { x: 0, z: -6 }, { x: 2, z: -6 }, { x: 4, z: -6 }, { x: 6, z: -6 },
-    
-    // Side wall options for advanced strategies
-    { x: -7, z: -3 }, { x: -7, z: -5 }, { x: 7, z: -3 }, { x: 7, z: -5 },
+    // Line 3: Back defense (z = -6)
+    { x: -4, z: -6 }, { x: -2, z: -6 }, { x: 0, z: -6 }, { x: 2, z: -6 }, { x: 4, z: -6 },
   ];
 
   const handleSlotClick = (x: number, z: number) => {
@@ -64,20 +63,16 @@ export default function ObstacleZones() {
       <group>
         {/* Horizontal lines marking defense zones */}
         <mesh position={[0, 0.02, -1.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
+          <boxGeometry args={[10, 0.02, 0.1]} />
           <meshStandardMaterial color="#fbbf24" transparent opacity={0.4} />
         </mesh>
         <mesh position={[0, 0.02, -3.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
+          <boxGeometry args={[10, 0.02, 0.1]} />
           <meshStandardMaterial color="#f97316" transparent opacity={0.5} />
         </mesh>
         <mesh position={[0, 0.02, -5.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
+          <boxGeometry args={[10, 0.02, 0.1]} />
           <meshStandardMaterial color="#dc2626" transparent opacity={0.6} />
-        </mesh>
-        <mesh position={[0, 0.02, -6.5]}>
-          <boxGeometry args={[16, 0.02, 0.1]} />
-          <meshStandardMaterial color="#7f1d1d" transparent opacity={0.7} />
         </mesh>
       </group>
     </group>
