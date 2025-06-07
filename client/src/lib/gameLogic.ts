@@ -1,4 +1,4 @@
-import { getPath } from "./pathfinding";
+import { getPath, getRandomPath } from "./pathfinding";
 
 export function updateGameLogic(gameState: any, delta: number) {
   if (gameState.gamePhase !== "playing") return;
@@ -47,7 +47,8 @@ function spawnEnemies(gameState: any, currentTime: number) {
 }
 
 function createEnemy(type: string, wave: number) {
-  const path = getPath();
+  // Use random path for each enemy
+  const path = getRandomPath();
   const startPoint = path[0];
   
   const baseConfig = {
@@ -73,13 +74,15 @@ function createEnemy(type: string, wave: number) {
     pathIndex: 0,
     type,
     reward: config.reward,
+    path: path, // Store the path with each enemy
   };
 }
 
 function updateEnemies(gameState: any, delta: number) {
-  const path = getPath();
-  
   gameState.enemies.forEach((enemy: any) => {
+    // Use the enemy's individual path
+    const path = enemy.path || getPath();
+    
     // Check if enemy has crossed the life line (z > 4.5) - now at the front
     if (enemy.z > 4.5) {
       // Enemy reached the end, crossed life line

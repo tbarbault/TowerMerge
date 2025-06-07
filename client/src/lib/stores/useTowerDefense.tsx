@@ -216,8 +216,39 @@ export const useTowerDefense = create<TowerDefenseState>()(
       });
     },
     
-    mergeTowers: () => {
+    mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => {
       const state = get();
+      
+      // If specific tower IDs are provided (drag and drop), use those
+      if (sourceTowerId && targetTowerId) {
+        const sourceTower = state.towers.find(t => t.id === sourceTowerId);
+        const targetTower = state.towers.find(t => t.id === targetTowerId);
+        
+        if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 3) {
+          console.log("Cannot merge towers:", { sourceTower, targetTower });
+          return;
+        }
+        
+        const upgradedTower: Tower = {
+          ...targetTower, // Keep the target tower's position
+          level: targetTower.level + 1,
+          damage: targetTower.damage * 2,
+          range: targetTower.range * 1.2,
+          fireRate: Math.max(targetTower.fireRate * 0.8, 200),
+        };
+        
+        console.log(`Merged towers: ${sourceTowerId} + ${targetTowerId} = Level ${upgradedTower.level}`);
+        
+        set({
+          towers: state.towers
+            .filter(t => t.id !== sourceTower.id && t.id !== targetTower.id)
+            .concat(upgradedTower),
+          selectedTower: upgradedTower,
+        });
+        return;
+      }
+      
+      // Original adjacent merging logic for button clicks
       if (!state.canMergeTowers || !state.selectedGridCell) return;
       
       const adjacentTowers = state.towers.filter(tower => {

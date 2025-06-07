@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import * as THREE from "three";
@@ -15,8 +15,11 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
   const meshRef = useRef<THREE.Group>(null);
   const turretRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
-  const { enemies } = useTowerDefense();
+  const { enemies, towers, mergeTowers } = useTowerDefense();
+  const { camera, raycaster, pointer } = useThree();
   const [targetRotation, setTargetRotation] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
 
   // Find target enemy and calculate rotation
   useEffect(() => {
@@ -43,9 +46,46 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
     }
   }, [enemies, position, level]);
 
+  // Handle drag and drop functionality
+  const handlePointerDown = (event: any) => {
+    if (event.button === 0) { // Left mouse button
+      setIsDragging(true);
+      const intersectionPoint = event.point;
+      const towerPosition = new THREE.Vector3(...position);
+      setDragOffset(intersectionPoint.clone().sub(towerPosition));
+      event.stopPropagation();
+    }
+  };
+
+  const handlePointerUp = (event: any) => {
+    if (isDragging) {
+      setIsDragging(false);
+      
+      // Check if dropped on another tower for merging
+      raycaster.setFromCamera(pointer, camera);
+      const intersects = raycaster.intersectObjects(meshRef.current?.parent?.children || []);
+      
+      for (const intersect of intersects) {
+        const userData = intersect.object.userData;
+        if (userData.towerId && userData.towerId !== towerId) {
+          const targetTower = towers.find(t => t.id === userData.towerId);
+          const currentTower = towers.find(t => t.id === towerId);
+          
+          if (targetTower && currentTower && targetTower.level === currentTower.level && currentTower.level < 3) {
+            console.log(`Merging tower ${towerId} with ${userData.towerId}`);
+            // Perform merge via game state
+            mergeTowers();
+            break;
+          }
+        }
+      }
+      event.stopPropagation();
+    }
+  };
+
   // Animate turret rotation and selection
   useFrame((state, delta) => {
-    if (turretRef.current) {
+    if (turretRef.current && !isDragging) {
       // Smooth rotation towards target
       const currentRotation = turretRef.current.rotation.y;
       const rotationDiff = targetRotation - currentRotation;
@@ -53,8 +93,19 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       turretRef.current.rotation.y += normalizedDiff * delta * 3; // Rotation speed
     }
 
-    if (meshRef.current && isSelected) {
+    if (meshRef.current && isSelected && !isDragging) {
       meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 4) * 0.05;
+    }
+
+    // Handle dragging
+    if (isDragging && meshRef.current) {
+      raycaster.setFromCamera(pointer, camera);
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+      const intersectionPoint = new THREE.Vector3();
+      raycaster.ray.intersectPlane(plane, intersectionPoint);
+      
+      const newPosition = intersectionPoint.sub(dragOffset);
+      meshRef.current.position.copy(newPosition);
     }
   });
 
@@ -103,9 +154,15 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
   const config = getTowerConfig(level);
 
   return (
-    <group ref={meshRef} position={position}>
+    <group 
+      ref={meshRef} 
+      position={position}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      userData={{ towerId }}
+    >
       {/* Tower base platform */}
-      <mesh position={[0, 0.1, 0]}>
+      <mesh position={[0, 0.1, 0]} userData={{ towerId }}>
         <cylinderGeometry args={[0.5, 0.6, 0.2, 8]} />
         <meshStandardMaterial 
           map={woodTexture}
