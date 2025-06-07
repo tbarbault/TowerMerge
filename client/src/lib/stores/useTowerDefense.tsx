@@ -141,9 +141,29 @@ export const useTowerDefense = create<TowerDefenseState>()(
       const state = get();
       const existingTower = state.towers.find(t => t.x === x && t.z === z);
       
+      // Calculate canPlaceTower
+      const towerExists = !!existingTower;
+      const hasEnoughCoins = state.coins >= 10;
+      const canPlace = !towerExists && hasEnoughCoins;
+      
+      // Calculate canMergeTowers
+      let canMerge = false;
+      if (existingTower && existingTower.level < 3) {
+        const adjacentTowers = state.towers.filter(tower => {
+          const dx = Math.abs(tower.x - x);
+          const dz = Math.abs(tower.z - z);
+          return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+        });
+        canMerge = adjacentTowers.some(tower => tower.level === existingTower.level);
+      }
+      
+      console.log("Grid cell selected:", { x, z, canPlace, canMerge, towerExists, hasEnoughCoins });
+      
       set({
         selectedGridCell: { x, z },
         selectedTower: existingTower || null,
+        canPlaceTower: canPlace,
+        canMergeTowers: canMerge,
       });
     },
     
@@ -171,10 +191,13 @@ export const useTowerDefense = create<TowerDefenseState>()(
         lastShot: 0,
       };
       
+      // Recalculate canPlaceTower after placing tower
       set({
         towers: [...state.towers, newTower],
         coins: state.coins - 10,
         selectedTower: newTower,
+        canPlaceTower: false, // Can't place another tower on same cell
+        canMergeTowers: false, // Reset merge state
       });
     },
     
@@ -305,32 +328,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     },
     
     // Computed properties
-    get canPlaceTower() {
-      const state = get();
-      if (!state.selectedGridCell || state.coins < 10) return false;
-      
-      return !state.towers.some(
-        tower => tower.x === state.selectedGridCell!.x && tower.z === state.selectedGridCell!.z
-      );
-    },
-    
-    get canMergeTowers() {
-      const state = get();
-      if (!state.selectedGridCell) return false;
-      
-      const currentTower = state.towers.find(
-        t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z
-      );
-      
-      if (!currentTower || currentTower.level >= 3) return false;
-      
-      const adjacentTowers = state.towers.filter(tower => {
-        const dx = Math.abs(tower.x - state.selectedGridCell!.x);
-        const dz = Math.abs(tower.z - state.selectedGridCell!.z);
-        return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
-      });
-      
-      return adjacentTowers.some(tower => tower.level === currentTower.level);
-    },
+    canPlaceTower: false,
+    canMergeTowers: false,
   }))
 );

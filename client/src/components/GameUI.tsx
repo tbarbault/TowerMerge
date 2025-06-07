@@ -151,7 +151,7 @@ export default function GameUI() {
                   </p>
                 </div>
 
-                {canPlaceTower && (
+                {canPlaceTower ? (
                   <Button 
                     onClick={buyTower}
                     className="bg-green-600 hover:bg-green-700"
@@ -160,9 +160,7 @@ export default function GameUI() {
                     <Coins className="w-4 h-4 mr-2" />
                     Buy Tower (10 coins)
                   </Button>
-                )}
-
-                {canMergeTowers && (
+                ) : canMergeTowers ? (
                   <Button 
                     onClick={mergeTowers}
                     className="bg-blue-600 hover:bg-blue-700"
@@ -170,19 +168,19 @@ export default function GameUI() {
                     <Zap className="w-4 h-4 mr-2" />
                     Merge Towers
                   </Button>
-                )}
-
-                {!canPlaceTower && !canMergeTowers && coins < 10 && (
+                ) : coins < 10 ? (
                   <Badge variant="destructive">
                     Need 10 coins to buy tower
                   </Badge>
-                )}
-
-                {!canPlaceTower && !canMergeTowers && coins >= 10 && (
+                ) : (
                   <Badge variant="secondary" className="bg-gray-700 text-gray-300">
                     Cell occupied
                   </Badge>
                 )}
+
+                <div className="text-xs text-gray-400 mt-2">
+                  Debug: canPlace={canPlaceTower.toString()}, canMerge={canMergeTowers.toString()}, coins={coins}
+                </div>
               </div>
             </CardContent>
           </Card>

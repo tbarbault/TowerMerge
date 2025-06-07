@@ -80,8 +80,8 @@ function updateEnemies(gameState: any, delta: number) {
   const path = getPath();
   
   gameState.enemies.forEach((enemy: any) => {
-    // Check if enemy has crossed the life line (z < -4.5)
-    if (enemy.z < -4.5) {
+    // Check if enemy has crossed the life line (z > 4.5) - now at the front
+    if (enemy.z > 4.5) {
       // Enemy reached the end, crossed life line
       gameState.removeEnemy(enemy.id);
       gameState.takeDamage(1);

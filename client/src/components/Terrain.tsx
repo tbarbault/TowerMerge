@@ -18,8 +18,8 @@ export default function Terrain() {
         />
       </mesh>
       
-      {/* Life line at the back of the grid - enemies crossing this lose player life */}
-      <mesh position={[0, 0.02, -5]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Life line at the front of the grid - enemies crossing this lose player life */}
+      <mesh position={[0, 0.02, 5]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[12, 0.2]} />
         <meshStandardMaterial 
           color="#ef4444" 
@@ -30,8 +30,8 @@ export default function Terrain() {
         />
       </mesh>
       
-      {/* Enemy spawn indicator at front */}
-      <mesh position={[0, 0.02, 6]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* Enemy spawn indicator at back */}
+      <mesh position={[0, 0.02, -6]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[12, 0.2]} />
         <meshStandardMaterial 
           color="#22c55e" 
