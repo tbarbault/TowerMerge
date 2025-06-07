@@ -359,32 +359,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
           
-          {/* Show mergeable towers when selected */}
-          {towers.filter(t => {
-            if (t.id === towerId || t.level !== level || t.level >= 3 || t.type !== type) return false;
-            // Convert world position back to grid coordinates
-            const currentGridX = Math.round((position[0] + 4) / 2);
-            const currentGridZ = Math.round((position[2] + 2) / 2);
-            const dx = Math.abs(t.x - currentGridX);
-            const dz = Math.abs(t.z - currentGridZ);
-            return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
-          }).map(tower => (
-            <mesh 
-              key={`mergeable-${tower.id}`}
-              position={[tower.x * 2 - 4, 0.05, tower.z * 2 - 2]} 
-              rotation={[-Math.PI / 2, 0, 0]}
-            >
-              <circleGeometry args={[0.7, 16]} />
-              <meshStandardMaterial 
-                color="#fbbf24" 
-                transparent 
-                opacity={0.8}
-                emissive="#fbbf24"
-                emissiveIntensity={0.4}
-                side={THREE.DoubleSide}
-              />
-            </mesh>
-          ))}
+
         </>
       )}
 

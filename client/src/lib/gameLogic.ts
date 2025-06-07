@@ -148,10 +148,11 @@ function updateTowers(gameState: any, currentTime: number) {
       const angleDiff = Math.abs(targetAngle - currentRotation);
       const normalizedAngleDiff = Math.min(angleDiff, 2 * Math.PI - angleDiff);
       
+      // Update tower's target rotation for visual component
+      gameState.updateTowerRotation(tower.id, currentRotation, targetAngle);
+      
       // Only fire if tower is aimed at target (within 0.1 radians ~= 5.7 degrees)
       if (normalizedAngleDiff > 0.1) {
-        // Update tower's target rotation for visual component
-        tower.targetRotation = targetAngle;
         return; // Don't fire yet, still rotating
       }
 
