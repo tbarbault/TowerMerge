@@ -52,10 +52,10 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 30, speed: 1.5, reward: 5 },
-    fast: { health: 20, speed: 2.5, reward: 7 },
-    heavy: { health: 60, speed: 1, reward: 10 },
-    boss: { health: 150, speed: 0.8, reward: 25 }
+    basic: { health: 30, speed: 0.8, reward: 5 },
+    fast: { health: 20, speed: 1.2, reward: 7 },
+    heavy: { health: 60, speed: 0.5, reward: 10 },
+    boss: { health: 150, speed: 0.4, reward: 25 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;

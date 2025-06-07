@@ -162,7 +162,7 @@ export default function GameUI() {
                   </Button>
                 ) : canMergeTowers ? (
                   <Button 
-                    onClick={mergeTowers}
+                    onClick={() => mergeTowers()}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
                     <Zap className="w-4 h-4 mr-2" />

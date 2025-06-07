@@ -61,6 +61,11 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
     if (isDragging) {
       setIsDragging(false);
       
+      // Reset tower position to original
+      if (meshRef.current) {
+        meshRef.current.position.set(...position);
+      }
+      
       // Check if dropped on another tower for merging
       raycaster.setFromCamera(pointer, camera);
       const intersects = raycaster.intersectObjects(meshRef.current?.parent?.children || []);
@@ -97,15 +102,26 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 4) * 0.05;
     }
 
-    // Handle dragging
+    // Handle dragging - only update position during active drag
     if (isDragging && meshRef.current) {
       raycaster.setFromCamera(pointer, camera);
       const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
       const intersectionPoint = new THREE.Vector3();
       raycaster.ray.intersectPlane(plane, intersectionPoint);
       
-      const newPosition = intersectionPoint.sub(dragOffset);
-      meshRef.current.position.copy(newPosition);
+      if (intersectionPoint) {
+        const newPosition = intersectionPoint.sub(dragOffset);
+        meshRef.current.position.copy(newPosition);
+      }
+    }
+    
+    // Ensure tower stays at original position when not dragging
+    if (!isDragging && meshRef.current) {
+      const currentPos = meshRef.current.position;
+      const targetPos = new THREE.Vector3(...position);
+      if (currentPos.distanceTo(targetPos) > 0.01) {
+        meshRef.current.position.copy(targetPos);
+      }
     }
   });
 
@@ -115,8 +131,8 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       case 1:
         return { 
           height: 0.8, 
-          baseColor: "#4a5568", 
-          turretColor: "#2d3748",
+          baseColor: "#a0aec0", 
+          turretColor: "#718096",
           segments: 12,
           barrelLength: 0.6,
           barrelRadius: 0.04 
@@ -124,8 +140,8 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       case 2:
         return { 
           height: 1.0, 
-          baseColor: "#2d3748", 
-          turretColor: "#1a202c",
+          baseColor: "#63b3ed", 
+          turretColor: "#4299e1",
           segments: 16,
           barrelLength: 0.8,
           barrelRadius: 0.05 
@@ -133,8 +149,8 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       case 3:
         return { 
           height: 1.2, 
-          baseColor: "#1a202c", 
-          turretColor: "#000000",
+          baseColor: "#fc8181", 
+          turretColor: "#f56565",
           segments: 20,
           barrelLength: 1.0,
           barrelRadius: 0.06 
@@ -142,8 +158,8 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
       default:
         return { 
           height: 0.8, 
-          baseColor: "#4a5568", 
-          turretColor: "#2d3748",
+          baseColor: "#a0aec0", 
+          turretColor: "#718096",
           segments: 12,
           barrelLength: 0.6,
           barrelRadius: 0.04 
