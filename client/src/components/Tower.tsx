@@ -73,8 +73,8 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
           
           if (targetTower && currentTower && targetTower.level === currentTower.level && currentTower.level < 3) {
             console.log(`Merging tower ${towerId} with ${userData.towerId}`);
-            // Perform merge via game state
-            mergeTowers();
+            // Perform merge via game state with specific tower IDs
+            mergeTowers(towerId, userData.towerId);
             break;
           }
         }
@@ -276,6 +276,40 @@ export default function Tower({ position, level, isSelected = false, towerId }: 
             side={THREE.DoubleSide}
           />
         </mesh>
+      )}
+
+      {/* Dragging indicator */}
+      {isDragging && (
+        <>
+          <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[0.8, 16]} />
+            <meshStandardMaterial 
+              color="#fbbf24" 
+              transparent 
+              opacity={0.5}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
+          
+          {/* Mergeable tower indicator - find towers of same level */}
+          {towers.filter(t => t.id !== towerId && t.level === level && t.level < 3).map(tower => (
+            <mesh 
+              key={`merge-indicator-${tower.id}`}
+              position={[tower.x * 2 - 4, 0.05, tower.z * 2 - 2]} 
+              rotation={[-Math.PI / 2, 0, 0]}
+            >
+              <circleGeometry args={[0.6, 16]} />
+              <meshStandardMaterial 
+                color="#10b981" 
+                transparent 
+                opacity={0.7}
+                emissive="#10b981"
+                emissiveIntensity={0.3}
+                side={THREE.DoubleSide}
+              />
+            </mesh>
+          ))}
+        </>
       )}
     </group>
   );

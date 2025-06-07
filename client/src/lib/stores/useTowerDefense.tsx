@@ -81,7 +81,7 @@ interface TowerDefenseState {
   endGame: () => void;
   selectGridCell: (x: number, z: number) => void;
   buyTower: () => void;
-  mergeTowers: () => void;
+  mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => void;
   
   // Game logic
   spawnEnemy: (enemy: Enemy) => void;
