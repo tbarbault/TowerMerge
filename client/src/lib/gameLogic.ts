@@ -137,78 +137,43 @@ function updateEnemies(gameState: any, delta: number) {
       };
 
       if (isBlocked(newX, newZ)) {
-        // Enhanced pathfinding with wall-following behavior
-        const avoidanceOptions = [];
-        
-        // Primary movement options (perpendicular and diagonal)
-        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
-          const offsetX = Math.cos(angle) * moveDistance * 0.8;
-          const offsetZ = Math.sin(angle) * moveDistance * 0.8;
-          avoidanceOptions.push({
-            x: enemy.x + offsetX,
-            z: enemy.z + offsetZ,
-            priority: 1
-          });
-        }
-        
-        // Secondary options (smaller movements)
-        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 6) {
-          const offsetX = Math.cos(angle) * moveDistance * 0.4;
-          const offsetZ = Math.sin(angle) * moveDistance * 0.4;
-          avoidanceOptions.push({
-            x: enemy.x + offsetX,
-            z: enemy.z + offsetZ,
-            priority: 2
-          });
-        }
+        // Try multiple avoidance options
+        const avoidanceOptions = [
+          // Perpendicular movements
+          { x: enemy.x + moveDistance * 0.7, z: enemy.z },
+          { x: enemy.x - moveDistance * 0.7, z: enemy.z },
+          { x: enemy.x, z: enemy.z + moveDistance * 0.7 },
+          { x: enemy.x, z: enemy.z - moveDistance * 0.7 },
+          // Diagonal movements
+          { x: enemy.x + moveDistance * 0.5, z: enemy.z + moveDistance * 0.5 },
+          { x: enemy.x + moveDistance * 0.5, z: enemy.z - moveDistance * 0.5 },
+          { x: enemy.x - moveDistance * 0.5, z: enemy.z + moveDistance * 0.5 },
+          { x: enemy.x - moveDistance * 0.5, z: enemy.z - moveDistance * 0.5 },
+        ];
 
         // Find the best unblocked option that moves toward target
         let bestOption = null;
         let bestScore = Infinity;
 
-        // Try options by priority
-        for (let priority = 1; priority <= 2; priority++) {
-          const priorityOptions = avoidanceOptions.filter(opt => opt.priority === priority);
-          
-          for (const option of priorityOptions) {
-            if (!isBlocked(option.x, option.z)) {
-              const distToTarget = Math.sqrt(
-                (currentTarget.x - option.x) ** 2 + (currentTarget.z - option.z) ** 2
-              );
-              
-              // Prefer options that move toward target and have higher priority
-              const score = distToTarget + (priority - 1) * 2;
-              
-              if (score < bestScore) {
-                bestScore = score;
-                bestOption = option;
-              }
+        for (const option of avoidanceOptions) {
+          if (!isBlocked(option.x, option.z)) {
+            const distToTarget = Math.sqrt(
+              (currentTarget.x - option.x) ** 2 + (currentTarget.z - option.z) ** 2
+            );
+            if (distToTarget < bestScore) {
+              bestScore = distToTarget;
+              bestOption = option;
             }
           }
-          
-          // If we found a good option at this priority, use it
-          if (bestOption) break;
         }
 
         if (bestOption) {
           newX = bestOption.x;
           newZ = bestOption.z;
         } else {
-          // If completely blocked, try tiny movements
-          const tinyMoves = [
-            { x: enemy.x + 0.1, z: enemy.z },
-            { x: enemy.x - 0.1, z: enemy.z },
-            { x: enemy.x, z: enemy.z + 0.1 },
-            { x: enemy.x, z: enemy.z - 0.1 }
-          ];
-          
-          for (const move of tinyMoves) {
-            if (!isBlocked(move.x, move.z)) {
-              newX = move.x;
-              newZ = move.z;
-              break;
-            }
-          }
+          // If all options blocked, stay in place
+          newX = enemy.x;
+          newZ = enemy.z;
         }
       }
       
