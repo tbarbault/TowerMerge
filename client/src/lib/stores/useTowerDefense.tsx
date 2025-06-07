@@ -1,0 +1,329 @@
+import { create } from "zustand";
+import { subscribeWithSelector } from "zustand/middleware";
+
+export type GamePhase = "menu" | "playing" | "gameOver";
+
+export interface Tower {
+  id: string;
+  x: number;
+  z: number;
+  level: number;
+  damage: number;
+  range: number;
+  fireRate: number;
+  lastShot: number;
+}
+
+export interface Enemy {
+  id: string;
+  x: number;
+  z: number;
+  health: number;
+  maxHealth: number;
+  speed: number;
+  pathIndex: number;
+  type: string;
+  reward: number;
+}
+
+export interface Bullet {
+  id: string;
+  x: number;
+  y: number;
+  z: number;
+  targetId: string;
+  damage: number;
+  speed: number;
+  color: string;
+}
+
+export interface GridCell {
+  x: number;
+  z: number;
+}
+
+interface TowerDefenseState {
+  // Game state
+  gamePhase: GamePhase;
+  wave: number;
+  health: number;
+  coins: number;
+  waveStartTime: number;
+  
+  // Game objects
+  towers: Tower[];
+  enemies: Enemy[];
+  bullets: Bullet[];
+  
+  // UI state
+  selectedGridCell: GridCell | null;
+  selectedTower: Tower | null;
+  
+  // Wave management
+  enemiesInWave: number;
+  enemiesSpawned: number;
+  waveProgress: number;
+  
+  // Actions
+  startGame: () => void;
+  restartGame: () => void;
+  endGame: () => void;
+  selectGridCell: (x: number, z: number) => void;
+  buyTower: () => void;
+  mergeTowers: () => void;
+  
+  // Game logic
+  spawnEnemy: (enemy: Enemy) => void;
+  removeBullet: (id: string) => void;
+  removeEnemy: (id: string) => void;
+  damageEnemy: (id: string, damage: number) => void;
+  addBullet: (bullet: Bullet) => void;
+  updateBullet: (id: string, x: number, y: number, z: number) => void;
+  updateEnemy: (id: string, x: number, z: number, pathIndex: number) => void;
+  updateTowerLastShot: (id: string, time: number) => void;
+  takeDamage: (amount: number) => void;
+  addCoins: (amount: number) => void;
+  nextWave: () => void;
+  setWaveProgress: (progress: number) => void;
+  setEnemiesSpawned: (count: number) => void;
+  
+  // Computed properties
+  canPlaceTower: boolean;
+  canMergeTowers: boolean;
+}
+
+export const useTowerDefense = create<TowerDefenseState>()(
+  subscribeWithSelector((set, get) => ({
+    // Initial state
+    gamePhase: "menu",
+    wave: 1,
+    health: 20,
+    coins: 50,
+    waveStartTime: 0,
+    
+    towers: [],
+    enemies: [],
+    bullets: [],
+    
+    selectedGridCell: null,
+    selectedTower: null,
+    
+    enemiesInWave: 5,
+    enemiesSpawned: 0,
+    waveProgress: 0,
+    
+    // Actions
+    startGame: () => {
+      set({
+        gamePhase: "playing",
+        wave: 1,
+        health: 20,
+        coins: 50,
+        towers: [],
+        enemies: [],
+        bullets: [],
+        waveStartTime: Date.now(),
+        enemiesSpawned: 0,
+        waveProgress: 0,
+      });
+    },
+    
+    restartGame: () => {
+      const state = get();
+      state.startGame();
+    },
+    
+    endGame: () => {
+      set({ gamePhase: "gameOver" });
+    },
+    
+    selectGridCell: (x: number, z: number) => {
+      const state = get();
+      const existingTower = state.towers.find(t => t.x === x && t.z === z);
+      
+      set({
+        selectedGridCell: { x, z },
+        selectedTower: existingTower || null,
+      });
+    },
+    
+    buyTower: () => {
+      const state = get();
+      if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 10) {
+        return;
+      }
+      
+      const newTower: Tower = {
+        id: Math.random().toString(36).substr(2, 9),
+        x: state.selectedGridCell.x,
+        z: state.selectedGridCell.z,
+        level: 1,
+        damage: 10,
+        range: 2.5,
+        fireRate: 1000, // ms between shots
+        lastShot: 0,
+      };
+      
+      set({
+        towers: [...state.towers, newTower],
+        coins: state.coins - 10,
+        selectedTower: newTower,
+      });
+    },
+    
+    mergeTowers: () => {
+      const state = get();
+      if (!state.canMergeTowers || !state.selectedGridCell) return;
+      
+      const adjacentTowers = state.towers.filter(tower => {
+        const dx = Math.abs(tower.x - state.selectedGridCell!.x);
+        const dz = Math.abs(tower.z - state.selectedGridCell!.z);
+        return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+      });
+      
+      const currentTower = state.towers.find(
+        t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z
+      );
+      
+      if (!currentTower) return;
+      
+      const mergeableTower = adjacentTowers.find(t => t.level === currentTower.level);
+      if (!mergeableTower) return;
+      
+      const upgradedTower: Tower = {
+        ...currentTower,
+        level: currentTower.level + 1,
+        damage: currentTower.damage * 2,
+        range: currentTower.range * 1.2,
+        fireRate: Math.max(currentTower.fireRate * 0.8, 200),
+      };
+      
+      set({
+        towers: state.towers
+          .filter(t => t.id !== currentTower.id && t.id !== mergeableTower.id)
+          .concat(upgradedTower),
+        selectedTower: upgradedTower,
+      });
+    },
+    
+    // Game logic actions
+    spawnEnemy: (enemy) => {
+      set(state => ({
+        enemies: [...state.enemies, enemy]
+      }));
+    },
+    
+    removeBullet: (id) => {
+      set(state => ({
+        bullets: state.bullets.filter(b => b.id !== id)
+      }));
+    },
+    
+    removeEnemy: (id) => {
+      set(state => ({
+        enemies: state.enemies.filter(e => e.id !== id)
+      }));
+    },
+    
+    damageEnemy: (id, damage) => {
+      set(state => ({
+        enemies: state.enemies.map(enemy =>
+          enemy.id === id
+            ? { ...enemy, health: Math.max(0, enemy.health - damage) }
+            : enemy
+        )
+      }));
+    },
+    
+    addBullet: (bullet) => {
+      set(state => ({
+        bullets: [...state.bullets, bullet]
+      }));
+    },
+    
+    updateBullet: (id, x, y, z) => {
+      set(state => ({
+        bullets: state.bullets.map(bullet =>
+          bullet.id === id ? { ...bullet, x, y, z } : bullet
+        )
+      }));
+    },
+    
+    updateEnemy: (id, x, z, pathIndex) => {
+      set(state => ({
+        enemies: state.enemies.map(enemy =>
+          enemy.id === id ? { ...enemy, x, z, pathIndex } : enemy
+        )
+      }));
+    },
+    
+    updateTowerLastShot: (id, time) => {
+      set(state => ({
+        towers: state.towers.map(tower =>
+          tower.id === id ? { ...tower, lastShot: time } : tower
+        )
+      }));
+    },
+    
+    takeDamage: (amount) => {
+      set(state => {
+        const newHealth = Math.max(0, state.health - amount);
+        if (newHealth === 0) {
+          return { health: newHealth, gamePhase: "gameOver" as GamePhase };
+        }
+        return { health: newHealth };
+      });
+    },
+    
+    addCoins: (amount) => {
+      set(state => ({ coins: state.coins + amount }));
+    },
+    
+    nextWave: () => {
+      set(state => ({
+        wave: state.wave + 1,
+        enemiesInWave: Math.floor(5 + state.wave * 1.5),
+        enemiesSpawned: 0,
+        waveProgress: 0,
+        waveStartTime: Date.now(),
+      }));
+    },
+    
+    setWaveProgress: (progress) => {
+      set({ waveProgress: progress });
+    },
+    
+    setEnemiesSpawned: (count) => {
+      set({ enemiesSpawned: count });
+    },
+    
+    // Computed properties
+    get canPlaceTower() {
+      const state = get();
+      if (!state.selectedGridCell || state.coins < 10) return false;
+      
+      return !state.towers.some(
+        tower => tower.x === state.selectedGridCell!.x && tower.z === state.selectedGridCell!.z
+      );
+    },
+    
+    get canMergeTowers() {
+      const state = get();
+      if (!state.selectedGridCell) return false;
+      
+      const currentTower = state.towers.find(
+        t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z
+      );
+      
+      if (!currentTower || currentTower.level >= 3) return false;
+      
+      const adjacentTowers = state.towers.filter(tower => {
+        const dx = Math.abs(tower.x - state.selectedGridCell!.x);
+        const dz = Math.abs(tower.z - state.selectedGridCell!.z);
+        return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
+      });
+      
+      return adjacentTowers.some(tower => tower.level === currentTower.level);
+    },
+  }))
+);
