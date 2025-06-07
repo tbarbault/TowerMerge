@@ -187,7 +187,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     selectedObstacleSlot: null,
     obstacleMode: false,
     
-    enemiesInWave: 5,
+    enemiesInWave: 8,
     enemiesSpawned: 0,
     waveProgress: 0,
     
@@ -199,8 +199,8 @@ export const useTowerDefense = create<TowerDefenseState>()(
       set({
         gamePhase: "playing",
         wave: 1,
-        health: 20,
-        coins: 75,
+        health: 15,
+        coins: 50,
         towers: [],
         enemies: [],
         bullets: [],
@@ -516,7 +516,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     nextWave: () => {
       set(state => ({
         wave: state.wave + 1,
-        enemiesInWave: Math.floor(5 + state.wave * 1.5),
+        enemiesInWave: Math.floor(8 + state.wave * 2.2),
         enemiesSpawned: 0,
         waveProgress: 0,
         waveStartTime: Date.now(),
