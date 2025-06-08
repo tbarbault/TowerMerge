@@ -24,7 +24,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "basic",
     name: "Crimson Crawler",
-    health: 250,
+    health: 238,
     speed: 1.2,
     reward: 1,
     color: "#ef4444",
@@ -43,7 +43,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "fast",
     name: "Verdant Dasher",
-    health: 204,
+    health: 194,
     speed: 2.0,
     reward: 2,
     color: "#22c55e",
@@ -62,7 +62,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "heavy",
     name: "Cobalt Bruiser",
-    health: 454,
+    health: 431,
     speed: 1.0,
     reward: 2,
     color: "#3b82f6",
@@ -81,7 +81,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "armored",
     name: "Violet Guardian",
-    health: 657,
+    health: 624,
     speed: 1.1,
     reward: 3,
     color: "#8b5cf6",
@@ -100,7 +100,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "elite",
     name: "Golden Vanguard",
-    health: 964,
+    health: 916,
     speed: 1.3,
     reward: 4,
     color: "#f59e0b",
@@ -119,7 +119,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "stealth",
     name: "Shadow Infiltrator",
-    health: 380,
+    health: 361,
     speed: 1.6,
     reward: 3,
     color: "#6b7280",
@@ -138,7 +138,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "berserker",
     name: "Crimson Berserker",
-    health: 720,
+    health: 684,
     speed: 1.4,
     reward: 5,
     color: "#dc2626",
@@ -157,7 +157,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "titan",
     name: "Obsidian Titan",
-    health: 1800,
+    health: 1710,
     speed: 0.7,
     reward: 12,
     color: "#1f2937",

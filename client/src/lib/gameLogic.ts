@@ -179,17 +179,17 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 250, speed: 1.2, reward: 1 }, // +5% from 238
-    fast: { health: 204, speed: 2.0, reward: 2 }, // +5% from 194
-    heavy: { health: 454, speed: 1.0, reward: 2 }, // +5% from 432
-    armored: { health: 657, speed: 1.1, reward: 3 }, // +5% from 626
-    elite: { health: 964, speed: 1.3, reward: 4 }, // +5% from 918
-    boss: { health: 1531, speed: 0.9, reward: 8 }, // +5% from 1458
-    megaboss: { health: 3062, speed: 0.8, reward: 15 }, // +5% from 2916
+    basic: { health: 238, speed: 1.2, reward: 1 }, // -5% from 250
+    fast: { health: 194, speed: 2.0, reward: 2 }, // -5% from 204
+    heavy: { health: 431, speed: 1.0, reward: 2 }, // -5% from 454
+    armored: { health: 624, speed: 1.1, reward: 3 }, // -5% from 657
+    elite: { health: 916, speed: 1.3, reward: 4 }, // -5% from 964
+    boss: { health: 1454, speed: 0.9, reward: 8 }, // -5% from 1531
+    megaboss: { health: 2909, speed: 0.8, reward: 15 }, // -5% from 3062
     // New enemies for increased complexity
-    stealth: { health: 380, speed: 1.6, reward: 3 }, // Wave 15+ - Fast and moderately tough
-    berserker: { health: 720, speed: 1.4, reward: 5 }, // Wave 20+ - High damage resistance, fast
-    titan: { health: 1800, speed: 0.7, reward: 12 } // Wave 30+ - Massive health, slow but devastating
+    stealth: { health: 361, speed: 1.6, reward: 3 }, // -5% from 380 - Wave 15+ - Fast and moderately tough
+    berserker: { health: 684, speed: 1.4, reward: 5 }, // -5% from 720 - Wave 20+ - High damage resistance, fast
+    titan: { health: 1710, speed: 0.7, reward: 12 } // -5% from 1800 - Wave 30+ - Massive health, slow but devastating
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
