@@ -220,8 +220,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             baseColor: "#22c55e", 
             turretColor: "#16a34a",
             segments: 8,
-            mortarTubeLength: 0.36,
-            mortarTubeRadius: 0.12,
+            mortarTubeLength: 0.45,
+            mortarTubeRadius: 0.18,
             mortarAngle: 0.6, // 35 degrees
             baseWidth: 1.4,
             isMortar: true
@@ -232,8 +232,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             baseColor: "#3b82f6", 
             turretColor: "#2563eb",
             segments: 10,
-            mortarTubeLength: 0.5,
-            mortarTubeRadius: 0.16,
+            mortarTubeLength: 0.65,
+            mortarTubeRadius: 0.24,
             mortarAngle: 0.6,
             baseWidth: 1.6,
             isMortar: true
@@ -244,8 +244,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             baseColor: "#a855f7", 
             turretColor: "#9333ea",
             segments: 12,
-            mortarTubeLength: 0.64,
-            mortarTubeRadius: 0.2,
+            mortarTubeLength: 0.85,
+            mortarTubeRadius: 0.3,
             mortarAngle: 0.6,
             baseWidth: 1.8,
             isMortar: true
@@ -256,8 +256,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             baseColor: "#ef4444", 
             turretColor: "#dc2626",
             segments: 14,
-            mortarTubeLength: 0.8,
-            mortarTubeRadius: 0.24,
+            mortarTubeLength: 1.1,
+            mortarTubeRadius: 0.36,
             mortarAngle: 0.6,
             baseWidth: 2.0,
             isMortar: true
@@ -268,8 +268,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             baseColor: "#f59e0b", 
             turretColor: "#d97706",
             segments: 16,
-            mortarTubeLength: 1.0,
-            mortarTubeRadius: 0.28,
+            mortarTubeLength: 1.4,
+            mortarTubeRadius: 0.42,
             mortarAngle: 0.6,
             baseWidth: 2.2,
             isMortar: true

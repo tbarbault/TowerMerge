@@ -303,7 +303,7 @@ function updateTowers(gameState: any, currentTime: number) {
         speed: tower.type === 'mortar' ? 4 : 12, // Faster turret bullets
         color: tower.level === 1 ? "#22c55e" : tower.level === 2 ? "#3b82f6" : tower.level === 3 ? "#a855f7" : tower.level === 4 ? "#ef4444" : "#f59e0b",
         type: tower.type === 'mortar' ? 'mortar' : 'bullet',
-        explosionRadius: tower.type === 'mortar' ? (0.6 + tower.level * 0.25) : undefined,
+        explosionRadius: tower.type === 'mortar' ? (1.2 + tower.level * 0.4) : undefined,
         targetX: tower.type === 'mortar' ? target.x : undefined,
         targetZ: tower.type === 'mortar' ? target.z : undefined,
       };

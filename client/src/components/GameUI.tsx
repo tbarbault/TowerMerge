@@ -54,9 +54,8 @@ export default function GameUI() {
               <p>• Enemies get stronger each wave</p>
               <p>• Don't let them reach your base!</p>
             </div>
-            <Button onClick={startGame} className="w-full" size="lg">
-              <Play className="w-4 h-4 mr-2" />
-              Start Game
+            <Button onClick={startGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
+              START
             </Button>
           </CardContent>
         </Card>
