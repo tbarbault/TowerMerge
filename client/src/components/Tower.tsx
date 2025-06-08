@@ -221,7 +221,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             turretColor: "#16a34a",
             segments: 8,
             mortarTubeLength: 0.55,
-            mortarTubeRadius: 0.22,
+            mortarTubeRadius: 0.66,
             mortarAngle: 0.6, // 35 degrees
             baseWidth: 1.4,
             isMortar: true
@@ -233,7 +233,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             turretColor: "#2563eb",
             segments: 10,
             mortarTubeLength: 0.8,
-            mortarTubeRadius: 0.3,
+            mortarTubeRadius: 0.9,
             mortarAngle: 0.6,
             baseWidth: 1.6,
             isMortar: true
@@ -245,7 +245,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             turretColor: "#9333ea",
             segments: 12,
             mortarTubeLength: 1.05,
-            mortarTubeRadius: 0.38,
+            mortarTubeRadius: 1.14,
             mortarAngle: 0.6,
             baseWidth: 1.8,
             isMortar: true
@@ -257,7 +257,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             turretColor: "#dc2626",
             segments: 14,
             mortarTubeLength: 1.35,
-            mortarTubeRadius: 0.46,
+            mortarTubeRadius: 1.38,
             mortarAngle: 0.6,
             baseWidth: 2.0,
             isMortar: true
@@ -269,7 +269,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             turretColor: "#d97706",
             segments: 16,
             mortarTubeLength: 1.7,
-            mortarTubeRadius: 0.54,
+            mortarTubeRadius: 1.62,
             mortarAngle: 0.6,
             baseWidth: 2.2,
             isMortar: true

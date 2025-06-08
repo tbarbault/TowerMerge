@@ -224,7 +224,7 @@ export default function GameUI() {
                       selectTowerType('turret');
                       buyTower();
                     }}
-                    className="bg-green-600 hover:bg-green-700 text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto"
+                    className="bg-green-600 hover:bg-green-700 text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg"
                     disabled={coins < 15}
                   >
                     <Target className="w-3 h-3" />
@@ -235,22 +235,13 @@ export default function GameUI() {
                       selectTowerType('mortar');
                       buyTower();
                     }}
-                    className="bg-orange-600 hover:bg-orange-700 text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto"
+                    className="bg-orange-600 hover:bg-orange-700 text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg"
                     disabled={coins < 25}
                   >
                     <Bomb className="w-3 h-3" />
                     <span>Mortar - 25</span>
                   </Button>
                 </div>
-                {canMergeTowers && (
-                  <Button 
-                    onClick={() => mergeTowers()}
-                    className="bg-blue-600 hover:bg-blue-700 w-full mt-2 text-xs p-3 md:p-2 min-h-[44px] md:min-h-auto"
-                  >
-                    <Zap className="w-3 h-3 mr-1" />
-                    Merge Towers
-                  </Button>
-                )}
               </div>
 
 
