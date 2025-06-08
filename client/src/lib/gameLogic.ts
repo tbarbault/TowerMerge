@@ -215,7 +215,7 @@ function updateTowers(gameState: any, currentTime: number) {
 
     // Find enemies in range (tower world position conversion)
     const towerWorldX = tower.x * 2 - 4;
-    const towerWorldZ = tower.z * 2 - 2;
+    const towerWorldZ = tower.z * 2 + 2;
     
     const enemiesInRange = gameState.enemies.filter((enemy: any) => {
       const dx = enemy.x - towerWorldX;
@@ -239,21 +239,21 @@ function updateTowers(gameState: any, currentTime: number) {
       const getBarrelLength = (type: 'turret' | 'mortar', level: number) => {
         if (type === 'turret') {
           switch (level) {
-            case 1: return 0.25;
-            case 2: return 0.32;
-            case 3: return 0.4;
-            case 4: return 0.5;
-            case 5: return 0.62;
-            default: return 0.25;
+            case 1: return 0.5;
+            case 2: return 0.64;
+            case 3: return 0.8;
+            case 4: return 1.0;
+            case 5: return 1.24;
+            default: return 0.5;
           }
         } else { // mortar
           switch (level) {
-            case 1: return 0.12;
-            case 2: return 0.16;
-            case 3: return 0.21;
-            case 4: return 0.27;
-            case 5: return 0.34;
-            default: return 0.12;
+            case 1: return 0.36;
+            case 2: return 0.5;
+            case 3: return 0.64;
+            case 4: return 0.8;
+            case 5: return 1.0;
+            default: return 0.36;
           }
         }
       };

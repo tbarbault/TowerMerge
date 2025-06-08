@@ -9,12 +9,64 @@ export default function Terrain() {
 
   return (
     <>
-      {/* Main terrain - extended for longer combat zone */}
-      <mesh position={[0, -0.5, -8]} receiveShadow>
-        <boxGeometry args={[30, 1, 35]} />
+      {/* Track lanes - create defined pathways for enemies */}
+      <mesh position={[0, -0.45, -8]} receiveShadow>
+        <boxGeometry args={[14, 1, 35]} />
+        <meshStandardMaterial 
+          map={grassTexture}
+          color="#2d5016"
+        />
+      </mesh>
+      
+      {/* Central track area - lighter green */}
+      <mesh position={[0, -0.4, -8]} receiveShadow>
+        <boxGeometry args={[12, 0.1, 32]} />
         <meshStandardMaterial 
           map={grassTexture}
           color="#4ade80"
+        />
+      </mesh>
+      
+      {/* Side barriers/walls */}
+      <mesh position={[-7, 0, -8]} receiveShadow>
+        <boxGeometry args={[2, 0.5, 35]} />
+        <meshStandardMaterial 
+          color="#1f2937"
+        />
+      </mesh>
+      
+      <mesh position={[7, 0, -8]} receiveShadow>
+        <boxGeometry args={[2, 0.5, 35]} />
+        <meshStandardMaterial 
+          color="#1f2937"
+        />
+      </mesh>
+      
+      {/* Track lane dividers */}
+      <mesh position={[-3, -0.35, -8]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.1, 32]} />
+        <meshStandardMaterial 
+          color="#374151" 
+          transparent 
+          opacity={0.7}
+        />
+      </mesh>
+      
+      <mesh position={[0, -0.35, -8]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.1, 32]} />
+        <meshStandardMaterial 
+          color="#374151" 
+          transparent 
+          opacity={0.7}
+        />
+      </mesh>
+      
+      <mesh position={[3, -0.35, -8]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.1, 32]} />
+        <meshStandardMaterial 
+          color="#374151" 
+          transparent 
+          opacity={0.7}
         />
       </mesh>
       
