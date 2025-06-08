@@ -64,6 +64,24 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
           size: 0.8,
           segments: 20 
         };
+      case "stealth":
+        return { 
+          color: "#6b7280", 
+          size: 0.28,
+          segments: 8 
+        };
+      case "berserker":
+        return { 
+          color: "#dc2626", 
+          size: 0.42,
+          segments: 12 
+        };
+      case "titan":
+        return { 
+          color: "#1f2937", 
+          size: 0.7,
+          segments: 16 
+        };
       default:
         return { 
           color: "#ef4444", 

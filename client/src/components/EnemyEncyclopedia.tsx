@@ -24,7 +24,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "basic",
     name: "Crimson Crawler",
-    health: 220,
+    health: 250,
     speed: 1.2,
     reward: 1,
     color: "#ef4444",
@@ -115,6 +115,63 @@ const enemyDatabase: EnemyData[] = [
     ],
     firstAppearsWave: 8,
     difficulty: "Very Hard"
+  },
+  {
+    type: "stealth",
+    name: "Shadow Infiltrator",
+    health: 380,
+    speed: 1.6,
+    reward: 3,
+    color: "#6b7280",
+    size: 0.28,
+    lore: "Cloaked in adaptive camouflage technology, these gray phantoms can phase in and out of visibility. Originally reconnaissance units, they've been modified for direct assault. Their stealth capabilities make them difficult to target, and their speed allows them to slip through defensive gaps.",
+    strengths: ["High speed", "Stealth phases", "Small target profile"],
+    weaknesses: ["Low health", "Visible when taking damage", "Vulnerable to area damage"],
+    tacticalNotes: [
+      "Place towers in overlapping coverage areas",
+      "Mortars can hit them even when cloaked",
+      "Focus on chokepoints to catch them"
+    ],
+    firstAppearsWave: 15,
+    difficulty: "Hard"
+  },
+  {
+    type: "berserker",
+    name: "Crimson Berserker",
+    health: 720,
+    speed: 1.4,
+    reward: 5,
+    color: "#dc2626",
+    size: 0.42,
+    lore: "Driven mad by combat stimulants and neural modifications, these red warriors feel no pain and know no fear. They charge relentlessly toward your defenses, their rage making them resistant to status effects. Once elite soldiers, they've sacrificed sanity for raw power.",
+    strengths: ["High speed and health", "Rage resistance", "Intimidation aura"],
+    weaknesses: ["Predictable path", "No tactical awareness", "Vulnerable to sustained fire"],
+    tacticalNotes: [
+      "Requires immediate attention when spotted",
+      "Use maximum level towers only",
+      "Don't let them group with other enemies"
+    ],
+    firstAppearsWave: 20,
+    difficulty: "Very Hard"
+  },
+  {
+    type: "titan",
+    name: "Obsidian Titan",
+    health: 1800,
+    speed: 0.7,
+    reward: 12,
+    color: "#1f2937",
+    size: 0.7,
+    lore: "Forged from compressed dark matter and obsidian cores, these black giants are living fortresses. Each step shakes the battlefield, and their presence alone demoralizes lesser units. They are the harbingers of the final assault waves, nearly unstoppable juggernauts of destruction.",
+    strengths: ["Massive health pool", "Earthquake attacks", "Damage reduction"],
+    weaknesses: ["Extremely slow", "Large hitbox", "Vulnerable to coordinated assault"],
+    tacticalNotes: [
+      "All available firepower must focus on titans",
+      "Prevent them from reaching defensive lines",
+      "Level 5 towers are essential for effective damage"
+    ],
+    firstAppearsWave: 30,
+    difficulty: "Extreme"
   },
   {
     type: "boss",

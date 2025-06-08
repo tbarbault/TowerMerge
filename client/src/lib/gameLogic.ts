@@ -45,10 +45,13 @@ export function getAvailableEnemyTypes(wave: number): string[] {
     if (wave >= 5) types.push("armored");
     return types;
   }
-  // Wave 8+: All enemy types available
+  // Wave 8+: All enemy types available with progressive unlocks
   else {
     const types = ["basic", "fast", "heavy", "armored"];
     if (wave >= 8) types.push("elite");
+    if (wave >= 15) types.push("stealth"); // New enemy at wave 15
+    if (wave >= 20) types.push("berserker"); // New enemy at wave 20
+    if (wave >= 30) types.push("titan"); // New enemy at wave 30
     return types;
   }
 }
@@ -102,14 +105,53 @@ function selectWeightedEnemyType(availableTypes: string[], wave: number) {
     };
     return getWeightedRandomType(availableTypes, weights);
   }
-  // Later waves favor stronger enemies
-  else {
+  // Later waves favor stronger enemies with new enemy types
+  else if (wave <= 14) {
     const weights = {
       basic: 20,
       fast: 25,
       heavy: 25,
       armored: 20,
       elite: 10
+    };
+    return getWeightedRandomType(availableTypes, weights);
+  }
+  // Wave 15-19: Introduce stealth enemies
+  else if (wave <= 19) {
+    const weights = {
+      basic: 15,
+      fast: 20,
+      heavy: 20,
+      armored: 20,
+      elite: 15,
+      stealth: 10
+    };
+    return getWeightedRandomType(availableTypes, weights);
+  }
+  // Wave 20-29: Introduce berserkers
+  else if (wave <= 29) {
+    const weights = {
+      basic: 10,
+      fast: 15,
+      heavy: 20,
+      armored: 20,
+      elite: 15,
+      stealth: 10,
+      berserker: 10
+    };
+    return getWeightedRandomType(availableTypes, weights);
+  }
+  // Wave 30+: All enemies including titans
+  else {
+    const weights = {
+      basic: 5,
+      fast: 10,
+      heavy: 15,
+      armored: 20,
+      elite: 20,
+      stealth: 10,
+      berserker: 15,
+      titan: 5
     };
     return getWeightedRandomType(availableTypes, weights);
   }
@@ -137,13 +179,17 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 238, speed: 1.2, reward: 1 }, // -10% from 264
-    fast: { health: 194, speed: 2.0, reward: 2 }, // -10% from 216
-    heavy: { health: 432, speed: 1.0, reward: 2 }, // -10% from 480
-    armored: { health: 626, speed: 1.1, reward: 3 }, // -10% from 696
-    elite: { health: 918, speed: 1.3, reward: 4 }, // -10% from 1020
-    boss: { health: 1458, speed: 0.9, reward: 8 }, // -10% from 1620
-    megaboss: { health: 2916, speed: 0.8, reward: 15 } // -10% from 3240
+    basic: { health: 250, speed: 1.2, reward: 1 }, // +5% from 238
+    fast: { health: 204, speed: 2.0, reward: 2 }, // +5% from 194
+    heavy: { health: 454, speed: 1.0, reward: 2 }, // +5% from 432
+    armored: { health: 657, speed: 1.1, reward: 3 }, // +5% from 626
+    elite: { health: 964, speed: 1.3, reward: 4 }, // +5% from 918
+    boss: { health: 1531, speed: 0.9, reward: 8 }, // +5% from 1458
+    megaboss: { health: 3062, speed: 0.8, reward: 15 }, // +5% from 2916
+    // New enemies for increased complexity
+    stealth: { health: 380, speed: 1.6, reward: 3 }, // Wave 15+ - Fast and moderately tough
+    berserker: { health: 720, speed: 1.4, reward: 5 }, // Wave 20+ - High damage resistance, fast
+    titan: { health: 1800, speed: 0.7, reward: 12 } // Wave 30+ - Massive health, slow but devastating
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
