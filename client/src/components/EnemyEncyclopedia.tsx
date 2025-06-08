@@ -201,7 +201,7 @@ export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: Enem
         
         <CardContent className="p-0 flex h-[calc(100vh-3rem)] md:h-[calc(95vh-4rem)]">
           {/* Enemy List */}
-          <div className="w-full md:w-1/3 border-r border-gray-700 overflow-y-auto">
+          <div className={`${selectedEnemy ? 'hidden md:block md:w-1/3' : 'w-full md:w-1/3'} border-r border-gray-700 overflow-y-auto`}>
             <div className="p-2 md:p-4 space-y-2 md:space-y-3">
               {enemyDatabase.map((enemy) => (
                 <div
@@ -260,9 +260,20 @@ export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: Enem
           </div>
 
           {/* Enemy Details */}
-          <div className={`${selectedEnemy ? 'flex-1' : 'hidden md:flex md:flex-1'} overflow-y-auto`}>
+          <div className={`${selectedEnemy ? 'flex-1' : 'hidden md:flex md:flex-1'} overflow-y-auto relative`}>
             {selectedEnemy ? (
               <div className="p-3 md:p-6 space-y-4 md:space-y-6">
+                {/* Mobile Back Button */}
+                <div className="md:hidden mb-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedEnemy(null)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    ← Back to List
+                  </Button>
+                </div>
                 {/* Header */}
                 <div className="flex items-center gap-3 md:gap-4">
                   <div
