@@ -100,8 +100,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               if (!audioMuted) {
                 try {
                   const mergeAudio = new Audio("/sounds/hit.mp3");
-                  mergeAudio.volume = 0.9;
-                  mergeAudio.playbackRate = 1.2; // Mechanical merge sound
+                  mergeAudio.volume = 1.0;
+                  mergeAudio.playbackRate = 1.0; // Clear mechanical merge sound
                   mergeAudio.play().catch(() => {});
                 } catch (e) {}
               }

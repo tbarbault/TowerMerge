@@ -252,8 +252,8 @@ export default function GameUI() {
                       if (!isMuted) {
                         try {
                           const audio = new Audio("/sounds/hit.mp3");
-                          audio.volume = 0.8;
-                          audio.playbackRate = 1.8; // High pitch for mechanical placement sound
+                          audio.volume = 1.0;
+                          audio.playbackRate = 1.4; // Mechanical placement sound
                           audio.play().catch(() => {});
                         } catch (e) {}
                       }
@@ -271,8 +271,8 @@ export default function GameUI() {
                       if (!isMuted) {
                         try {
                           const audio = new Audio("/sounds/hit.mp3");
-                          audio.volume = 0.9;
-                          audio.playbackRate = 1.4; // Mechanical sound for mortar placement
+                          audio.volume = 1.0;
+                          audio.playbackRate = 1.1; // Deeper mechanical sound for mortar placement
                           audio.play().catch(() => {});
                         } catch (e) {}
                       }

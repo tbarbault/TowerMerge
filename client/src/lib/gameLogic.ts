@@ -396,8 +396,8 @@ function updateBullets(gameState: any, delta: number) {
           if (!audioState) {
             try {
               const deathAudio = new Audio("/sounds/success.mp3");
-              deathAudio.volume = 0.9;
-              deathAudio.playbackRate = 0.9; // Slightly lower for multiple deaths
+              deathAudio.volume = 0.4;
+              deathAudio.playbackRate = 1.8; // Light bubble sound for multiple deaths
               deathAudio.play().catch(() => {});
             } catch (e) {}
           }
@@ -409,8 +409,8 @@ function updateBullets(gameState: any, delta: number) {
         if (!audioState) {
           try {
             const explosionAudio = new Audio("/sounds/hit.mp3");
-            explosionAudio.volume = 1.0;
-            explosionAudio.playbackRate = 0.6; // Deep explosion sound
+            explosionAudio.volume = 0.9;
+            explosionAudio.playbackRate = 0.8; // Deep explosion sound
             explosionAudio.play().catch(() => {});
           } catch (e) {}
         }
@@ -476,8 +476,8 @@ function updateBullets(gameState: any, delta: number) {
           if (!audioState) {
             try {
               const deathAudio = new Audio("/sounds/success.mp3");
-              deathAudio.volume = 0.8;
-              deathAudio.playbackRate = 1.1;
+              deathAudio.volume = 0.3;
+              deathAudio.playbackRate = 2.0; // Light bubble sound effect
               deathAudio.play().catch(() => {});
             } catch (e) {}
           }
@@ -489,8 +489,8 @@ function updateBullets(gameState: any, delta: number) {
         if (!audioState) {
           try {
             const impactAudio = new Audio("/sounds/hit.mp3");
-            impactAudio.volume = 0.6;
-            impactAudio.playbackRate = 1.8; // Sharp bullet impact
+            impactAudio.volume = 0.8;
+            impactAudio.playbackRate = 1.3; // Clear bullet impact
             impactAudio.play().catch(() => {});
           } catch (e) {}
         }
