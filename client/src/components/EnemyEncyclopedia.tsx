@@ -43,7 +43,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "fast",
     name: "Verdant Dasher",
-    health: 180,
+    health: 204,
     speed: 2.0,
     reward: 2,
     color: "#22c55e",
@@ -62,7 +62,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "heavy",
     name: "Cobalt Bruiser",
-    health: 400,
+    health: 454,
     speed: 1.0,
     reward: 2,
     color: "#3b82f6",
@@ -81,7 +81,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "armored",
     name: "Violet Guardian",
-    health: 580,
+    health: 657,
     speed: 1.1,
     reward: 3,
     color: "#8b5cf6",
@@ -100,7 +100,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "elite",
     name: "Golden Vanguard",
-    health: 850,
+    health: 964,
     speed: 1.3,
     reward: 4,
     color: "#f59e0b",
@@ -176,7 +176,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "boss",
     name: "Crimson Overlord",
-    health: 1350,
+    health: 1531,
     speed: 0.9,
     reward: 8,
     color: "#dc2626",
@@ -195,7 +195,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "megaboss",
     name: "Void Leviathan",
-    health: 2700,
+    health: 3062,
     speed: 0.8,
     reward: 15,
     color: "#7c3aed",
