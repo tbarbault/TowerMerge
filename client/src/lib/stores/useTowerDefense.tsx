@@ -108,7 +108,6 @@ interface TowerDefenseState {
   muzzleFlashes: MuzzleFlash[];
   explosions: Explosion[];
   impacts: Impact[];
-  mortarSmokes: any[];
   obstacles: Obstacle[];
   
   // UI state
@@ -161,8 +160,6 @@ interface TowerDefenseState {
   removeExplosion: (id: string) => void;
   addImpact: (impact: Impact) => void;
   removeImpact: (id: string) => void;
-  addMortarSmoke: (smoke: any) => void;
-  removeMortarSmoke: (id: string) => void;
   
   // Computed properties
   canPlaceTower: boolean;
@@ -187,7 +184,6 @@ export const useTowerDefense = create<TowerDefenseState>()(
     muzzleFlashes: [],
     explosions: [],
     impacts: [],
-    mortarSmokes: [],
     obstacles: [],
     
     selectedGridCell: null,
@@ -301,7 +297,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       
       const getTowerStats = (type: 'turret' | 'mortar') => {
         if (type === 'turret') {
-          return { damage: 15, range: 6.0, fireRate: 500 };
+          return { damage: 8, range: 6.0, fireRate: 250 }; // Doubled fire rate, halved damage
         } else {
           return { damage: 55, range: 7.0, fireRate: 1400 };
         }
@@ -528,15 +524,27 @@ export const useTowerDefense = create<TowerDefenseState>()(
     },
     
     nextWave: () => {
-      set(state => ({
-        wave: state.wave + 1,
-        enemiesInWave: Math.floor(5 + state.wave * 1.5),
-        enemiesSpawned: 0,
-        waveProgress: 0,
-        waveStartTime: Date.now(),
-        waveCompletionTime: null,
-        showWaveTransition: true,
-      }));
+      set(state => {
+        const newWave = state.wave + 1;
+        let newHighestWave = state.highestWave;
+        
+        // Update highest wave if current wave exceeds it
+        if (newWave > state.highestWave) {
+          newHighestWave = newWave;
+          localStorage.setItem('highestWave', newWave.toString());
+        }
+        
+        return {
+          wave: newWave,
+          highestWave: newHighestWave,
+          enemiesInWave: Math.floor(5 + state.wave * 1.5),
+          enemiesSpawned: 0,
+          waveProgress: 0,
+          waveStartTime: Date.now(),
+          waveCompletionTime: null,
+          showWaveTransition: true,
+        };
+      });
       
       // Auto-hide wave transition after 1 second
       setTimeout(() => {
@@ -593,18 +601,6 @@ export const useTowerDefense = create<TowerDefenseState>()(
     removeImpact: (id) => {
       set(state => ({
         impacts: state.impacts.filter(i => i.id !== id)
-      }));
-    },
-    
-    addMortarSmoke: (smoke) => {
-      set(state => ({
-        mortarSmokes: [...state.mortarSmokes, smoke]
-      }));
-    },
-    
-    removeMortarSmoke: (id) => {
-      set(state => ({
-        mortarSmokes: state.mortarSmokes.filter(s => s.id !== id)
       }));
     },
   }))
