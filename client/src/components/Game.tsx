@@ -21,30 +21,51 @@ export default function Game() {
   const gameState = useTowerDefense();
   const { setBackgroundMusic, setHitSound, setSuccessSound, setTowerPlaceSound, setEnemyDeathSound } = useAudio();
 
-  // Initialize audio
+  // Initialize audio with mobile support
   useEffect(() => {
-    const bgMusic = new Audio("/sounds/background.mp3");
-    bgMusic.loop = true;
-    bgMusic.volume = 0.3;
-    setBackgroundMusic(bgMusic);
+    const initializeAudio = async () => {
+      try {
+        const bgMusic = new Audio("/sounds/background.mp3");
+        bgMusic.loop = true;
+        bgMusic.volume = 0.3;
+        bgMusic.preload = "auto";
+        setBackgroundMusic(bgMusic);
 
-    const hitAudio = new Audio("/sounds/hit.mp3");
-    hitAudio.volume = 0.5;
-    setHitSound(hitAudio);
+        const hitAudio = new Audio("/sounds/hit.mp3");
+        hitAudio.volume = 0.5;
+        hitAudio.preload = "auto";
+        setHitSound(hitAudio);
 
-    const successAudio = new Audio("/sounds/success.mp3");
-    successAudio.volume = 0.7;
-    setSuccessSound(successAudio);
+        const successAudio = new Audio("/sounds/success.mp3");
+        successAudio.volume = 0.7;
+        successAudio.preload = "auto";
+        setSuccessSound(successAudio);
 
-    // Use hit sound for tower placement
-    const towerPlaceAudio = new Audio("/sounds/hit.mp3");
-    towerPlaceAudio.volume = 0.6;
-    setTowerPlaceSound(towerPlaceAudio);
+        const towerPlaceAudio = new Audio("/sounds/hit.mp3");
+        towerPlaceAudio.volume = 0.6;
+        towerPlaceAudio.preload = "auto";
+        setTowerPlaceSound(towerPlaceAudio);
 
-    // Use success sound for enemy death
-    const enemyDeathAudio = new Audio("/sounds/success.mp3");
-    enemyDeathAudio.volume = 0.4;
-    setEnemyDeathSound(enemyDeathAudio);
+        const enemyDeathAudio = new Audio("/sounds/success.mp3");
+        enemyDeathAudio.volume = 0.4;
+        enemyDeathAudio.preload = "auto";
+        setEnemyDeathSound(enemyDeathAudio);
+
+        // Enable audio context on first user interaction
+        const enableAudio = () => {
+          bgMusic.play().catch(() => {}); // Attempt to start background music
+          document.removeEventListener('touchstart', enableAudio);
+          document.removeEventListener('click', enableAudio);
+        };
+
+        document.addEventListener('touchstart', enableAudio, { once: true });
+        document.addEventListener('click', enableAudio, { once: true });
+      } catch (error) {
+        console.warn("Audio initialization failed:", error);
+      }
+    };
+
+    initializeAudio();
   }, [setBackgroundMusic, setHitSound, setSuccessSound, setTowerPlaceSound, setEnemyDeathSound]);
 
   // Game loop

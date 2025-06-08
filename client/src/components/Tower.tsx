@@ -302,8 +302,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       userData={{ towerId }}
     >
       {type === 'turret' ? (
-        // Turret - Military Style Design for all levels
-        <>
+        // Turret - Military Style Design for all levels (20% larger)
+        <group scale={1.2}>
           {/* Hexagonal Base Platform */}
           <mesh position={[0, 0.05, 0]} userData={{ towerId }}>
             <cylinderGeometry args={[0.8, 0.9, 0.1, 6]} />
@@ -564,7 +564,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               );
             })}
           </group>
-        </>
+        </group>
       ) : type === 'mortar' ? (
         // Mortar - Artillery Style Design for all levels
         <>

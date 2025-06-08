@@ -31,11 +31,11 @@ function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Mobile-optimized camera settings - improved zoom for iPhone
+  // Mobile-optimized camera settings - adjusted to show all tiles
   const cameraSettings = isMobile 
     ? {
-        position: [0, 14, 14] as [number, number, number],
-        fov: 75,
+        position: [0, 16, 16] as [number, number, number],
+        fov: 80,
         near: 0.1,
         far: 1000
       }
