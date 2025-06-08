@@ -93,6 +93,12 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             if (isAdjacent) {
               console.log(`Merging tower ${towerId} with ${userData.towerId}`);
               mergeTowers(towerId, userData.towerId);
+              // Play merge sound effect
+              try {
+                const hitAudio = new Audio("/sounds/hit.mp3");
+                hitAudio.volume = 0.7;
+                hitAudio.play().catch(() => {});
+              } catch (e) {}
               break;
             } else {
               console.log("Towers must be adjacent (no diagonal merging)");

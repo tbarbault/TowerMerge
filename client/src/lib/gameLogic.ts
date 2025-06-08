@@ -383,9 +383,15 @@ function updateBullets(gameState: any, delta: number) {
           if (enemy.health <= finalDamage) {
             // Enemy will die, award coins
             gameState.addCoins(enemy.reward);
-
           }
         });
+
+        // Play explosion sound effect
+        try {
+          const explosionAudio = new Audio("/sounds/hit.mp3");
+          explosionAudio.volume = 0.5;
+          explosionAudio.play().catch(() => {});
+        } catch (e) {}
         
         gameState.removeBullet(bullet.id);
         return;
