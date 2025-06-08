@@ -21,6 +21,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
   const [targetRotation, setTargetRotation] = useState(0);
+  const animationGroupRef = useRef<THREE.Group>(null);
   
   // Calculate tower range based on type and level
   const baseRange = type === 'turret' ? 6.0 : 7.0;
@@ -323,6 +324,85 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
           
+          {/* Progressive base enhancements */}
+          {level >= 2 && (
+            <>
+              {/* Corner reinforcements */}
+              {Array.from({ length: 6 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 3) * 0.75,
+                  0.12,
+                  Math.sin(i * Math.PI / 3) * 0.75
+                ]} rotation={[0, i * Math.PI / 3, 0]}>
+                  <boxGeometry args={[0.05, 0.15, 0.08]} />
+                  <meshStandardMaterial 
+                    color="#2F2F2F"
+                    metalness={0.8}
+                    roughness={0.2}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
+          {level >= 3 && (
+            <>
+              {/* Power conduits on base */}
+              {Array.from({ length: 3 }, (_, i) => (
+                <mesh key={i} position={[0, 0.05 + i * 0.03, 0]} rotation={[0, i * Math.PI / 2, 0]}>
+                  <torusGeometry args={[0.72, 0.01, 6, 16]} />
+                  <meshStandardMaterial 
+                    color="#00AAFF"
+                    emissive="#0066AA"
+                    emissiveIntensity={0.3}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
+          {level >= 4 && (
+            <>
+              {/* Advanced cooling systems */}
+              {Array.from({ length: 12 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 6) * 0.65,
+                  0.19,
+                  Math.sin(i * Math.PI / 6) * 0.65
+                ]}>
+                  <cylinderGeometry args={[0.01, 0.01, 0.04, 6]} />
+                  <meshStandardMaterial 
+                    color="#FF4400"
+                    emissive="#AA2200"
+                    emissiveIntensity={0.4}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
+          {level >= 5 && (
+            <>
+              {/* Elite shield generators */}
+              {Array.from({ length: 6 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 3) * 0.6,
+                  0.25,
+                  Math.sin(i * Math.PI / 3) * 0.6
+                ]}>
+                  <sphereGeometry args={[0.03, 8, 6]} />
+                  <meshStandardMaterial 
+                    color="#FFFF00"
+                    emissive="#DDDD00"
+                    emissiveIntensity={0.6}
+                    transparent
+                    opacity={0.8}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
           {/* Secondary Base */}
           <mesh position={[0, 0.22, 0]}>
             <cylinderGeometry args={[0.5, 0.6, 0.2, 8]} />
@@ -343,7 +423,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
           
-          {/* Turret Head - Spherical */}
+          {/* Turret Head - Spherical with level-based complexity */}
           <group ref={turretRef} position={[0, 0.45, 0]}>
             <mesh position={[0, 0, 0]}>
               <sphereGeometry args={[0.3, 16, 12]} />
@@ -353,6 +433,94 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
                 roughness={0.3}
               />
             </mesh>
+            
+            {/* Level-based armor plating and details */}
+            {level >= 2 && (
+              <>
+                {/* Armor plating rings */}
+                {Array.from({ length: 3 }, (_, i) => (
+                  <mesh key={i} position={[0, 0, 0]} rotation={[0, (i * Math.PI) / 3, 0]}>
+                    <torusGeometry args={[0.32, 0.02, 8, 16]} />
+                    <meshStandardMaterial 
+                      color="#4A4A4A"
+                      metalness={0.9}
+                      roughness={0.1}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
+            
+            {level >= 3 && (
+              <>
+                {/* Advanced targeting sensors */}
+                {Array.from({ length: 4 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 2) * 0.25,
+                    0.1,
+                    Math.sin(i * Math.PI / 2) * 0.25
+                  ]}>
+                    <cylinderGeometry args={[0.02, 0.02, 0.08, 8]} />
+                    <meshStandardMaterial 
+                      color="#FF4444"
+                      emissive="#FF0000"
+                      emissiveIntensity={0.3}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
+            
+            {level >= 4 && (
+              <>
+                {/* Heavy armor panels */}
+                {Array.from({ length: 6 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 3) * 0.28,
+                    0,
+                    Math.sin(i * Math.PI / 3) * 0.28
+                  ]} rotation={[0, i * Math.PI / 3, 0]}>
+                    <boxGeometry args={[0.06, 0.15, 0.03]} />
+                    <meshStandardMaterial 
+                      color="#2F2F2F"
+                      metalness={0.8}
+                      roughness={0.2}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
+            
+            {level >= 5 && (
+              <>
+                {/* Elite energy conduits */}
+                <mesh position={[0, 0.2, 0]}>
+                  <sphereGeometry args={[0.08, 12, 8]} />
+                  <meshStandardMaterial 
+                    color="#FFD700"
+                    emissive="#FFA500"
+                    emissiveIntensity={0.5}
+                    transparent
+                    opacity={0.8}
+                  />
+                </mesh>
+                {/* Energy flow lines */}
+                {Array.from({ length: 8 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 4) * 0.15,
+                    0.15,
+                    Math.sin(i * Math.PI / 4) * 0.15
+                  ]} rotation={[0, 0, i * Math.PI / 4]}>
+                    <cylinderGeometry args={[0.01, 0.01, 0.1, 6]} />
+                    <meshStandardMaterial 
+                      color="#FFD700"
+                      emissive="#FFA500"
+                      emissiveIntensity={0.4}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
             
             {/* Gun Barrels - Multiple based on level */}
             {Array.from({ length: level }, (_, i) => {
@@ -420,6 +588,89 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
           
+          {/* Progressive mortar base enhancements */}
+          {level >= 2 && (
+            <>
+              {/* Stabilization legs */}
+              {Array.from({ length: 6 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 3) * 0.75,
+                  0.12,
+                  Math.sin(i * Math.PI / 3) * 0.75
+                ]} rotation={[0, i * Math.PI / 3, 0]}>
+                  <boxGeometry args={[0.04, 0.15, 0.06]} />
+                  <meshStandardMaterial 
+                    color="#2F2F2F"
+                    metalness={0.8}
+                    roughness={0.2}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
+          {level >= 3 && (
+            <>
+              {/* Ammunition feed systems */}
+              {Array.from({ length: 4 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 2) * 0.6,
+                  0.1,
+                  Math.sin(i * Math.PI / 2) * 0.6
+                ]} rotation={[0, i * Math.PI / 2, Math.PI / 4]}>
+                  <cylinderGeometry args={[0.02, 0.015, 0.08, 8]} />
+                  <meshStandardMaterial 
+                    color="#8B4513"
+                    metalness={0.6}
+                    roughness={0.4}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
+          {level >= 4 && (
+            <>
+              {/* Advanced recoil dampeners */}
+              {Array.from({ length: 8 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 4) * 0.65,
+                  0.18,
+                  Math.sin(i * Math.PI / 4) * 0.65
+                ]}>
+                  <cylinderGeometry args={[0.015, 0.02, 0.06, 6]} />
+                  <meshStandardMaterial 
+                    color="#4A4A4A"
+                    metalness={0.9}
+                    roughness={0.1}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
+          {level >= 5 && (
+            <>
+              {/* Elite targeting matrix */}
+              {Array.from({ length: 6 }, (_, i) => (
+                <mesh key={i} position={[
+                  Math.cos(i * Math.PI / 3) * 0.55,
+                  0.24,
+                  Math.sin(i * Math.PI / 3) * 0.55
+                ]}>
+                  <boxGeometry args={[0.03, 0.02, 0.05]} />
+                  <meshStandardMaterial 
+                    color="#00FFFF"
+                    emissive="#0099BB"
+                    emissiveIntensity={0.5}
+                    transparent
+                    opacity={0.9}
+                  />
+                </mesh>
+              ))}
+            </>
+          )}
+          
           {/* Mortar Support Base */}
           <mesh position={[0, 0.22, 0]}>
             <cylinderGeometry args={[0.4, 0.5, 0.12, 8]} />
@@ -430,7 +681,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
           
-          {/* Pivot Mount and Mortar Tubes */}
+          {/* Pivot Mount and Mortar Tubes with progressive complexity */}
           <group ref={turretRef} position={[0, 0.32, 0.1]}>
             <mesh position={[0, 0, 0]}>
               <sphereGeometry args={[0.12, 12, 8]} />
@@ -440,6 +691,142 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
                 roughness={0.3}
               />
             </mesh>
+            
+            {/* Level-based structural enhancements */}
+            {level >= 2 && (
+              <>
+                {/* Reinforcement struts */}
+                {Array.from({ length: 4 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 2) * 0.1,
+                    -0.05,
+                    Math.sin(i * Math.PI / 2) * 0.1
+                  ]} rotation={[0, i * Math.PI / 2, 0]}>
+                    <boxGeometry args={[0.03, 0.08, 0.02]} />
+                    <meshStandardMaterial 
+                      color="#2F2F2F"
+                      metalness={0.8}
+                      roughness={0.2}
+                    />
+                  </mesh>
+                ))}
+                {/* Hydraulic pistons */}
+                <mesh position={[0, -0.08, 0]}>
+                  <cylinderGeometry args={[0.04, 0.06, 0.12, 8]} />
+                  <meshStandardMaterial 
+                    color="#4A4A4A"
+                    metalness={0.9}
+                    roughness={0.1}
+                  />
+                </mesh>
+              </>
+            )}
+            
+            {level >= 3 && (
+              <>
+                {/* Advanced targeting computer */}
+                <mesh position={[0, 0.08, 0.05]}>
+                  <boxGeometry args={[0.08, 0.04, 0.06]} />
+                  <meshStandardMaterial 
+                    color="#1A1A1A"
+                    metalness={0.3}
+                    roughness={0.8}
+                  />
+                </mesh>
+                {/* Sensor arrays */}
+                {Array.from({ length: 3 }, (_, i) => (
+                  <mesh key={i} position={[
+                    (i - 1) * 0.03,
+                    0.1,
+                    0.08
+                  ]}>
+                    <cylinderGeometry args={[0.008, 0.008, 0.02, 6]} />
+                    <meshStandardMaterial 
+                      color="#00FF00"
+                      emissive="#00AA00"
+                      emissiveIntensity={0.4}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
+            
+            {level >= 4 && (
+              <>
+                {/* Heavy armor plating */}
+                {Array.from({ length: 6 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 3) * 0.13,
+                    0,
+                    Math.sin(i * Math.PI / 3) * 0.13
+                  ]} rotation={[0, i * Math.PI / 3, 0]}>
+                    <boxGeometry args={[0.03, 0.12, 0.02]} />
+                    <meshStandardMaterial 
+                      color="#2F2F2F"
+                      metalness={0.9}
+                      roughness={0.1}
+                    />
+                  </mesh>
+                ))}
+                {/* Cooling vents */}
+                {Array.from({ length: 8 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 4) * 0.11,
+                    0.02,
+                    Math.sin(i * Math.PI / 4) * 0.11
+                  ]}>
+                    <cylinderGeometry args={[0.01, 0.01, 0.03, 6]} />
+                    <meshStandardMaterial 
+                      color="#FF6600"
+                      emissive="#FF3300"
+                      emissiveIntensity={0.2}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
+            
+            {level >= 5 && (
+              <>
+                {/* Elite command module */}
+                <mesh position={[0, 0.12, 0]}>
+                  <cylinderGeometry args={[0.06, 0.04, 0.08, 8]} />
+                  <meshStandardMaterial 
+                    color="#FFD700"
+                    metalness={0.8}
+                    roughness={0.1}
+                    emissive="#FFA500"
+                    emissiveIntensity={0.3}
+                  />
+                </mesh>
+                {/* Communication arrays */}
+                {Array.from({ length: 4 }, (_, i) => (
+                  <mesh key={i} position={[
+                    Math.cos(i * Math.PI / 2) * 0.08,
+                    0.15,
+                    Math.sin(i * Math.PI / 2) * 0.08
+                  ]}>
+                    <boxGeometry args={[0.02, 0.01, 0.04]} />
+                    <meshStandardMaterial 
+                      color="#00FFFF"
+                      emissive="#0088FF"
+                      emissiveIntensity={0.5}
+                    />
+                  </mesh>
+                ))}
+                {/* Power conduits */}
+                {Array.from({ length: 6 }, (_, i) => (
+                  <mesh key={i} position={[0, 0.05 + i * 0.02, 0]} rotation={[0, i * Math.PI / 6, 0]}>
+                    <torusGeometry args={[0.08, 0.005, 6, 12]} />
+                    <meshStandardMaterial 
+                      color="#FFFF00"
+                      emissive="#FFAA00"
+                      emissiveIntensity={0.4}
+                    />
+                  </mesh>
+                ))}
+              </>
+            )}
             
             {/* Multiple Mortar Tubes based on level */}
             {Array.from({ length: level }, (_, i) => {
