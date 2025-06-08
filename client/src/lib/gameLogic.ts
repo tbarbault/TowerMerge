@@ -386,10 +386,11 @@ function updateBullets(gameState: any, delta: number) {
           }
         });
 
-        // Play explosion sound effect
+        // Play explosion sound effect for mortars
         try {
           const explosionAudio = new Audio("/sounds/hit.mp3");
-          explosionAudio.volume = 0.5;
+          explosionAudio.volume = 0.9;
+          explosionAudio.playbackRate = 0.7; // Lower pitch for explosions
           explosionAudio.play().catch(() => {});
         } catch (e) {}
         

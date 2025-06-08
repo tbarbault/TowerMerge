@@ -250,8 +250,9 @@ export default function GameUI() {
                       selectTowerType('turret');
                       buyTower();
                       try {
-                        const audio = new Audio("/sounds/hit.mp3");
-                        audio.volume = 0.6;
+                        const audio = new Audio("/sounds/success.mp3");
+                        audio.volume = 0.7;
+                        audio.playbackRate = 1.3; // Higher pitch for turret placement
                         audio.play().catch(() => {});
                       } catch (e) {}
                     }}
@@ -266,8 +267,9 @@ export default function GameUI() {
                       selectTowerType('mortar');
                       buyTower();
                       try {
-                        const audio = new Audio("/sounds/hit.mp3");
-                        audio.volume = 0.6;
+                        const audio = new Audio("/sounds/success.mp3");
+                        audio.volume = 0.8;
+                        audio.playbackRate = 0.9; // Lower pitch for mortar placement
                         audio.play().catch(() => {});
                       } catch (e) {}
                     }}

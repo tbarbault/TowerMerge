@@ -95,9 +95,10 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               mergeTowers(towerId, userData.towerId);
               // Play merge sound effect
               try {
-                const hitAudio = new Audio("/sounds/hit.mp3");
-                hitAudio.volume = 0.7;
-                hitAudio.play().catch(() => {});
+                const mergeAudio = new Audio("/sounds/hit.mp3");
+                mergeAudio.volume = 0.8;
+                mergeAudio.playbackRate = 1.1; // Slightly higher pitch for merging
+                mergeAudio.play().catch(() => {});
               } catch (e) {}
               break;
             } else {
