@@ -440,13 +440,14 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       {/* Range indicator (when selected) */}
       {isSelected && (
         <>
-          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <mesh position={[0, 0.15, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <ringGeometry args={[towerRange - 0.1, towerRange + 0.1, 32]} />
             <meshStandardMaterial 
               color="#22c55e" 
               transparent 
-              opacity={0.3}
+              opacity={0.4}
               side={THREE.DoubleSide}
+              depthTest={false}
             />
           </mesh>
         </>
