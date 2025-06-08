@@ -31,16 +31,16 @@ function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Mobile-optimized camera settings - dezoomed slightly
+  // Mobile-optimized camera settings - restored previous zoom level
   const cameraSettings = isMobile 
     ? {
-        position: [0, 16, 16] as [number, number, number],
+        position: [0, 20, 20] as [number, number, number],
         fov: 85,
         near: 0.1,
         far: 1000
       }
     : {
-        position: [0, 15, 15] as [number, number, number],
+        position: [0, 18, 18] as [number, number, number],
         fov: 60,
         near: 0.1,
         far: 1000

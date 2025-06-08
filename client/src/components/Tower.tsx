@@ -300,12 +300,12 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       onPointerUp={handlePointerUp}
       userData={{ towerId }}
     >
-      {type === 'turret' && level === 1 ? (
-        // Level 1 Turret - Military Style Design
+      {type === 'turret' ? (
+        // Turret - Military Style Design for all levels
         <>
           {/* Hexagonal Base Platform */}
           <mesh position={[0, 0.05, 0]} userData={{ towerId }}>
-            <cylinderGeometry args={[1.6, 1.8, 0.1, 6]} />
+            <cylinderGeometry args={[0.8, 0.9, 0.1, 6]} />
             <meshStandardMaterial 
               color="#8B4513"
               metalness={0.3}
@@ -314,28 +314,28 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           </mesh>
           
           {/* Main Base Structure */}
-          <mesh position={[0, 0.15, 0]}>
-            <cylinderGeometry args={[1.4, 1.6, 0.2, 6]} />
+          <mesh position={[0, 0.12, 0]}>
+            <cylinderGeometry args={[0.7, 0.8, 0.15, 6]} />
             <meshStandardMaterial 
-              color="#556B2F"
+              color={level === 1 ? "#556B2F" : level === 2 ? "#4682B4" : level === 3 ? "#9370DB" : level === 4 ? "#DC143C" : "#FF8C00"}
               metalness={0.4}
               roughness={0.6}
             />
           </mesh>
           
           {/* Secondary Base */}
-          <mesh position={[0, 0.3, 0]}>
-            <cylinderGeometry args={[1.0, 1.2, 0.3, 8]} />
+          <mesh position={[0, 0.22, 0]}>
+            <cylinderGeometry args={[0.5, 0.6, 0.2, 8]} />
             <meshStandardMaterial 
-              color="#6B8E23"
+              color={level === 1 ? "#6B8E23" : level === 2 ? "#5A8AC0" : level === 3 ? "#A085DB" : level === 4 ? "#E85A5A" : "#FFA500"}
               metalness={0.5}
               roughness={0.5}
             />
           </mesh>
           
           {/* Turret Mounting */}
-          <mesh position={[0, 0.5, 0]}>
-            <cylinderGeometry args={[0.7, 0.8, 0.2, 8]} />
+          <mesh position={[0, 0.35, 0]}>
+            <cylinderGeometry args={[0.35, 0.4, 0.15, 8]} />
             <meshStandardMaterial 
               color="#4F5D2F"
               metalness={0.6}
@@ -344,53 +344,65 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           </mesh>
           
           {/* Turret Head - Spherical */}
-          <group ref={turretRef} position={[0, 0.7, 0]}>
+          <group ref={turretRef} position={[0, 0.45, 0]}>
             <mesh position={[0, 0, 0]}>
-              <sphereGeometry args={[0.6, 16, 12]} />
+              <sphereGeometry args={[0.3, 16, 12]} />
               <meshStandardMaterial 
-                color="#6B8E23"
+                color={level === 1 ? "#6B8E23" : level === 2 ? "#5A8AC0" : level === 3 ? "#A085DB" : level === 4 ? "#E85A5A" : "#FFA500"}
                 metalness={0.7}
                 roughness={0.3}
               />
             </mesh>
             
-            {/* Gun Barrel Support */}
-            <mesh position={[0, 0, 0.4]}>
-              <cylinderGeometry args={[0.15, 0.2, 0.3, 8]} />
-              <meshStandardMaterial 
-                color="#2F4F2F"
-                metalness={0.8}
-                roughness={0.2}
-              />
-            </mesh>
-            
-            {/* Main Gun Barrel */}
-            <mesh position={[0, 0, 0.9]} rotation={[Math.PI / 2, 0, 0]}>
-              <cylinderGeometry args={[0.08, 0.06, 0.8, 12]} />
-              <meshStandardMaterial 
-                color="#2F2F2F"
-                metalness={0.9}
-                roughness={0.1}
-              />
-            </mesh>
-            
-            {/* Barrel Tip */}
-            <mesh position={[0, 0, 1.3]}>
-              <cylinderGeometry args={[0.06, 0.05, 0.1, 8]} />
-              <meshStandardMaterial 
-                color="#1A1A1A"
-                metalness={0.9}
-                roughness={0.1}
-              />
-            </mesh>
+            {/* Gun Barrels - Multiple based on level */}
+            {Array.from({ length: level }, (_, i) => {
+              const angle = level === 1 ? 0 : (i * 2 * Math.PI) / level;
+              const radius = level === 1 ? 0 : 0.08;
+              const x = Math.sin(angle) * radius;
+              const z = Math.cos(angle) * radius;
+              
+              return (
+                <group key={i}>
+                  {/* Gun Barrel Support */}
+                  <mesh position={[x, 0, 0.2 + z]}>
+                    <cylinderGeometry args={[0.08, 0.1, 0.15, 8]} />
+                    <meshStandardMaterial 
+                      color="#2F4F2F"
+                      metalness={0.8}
+                      roughness={0.2}
+                    />
+                  </mesh>
+                  
+                  {/* Main Gun Barrel */}
+                  <mesh position={[x, 0, 0.45 + z]} rotation={[Math.PI / 2, 0, 0]}>
+                    <cylinderGeometry args={[0.04, 0.03, 0.4, 12]} />
+                    <meshStandardMaterial 
+                      color="#2F2F2F"
+                      metalness={0.9}
+                      roughness={0.1}
+                    />
+                  </mesh>
+                  
+                  {/* Barrel Tip */}
+                  <mesh position={[x, 0, 0.65 + z]}>
+                    <cylinderGeometry args={[0.03, 0.025, 0.05, 8]} />
+                    <meshStandardMaterial 
+                      color="#1A1A1A"
+                      metalness={0.9}
+                      roughness={0.1}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
           </group>
         </>
-      ) : type === 'mortar' && level === 1 ? (
-        // Level 1 Mortar - Artillery Style Design
+      ) : type === 'mortar' ? (
+        // Mortar - Artillery Style Design for all levels
         <>
           {/* Hexagonal Base Platform */}
           <mesh position={[0, 0.05, 0]} userData={{ towerId }}>
-            <cylinderGeometry args={[1.6, 1.8, 0.1, 6]} />
+            <cylinderGeometry args={[0.8, 0.9, 0.1, 6]} />
             <meshStandardMaterial 
               color="#8B4513"
               metalness={0.3}
@@ -399,29 +411,29 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           </mesh>
           
           {/* Main Base Structure */}
-          <mesh position={[0, 0.15, 0]}>
-            <cylinderGeometry args={[1.4, 1.6, 0.2, 6]} />
+          <mesh position={[0, 0.12, 0]}>
+            <cylinderGeometry args={[0.7, 0.8, 0.15, 6]} />
             <meshStandardMaterial 
-              color="#556B2F"
+              color={level === 1 ? "#556B2F" : level === 2 ? "#4682B4" : level === 3 ? "#9370DB" : level === 4 ? "#DC143C" : "#FF8C00"}
               metalness={0.4}
               roughness={0.6}
             />
           </mesh>
           
           {/* Mortar Support Base */}
-          <mesh position={[0, 0.3, 0]}>
-            <cylinderGeometry args={[0.8, 1.0, 0.15, 8]} />
+          <mesh position={[0, 0.22, 0]}>
+            <cylinderGeometry args={[0.4, 0.5, 0.12, 8]} />
             <meshStandardMaterial 
-              color="#6B8E23"
+              color={level === 1 ? "#6B8E23" : level === 2 ? "#5A8AC0" : level === 3 ? "#A085DB" : level === 4 ? "#E85A5A" : "#FFA500"}
               metalness={0.5}
               roughness={0.5}
             />
           </mesh>
           
-          {/* Pivot Mount */}
-          <group ref={turretRef} position={[0, 0.45, 0.2]}>
+          {/* Pivot Mount and Mortar Tubes */}
+          <group ref={turretRef} position={[0, 0.32, 0.1]}>
             <mesh position={[0, 0, 0]}>
-              <sphereGeometry args={[0.25, 12, 8]} />
+              <sphereGeometry args={[0.12, 12, 8]} />
               <meshStandardMaterial 
                 color="#4F5D2F"
                 metalness={0.7}
@@ -429,162 +441,60 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               />
             </mesh>
             
-            {/* Mortar Tube Support */}
-            <mesh position={[0, 0.15, -0.1]} rotation={[0.6, 0, 0]}>
-              <cylinderGeometry args={[0.2, 0.25, 0.3, 8]} />
-              <meshStandardMaterial 
-                color="#2F4F2F"
-                metalness={0.6}
-                roughness={0.4}
-              />
-            </mesh>
-            
-            {/* Main Mortar Tube */}
-            <mesh position={[0, 0.4, 0.4]} rotation={[0.6, 0, 0]}>
-              <cylinderGeometry args={[0.15, 0.12, 1.0, 12]} />
-              <meshStandardMaterial 
-                color="#2F2F2F"
-                metalness={0.8}
-                roughness={0.2}
-              />
-            </mesh>
-            
-            {/* Tube Reinforcement Ring */}
-            <mesh position={[0, 0.65, 0.75]} rotation={[0.6, 0, 0]}>
-              <cylinderGeometry args={[0.18, 0.18, 0.08, 12]} />
-              <meshStandardMaterial 
-                color="#4A4A4A"
-                metalness={0.9}
-                roughness={0.1}
-              />
-            </mesh>
-            
-            {/* Muzzle */}
-            <mesh position={[0, 0.85, 1.0]} rotation={[0.6, 0, 0]}>
-              <cylinderGeometry args={[0.12, 0.1, 0.15, 8]} />
-              <meshStandardMaterial 
-                color="#1A1A1A"
-                metalness={0.9}
-                roughness={0.1}
-              />
-            </mesh>
-          </group>
-        </>
-      ) : (
-        // Higher level towers - keep existing design
-        <>
-          {/* Tower base platform */}
-          <mesh position={[0, 0.1, 0]} userData={{ towerId }}>
-            <cylinderGeometry args={[1.0, 1.2, 0.4, 8]} />
-            <meshStandardMaterial 
-              map={woodTexture}
-              color="#8b4513"
-            />
-          </mesh>
-
-          {/* Main tower base - different for mortar vs turret */}
-          {config.isMortar ? (
-            // Mortar: Wide, low platform
-            <mesh position={[0, config.height / 2 + 0.2, 0]}>
-              <cylinderGeometry args={[(config as any).baseWidth / 2, (config as any).baseWidth / 2 + 0.1, config.height, config.segments]} />
-              <meshStandardMaterial 
-                color={config.baseColor}
-                metalness={0.5}
-                roughness={0.4}
-                emissive={config.baseColor}
-                emissiveIntensity={0.05}
-              />
-            </mesh>
-          ) : (
-            // Turret: Tall cylindrical base
-            <mesh position={[0, config.height / 2 + 0.2, 0]}>
-              <cylinderGeometry args={[0.7, 0.9, config.height, config.segments]} />
-              <meshStandardMaterial 
-                color={config.baseColor}
-                metalness={0.7}
-                roughness={0.2}
-                emissive={config.baseColor}
-                emissiveIntensity={0.05}
-              />
-            </mesh>
-          )}
-
-          {/* Rotating turret */}
-          <group ref={turretRef} position={[0, config.height + 0.2, 0]}>
-            {/* Turret body - different for mortar vs turret */}
-            {config.isMortar ? (
-              // Mortar: Low, wide mounting platform
-              <mesh position={[0, 0.16, 0]}>
-                <cylinderGeometry args={[0.6, 0.7, 0.32, 8]} />
-                <meshStandardMaterial 
-                  color={config.turretColor}
-                  metalness={0.6}
-                  roughness={0.3}
-                  emissive={config.turretColor}
-                  emissiveIntensity={0.05}
-                />
-              </mesh>
-            ) : (
-              // Turret: Rectangular gun mount
-              <mesh position={[0, 0.3, 0]}>
-                <boxGeometry args={[0.8, 0.6, 1.2]} />
-                <meshStandardMaterial 
-                  color={config.turretColor}
-                  metalness={0.8}
-                  roughness={0.1}
-                  emissive={config.turretColor}
-                  emissiveIntensity={0.05}
-                />
-              </mesh>
-            )}
-
-            {/* Weapons - different for turret vs mortar */}
-            {config.isMortar ? (
-              // Mortar: Angled cannon tube
-              <mesh 
-                position={[0, 0.2, (config as any).mortarTubeLength / 2 + 0.1]} 
-                rotation={[(config as any).mortarAngle, 0, 0]}
-              >
-                <cylinderGeometry args={[(config as any).mortarTubeRadius, (config as any).mortarTubeRadius * 0.8, (config as any).mortarTubeLength, 12]} />
-                <meshStandardMaterial 
-                  color="#8b4513"
-                  metalness={0.6}
-                  roughness={0.3}
-                  emissive="#654321"
-                  emissiveIntensity={0.05}
-                />
-              </mesh>
-            ) : (
-              // Turret: Multiple barrels based on level
-              <>
-                {Array.from({ length: (config as any).barrelCount }, (_, i) => {
-                  const angle = (i * 2 * Math.PI) / (config as any).barrelCount;
-                  const radius = (config as any).barrelCount === 1 ? 0 : 0.1;
-                  const x = Math.sin(angle) * radius;
-                  const z = Math.cos(angle) * radius;
+            {/* Multiple Mortar Tubes based on level */}
+            {Array.from({ length: level }, (_, i) => {
+              const angle = level === 1 ? 0 : (i * 2 * Math.PI) / level;
+              const radius = level === 1 ? 0 : 0.06;
+              const x = Math.sin(angle) * radius;
+              const z = Math.cos(angle) * radius;
+              
+              return (
+                <group key={i}>
+                  {/* Mortar Tube Support */}
+                  <mesh position={[x, 0.08, -0.05 + z]} rotation={[0.6, 0, 0]}>
+                    <cylinderGeometry args={[0.1, 0.12, 0.15, 8]} />
+                    <meshStandardMaterial 
+                      color="#2F4F2F"
+                      metalness={0.6}
+                      roughness={0.4}
+                    />
+                  </mesh>
                   
-                  return (
-                    <mesh 
-                      key={i}
-                      position={[x, 0.15, z + (config as any).barrelLength / 2 + 0.25]} 
-                      rotation={[Math.PI / 2, 0, 0]}
-                    >
-                      <cylinderGeometry args={[(config as any).barrelRadius, (config as any).barrelRadius, (config as any).barrelLength, 8]} />
-                      <meshStandardMaterial 
-                        color="#4a5568"
-                        metalness={0.9}
-                        roughness={0.1}
-                        emissive="#2d3748"
-                        emissiveIntensity={0.02}
-                      />
-                    </mesh>
-                  );
-                })}
-              </>
-            )}
+                  {/* Main Mortar Tube */}
+                  <mesh position={[x, 0.2, 0.2 + z]} rotation={[0.6, 0, 0]}>
+                    <cylinderGeometry args={[0.075, 0.06, 0.5, 12]} />
+                    <meshStandardMaterial 
+                      color="#2F2F2F"
+                      metalness={0.8}
+                      roughness={0.2}
+                    />
+                  </mesh>
+                  
+                  {/* Tube Reinforcement Ring */}
+                  <mesh position={[x, 0.32, 0.38 + z]} rotation={[0.6, 0, 0]}>
+                    <cylinderGeometry args={[0.09, 0.09, 0.04, 12]} />
+                    <meshStandardMaterial 
+                      color="#4A4A4A"
+                      metalness={0.9}
+                      roughness={0.1}
+                    />
+                  </mesh>
+                  
+                  {/* Muzzle */}
+                  <mesh position={[x, 0.42, 0.5 + z]} rotation={[0.6, 0, 0]}>
+                    <cylinderGeometry args={[0.06, 0.05, 0.08, 8]} />
+                    <meshStandardMaterial 
+                      color="#1A1A1A"
+                      metalness={0.9}
+                      roughness={0.1}
+                    />
+                  </mesh>
+                </group>
+              );
+            })}
           </group>
         </>
-      )}
+      ) : null}
 
       {/* Selection indicator */}
       {isSelected && (
@@ -601,11 +511,11 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       )}
 
       {/* Level indicator */}
-      <mesh position={[0, (type === 'turret' && level === 1) || (type === 'mortar' && level === 1) ? 1.5 : config.height + 0.7, 0]}>
+      <mesh position={[0, type === 'turret' ? 0.85 : 0.75, 0]}>
         <sphereGeometry args={[0.08, 8, 8]} />
         <meshStandardMaterial 
-          color={level === 1 ? "#ef4444" : level === 2 ? "#3b82f6" : "#fbbf24"}
-          emissive={level === 1 ? "#ef4444" : level === 2 ? "#3b82f6" : "#fbbf24"}
+          color={level === 1 ? "#ef4444" : level === 2 ? "#3b82f6" : level === 3 ? "#9370DB" : level === 4 ? "#dc2626" : "#f59e0b"}
+          emissive={level === 1 ? "#ef4444" : level === 2 ? "#3b82f6" : level === 3 ? "#9370DB" : level === 4 ? "#dc2626" : "#f59e0b"}
           emissiveIntensity={0.5}
         />
       </mesh>
