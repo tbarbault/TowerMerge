@@ -95,8 +95,9 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               console.log(`Merging tower ${towerId} with ${userData.towerId}`);
               mergeTowers(towerId, userData.towerId);
               // Play merge sound effect
-              const { isMuted } = useAudio.getState();
-              if (!isMuted) {
+              const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
+                JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+              if (!audioMuted) {
                 try {
                   const mergeAudio = new Audio("/sounds/hit.mp3");
                   mergeAudio.volume = 1.0;

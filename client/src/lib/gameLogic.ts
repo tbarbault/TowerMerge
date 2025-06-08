@@ -391,26 +391,34 @@ function updateBullets(gameState: any, delta: number) {
 
         // Play enemy death sound if any enemies were killed by explosion
         if (enemiesKilled > 0) {
-          try {
-            const deathAudio = new Audio("/sounds/bubble_death.wav");
-            deathAudio.volume = 0.6;
-            deathAudio.playbackRate = 1.2; // Slightly faster for multiple deaths
-            deathAudio.play().catch(() => {});
-            console.log("Playing explosion death sound for", enemiesKilled, "enemies");
-          } catch (e) {
-            console.log("Error playing explosion death sound:", e);
+          const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
+            JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+          if (!audioMuted) {
+            try {
+              const deathAudio = new Audio("/sounds/bubble_death.wav");
+              deathAudio.volume = 0.6;
+              deathAudio.playbackRate = 1.2; // Slightly faster for multiple deaths
+              deathAudio.play().catch(() => {});
+              console.log("Playing explosion death sound for", enemiesKilled, "enemies");
+            } catch (e) {
+              console.log("Error playing explosion death sound:", e);
+            }
           }
         }
 
         // Play explosion sound effect for mortars
-        try {
-          const explosionAudio = new Audio("/sounds/explosion.wav");
-          explosionAudio.volume = 0.6;
-          explosionAudio.playbackRate = 1.0;
-          explosionAudio.play().catch(() => {});
-          console.log("Playing mortar explosion sound");
-        } catch (e) {
-          console.log("Error playing explosion sound:", e);
+        const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
+          JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+        if (!audioMuted) {
+          try {
+            const explosionAudio = new Audio("/sounds/explosion.wav");
+            explosionAudio.volume = 0.6;
+            explosionAudio.playbackRate = 1.0;
+            explosionAudio.play().catch(() => {});
+            console.log("Playing mortar explosion sound");
+          } catch (e) {
+            console.log("Error playing explosion sound:", e);
+          }
         }
         
         gameState.removeBullet(bullet.id);
@@ -469,26 +477,34 @@ function updateBullets(gameState: any, delta: number) {
           gameState.addCoins(hitEnemy.reward);
           
           // Play enemy death sound
-          try {
-            const deathAudio = new Audio("/sounds/bubble_death.wav");
-            deathAudio.volume = 0.5;
-            deathAudio.playbackRate = 1.0;
-            deathAudio.play().catch(() => {});
-            console.log("Playing enemy death sound");
-          } catch (e) {
-            console.log("Error playing death sound:", e);
+          const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
+            JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+          if (!audioMuted) {
+            try {
+              const deathAudio = new Audio("/sounds/bubble_death.wav");
+              deathAudio.volume = 0.5;
+              deathAudio.playbackRate = 1.0;
+              deathAudio.play().catch(() => {});
+              console.log("Playing enemy death sound");
+            } catch (e) {
+              console.log("Error playing death sound:", e);
+            }
           }
         }
 
         // Play impact sound effect for bullets
-        try {
-          const impactAudio = new Audio("/sounds/bullet_impact.wav");
-          impactAudio.volume = 0.7;
-          impactAudio.playbackRate = 1.0;
-          impactAudio.play().catch(() => {});
-          console.log("Playing bullet impact sound");
-        } catch (e) {
-          console.log("Error playing bullet impact sound:", e);
+        const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
+          JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+        if (!audioMuted) {
+          try {
+            const impactAudio = new Audio("/sounds/bullet_impact.wav");
+            impactAudio.volume = 0.49; // Reduced by 30% from 0.7
+            impactAudio.playbackRate = 1.0;
+            impactAudio.play().catch(() => {});
+            console.log("Playing bullet impact sound");
+          } catch (e) {
+            console.log("Error playing bullet impact sound:", e);
+          }
         }
         
         gameState.removeBullet(bullet.id);
