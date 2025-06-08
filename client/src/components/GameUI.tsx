@@ -234,7 +234,7 @@ export default function GameUI() {
 
 
       {/* Bottom Controls - Mobile Optimized */}
-      <div className="absolute bottom-20 left-2 right-2 flex justify-center z-40">
+      <div className="absolute bottom-25 left-2 right-2 flex justify-center z-40">
         <Card className="bg-black bg-opacity-90 border-gray-700 w-full max-w-md">
           <CardContent className="p-3 md:p-4">
             <div className="space-y-3 md:space-y-4">
