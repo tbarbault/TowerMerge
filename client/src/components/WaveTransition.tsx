@@ -12,7 +12,7 @@ export default function WaveTransition({ wave, show, onComplete }: WaveTransitio
     if (show) {
       const timer = setTimeout(() => {
         onComplete();
-      }, 2500);
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [show, onComplete]);
