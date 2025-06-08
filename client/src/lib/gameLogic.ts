@@ -383,6 +383,11 @@ function updateBullets(gameState: any, delta: number) {
           if (enemy.health <= finalDamage) {
             // Enemy will die, award coins
             gameState.addCoins(enemy.reward);
+            // Play enemy death sound
+            try {
+              const { playEnemyDeath } = require('../stores/useAudio').useAudio.getState();
+              playEnemyDeath();
+            } catch (e) {}
           }
         });
         
@@ -436,9 +441,20 @@ function updateBullets(gameState: any, delta: number) {
         
         gameState.damageEnemy(hitEnemy.id, bullet.damage);
         
+        // Play hit sound for projectile impact
+        try {
+          const { playHit } = require('../stores/useAudio').useAudio.getState();
+          playHit();
+        } catch (e) {}
+        
         if (hitEnemy.health <= bullet.damage) {
           // Enemy will die, award coins
           gameState.addCoins(hitEnemy.reward);
+          // Play enemy death sound
+          try {
+            const { playEnemyDeath } = require('../stores/useAudio').useAudio.getState();
+            playEnemyDeath();
+          } catch (e) {}
         }
         
         gameState.removeBullet(bullet.id);

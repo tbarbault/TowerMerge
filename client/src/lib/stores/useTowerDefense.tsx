@@ -324,6 +324,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
         canPlaceTower: false,
         canMergeTowers: false,
       });
+
+      // Play tower placement sound
+      const { playTowerPlace } = require('../stores/useAudio').useAudio.getState();
+      playTowerPlace();
     },
     
     mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => {

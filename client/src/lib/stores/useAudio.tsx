@@ -80,5 +80,27 @@ export const useAudio = create<AudioState>((set, get) => ({
         console.log("Success sound play prevented:", error);
       });
     }
-  }
+  },
+  
+  playTowerPlace: () => {
+    const { towerPlaceSound, isMuted } = get();
+    if (towerPlaceSound && !isMuted) {
+      towerPlaceSound.currentTime = 0;
+      towerPlaceSound.volume = 0.4;
+      towerPlaceSound.play().catch(error => {
+        console.log("Tower place sound play prevented:", error);
+      });
+    }
+  },
+  
+  playEnemyDeath: () => {
+    const { enemyDeathSound, isMuted } = get();
+    if (enemyDeathSound && !isMuted) {
+      const soundClone = enemyDeathSound.cloneNode() as HTMLAudioElement;
+      soundClone.volume = 0.3;
+      soundClone.play().catch(error => {
+        console.log("Enemy death sound play prevented:", error);
+      });
+    }
+  },
 }));

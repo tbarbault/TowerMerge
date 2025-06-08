@@ -19,7 +19,7 @@ import { updateGameLogic } from "../lib/gameLogic";
 
 export default function Game() {
   const gameState = useTowerDefense();
-  const { setBackgroundMusic, setHitSound, setSuccessSound } = useAudio();
+  const { setBackgroundMusic, setHitSound, setSuccessSound, setTowerPlaceSound, setEnemyDeathSound } = useAudio();
 
   // Initialize audio
   useEffect(() => {
@@ -35,7 +35,17 @@ export default function Game() {
     const successAudio = new Audio("/sounds/success.mp3");
     successAudio.volume = 0.7;
     setSuccessSound(successAudio);
-  }, [setBackgroundMusic, setHitSound, setSuccessSound]);
+
+    // Use hit sound for tower placement
+    const towerPlaceAudio = new Audio("/sounds/hit.mp3");
+    towerPlaceAudio.volume = 0.6;
+    setTowerPlaceSound(towerPlaceAudio);
+
+    // Use success sound for enemy death
+    const enemyDeathAudio = new Audio("/sounds/success.mp3");
+    enemyDeathAudio.volume = 0.4;
+    setEnemyDeathSound(enemyDeathAudio);
+  }, [setBackgroundMusic, setHitSound, setSuccessSound, setTowerPlaceSound, setEnemyDeathSound]);
 
   // Game loop
   useFrame((state, delta) => {
