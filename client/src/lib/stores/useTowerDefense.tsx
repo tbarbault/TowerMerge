@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
-export type GamePhase = "menu" | "playing" | "gameOver";
+export type GamePhase = "menu" | "playing" | "paused" | "gameOver";
 
 export interface Tower {
   id: string;
@@ -125,6 +125,8 @@ interface TowerDefenseState {
   // Actions
   startGame: () => void;
   restartGame: () => void;
+  pauseGame: () => void;
+  resumeGame: () => void;
   endGame: () => void;
   selectGridCell: (x: number, z: number) => void;
   selectTowerType: (type: 'turret' | 'mortar') => void;
@@ -228,6 +230,14 @@ export const useTowerDefense = create<TowerDefenseState>()(
     restartGame: () => {
       const state = get();
       state.startGame();
+    },
+    
+    pauseGame: () => {
+      set({ gamePhase: "paused" });
+    },
+    
+    resumeGame: () => {
+      set({ gamePhase: "playing" });
     },
     
     endGame: () => {

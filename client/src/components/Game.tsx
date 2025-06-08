@@ -68,7 +68,10 @@ export default function Game() {
 
   // Game loop
   useFrame((state, delta) => {
-    updateGameLogic(gameState, delta);
+    // Only update game logic if not paused
+    if (gameState.gamePhase === "playing") {
+      updateGameLogic(gameState, delta);
+    }
   });
 
   return (

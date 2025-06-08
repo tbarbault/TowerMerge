@@ -4,7 +4,7 @@ import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import WaveTransition from "./WaveTransition";
 import EnemyEncyclopedia from "./EnemyEncyclopedia";
@@ -24,6 +24,8 @@ export default function GameUI() {
     selectedTowerType,
     startGame,
     restartGame,
+    pauseGame,
+    resumeGame,
     buyTower,
     mergeTowers,
     selectTowerType,
