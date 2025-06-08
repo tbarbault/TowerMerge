@@ -214,7 +214,13 @@ export const useTowerDefense = create<TowerDefenseState>()(
         waveCompletionTime: null,
         enemiesSpawned: 0,
         waveProgress: 0,
+        showWaveTransition: true,
       });
+      
+      // Auto-hide wave transition after 1 second
+      setTimeout(() => {
+        set(state => ({ ...state, showWaveTransition: false }));
+      }, 1000);
     },
     
     restartGame: () => {
@@ -523,7 +529,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         waveProgress: 0,
         waveStartTime: Date.now(),
         waveCompletionTime: null,
-        showWaveTransition: true,
+        showWaveTransition: false, // No animation for subsequent waves
       }));
     },
     

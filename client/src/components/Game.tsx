@@ -11,6 +11,7 @@ import Bullet from "./Bullet";
 import Explosion from "./Explosion";
 import Impact from "./Impact";
 import Obstacle from "./Obstacle";
+import TunnelExits from "./TunnelExits";
 
 import { updateGameLogic } from "../lib/gameLogic";
 
@@ -44,6 +45,7 @@ export default function Game() {
       <Lights />
       <Terrain />
       <Grid />
+      <TunnelExits />
       
       {/* Render towers */}
       {gameState.towers.map((tower) => (
