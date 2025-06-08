@@ -12,6 +12,8 @@ import EnemyEncyclopedia from "./EnemyEncyclopedia";
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
   
+  console.log("GameUI render - showEncyclopedia:", showEncyclopedia);
+  
   const {
     gamePhase,
     wave,
@@ -64,8 +66,11 @@ export default function GameUI() {
             </Button>
             <Button 
               onClick={() => {
-                console.log("Encyclopedia button clicked - menu");
-                setShowEncyclopedia(true);
+                console.log("Encyclopedia button clicked - menu, current state:", showEncyclopedia);
+                setShowEncyclopedia(prev => {
+                  console.log("Setting showEncyclopedia from", prev, "to true");
+                  return true;
+                });
               }} 
               variant="outline" 
               className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg"
