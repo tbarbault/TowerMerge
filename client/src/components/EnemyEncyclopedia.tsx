@@ -217,10 +217,21 @@ export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: Enem
                 >
                   <div className="flex items-center gap-2 md:gap-3">
                     <div
-                      className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: enemy.color }}
+                      className="flex items-center justify-center flex-shrink-0"
+                      style={{ 
+                        backgroundColor: enemy.color,
+                        width: `${Math.max(24, enemy.size * 8)}px`,
+                        height: `${Math.max(24, enemy.size * 8)}px`,
+                        borderRadius: '50%'
+                      }}
                     >
-                      <div className="w-3 h-3 md:w-4 md:h-4 bg-white rounded-full opacity-90" />
+                      <div 
+                        style={{
+                          width: `${Math.max(12, enemy.size * 4)}px`,
+                          height: `${Math.max(12, enemy.size * 4)}px`
+                        }}
+                        className="bg-white rounded-full opacity-90" 
+                      />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className={`font-semibold truncate text-sm md:text-base ${
@@ -255,10 +266,21 @@ export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: Enem
                 {/* Header */}
                 <div className="flex items-center gap-3 md:gap-4">
                   <div
-                    className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: selectedEnemy.color }}
+                    className="flex items-center justify-center flex-shrink-0"
+                    style={{ 
+                      backgroundColor: selectedEnemy.color,
+                      width: `${Math.max(48, selectedEnemy.size * 16)}px`,
+                      height: `${Math.max(48, selectedEnemy.size * 16)}px`,
+                      borderRadius: '50%'
+                    }}
                   >
-                    <div className="w-6 h-6 md:w-8 md:h-8 bg-white rounded-full opacity-90" />
+                    <div 
+                      style={{
+                        width: `${Math.max(24, selectedEnemy.size * 8)}px`,
+                        height: `${Math.max(24, selectedEnemy.size * 8)}px`
+                      }}
+                      className="bg-white rounded-full opacity-90" 
+                    />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h2 className="text-xl md:text-3xl font-bold text-white truncate">{selectedEnemy.name}</h2>
