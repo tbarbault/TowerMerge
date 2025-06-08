@@ -98,6 +98,7 @@ interface TowerDefenseState {
   coins: number;
   waveStartTime: number;
   waveCompletionTime: number | null;
+  showWaveTransition: boolean;
   
   // Game objects
   towers: Tower[];
@@ -151,6 +152,7 @@ interface TowerDefenseState {
   setWaveProgress: (progress: number) => void;
   setEnemiesSpawned: (count: number) => void;
   setWaveCompletionTime: (time: number | null) => void;
+  setShowWaveTransition: (show: boolean) => void;
   addMuzzleFlash: (flash: MuzzleFlash) => void;
   removeMuzzleFlash: (id: string) => void;
   addExplosion: (explosion: Explosion) => void;
@@ -172,6 +174,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     coins: 75,
     waveStartTime: 0,
     waveCompletionTime: null,
+    showWaveTransition: false,
     
     towers: [],
     enemies: [],
