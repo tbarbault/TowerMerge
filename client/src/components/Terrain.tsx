@@ -9,36 +9,38 @@ export default function Terrain() {
 
   return (
     <>
-      {/* Track lanes - create defined pathways for enemies */}
-      <mesh position={[0, -0.45, -8]} receiveShadow>
-        <boxGeometry args={[14, 1, 35]} />
-        <meshStandardMaterial 
-          map={grassTexture}
-          color="#2d5016"
-        />
-      </mesh>
-      
-      {/* Central track area - lighter green */}
-      <mesh position={[0, -0.4, -8]} receiveShadow>
-        <boxGeometry args={[12, 0.1, 32]} />
+      {/* Main green terrain base */}
+      <mesh position={[0, -0.5, -8]} receiveShadow>
+        <boxGeometry args={[20, 1, 35]} />
         <meshStandardMaterial 
           map={grassTexture}
           color="#4ade80"
         />
       </mesh>
       
-      {/* Side barriers/walls */}
-      <mesh position={[-7, 0, -8]} receiveShadow>
-        <boxGeometry args={[2, 0.5, 35]} />
+      {/* Central track area - defined pathway */}
+      <mesh position={[0, -0.4, -8]} receiveShadow>
+        <boxGeometry args={[14, 0.1, 32]} />
         <meshStandardMaterial 
-          color="#1f2937"
+          map={grassTexture}
+          color="#65a30d"
         />
       </mesh>
       
-      <mesh position={[7, 0, -8]} receiveShadow>
-        <boxGeometry args={[2, 0.5, 35]} />
+      {/* Side barriers/walls */}
+      <mesh position={[-8, 0, -8]} receiveShadow>
+        <boxGeometry args={[1.5, 0.8, 35]} />
         <meshStandardMaterial 
-          color="#1f2937"
+          map={grassTexture}
+          color="#365314"
+        />
+      </mesh>
+      
+      <mesh position={[8, 0, -8]} receiveShadow>
+        <boxGeometry args={[1.5, 0.8, 35]} />
+        <meshStandardMaterial 
+          map={grassTexture}
+          color="#365314"
         />
       </mesh>
       

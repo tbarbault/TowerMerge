@@ -302,7 +302,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
     >
       {/* Tower base platform */}
       <mesh position={[0, 0.1, 0]} userData={{ towerId }}>
-        <cylinderGeometry args={[0.5, 0.6, 0.2, 8]} />
+        <cylinderGeometry args={[1.0, 1.2, 0.4, 8]} />
         <meshStandardMaterial 
           map={woodTexture}
           color="#8b4513"
@@ -325,7 +325,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       ) : (
         // Turret: Tall cylindrical base
         <mesh position={[0, config.height / 2 + 0.2, 0]}>
-          <cylinderGeometry args={[0.35, 0.45, config.height, config.segments]} />
+          <cylinderGeometry args={[0.7, 0.9, config.height, config.segments]} />
           <meshStandardMaterial 
             color={config.baseColor}
             metalness={0.7}
@@ -341,8 +341,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
         {/* Turret body - different for mortar vs turret */}
         {config.isMortar ? (
           // Mortar: Low, wide mounting platform
-          <mesh position={[0, 0.08, 0]}>
-            <cylinderGeometry args={[0.3, 0.35, 0.16, 8]} />
+          <mesh position={[0, 0.16, 0]}>
+            <cylinderGeometry args={[0.6, 0.7, 0.32, 8]} />
             <meshStandardMaterial 
               color={config.turretColor}
               metalness={0.6}
@@ -353,8 +353,8 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           </mesh>
         ) : (
           // Turret: Rectangular gun mount
-          <mesh position={[0, 0.15, 0]}>
-            <boxGeometry args={[0.4, 0.3, 0.6]} />
+          <mesh position={[0, 0.3, 0]}>
+            <boxGeometry args={[0.8, 0.6, 1.2]} />
             <meshStandardMaterial 
               color={config.turretColor}
               metalness={0.8}
