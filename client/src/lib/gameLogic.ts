@@ -214,8 +214,8 @@ function updateTowers(gameState: any, currentTime: number) {
     if (currentTime - tower.lastShot < tower.fireRate) return;
 
     // Find enemies in range (tower world position conversion)
-    const towerWorldX = tower.x * 2 - 4;
-    const towerWorldZ = tower.z * 2 + 2;
+    const towerWorldX = tower.x * 2.5 - 5;
+    const towerWorldZ = tower.z * 2.5 + 1.25;
     
     const enemiesInRange = gameState.enemies.filter((enemy: any) => {
       const dx = enemy.x - towerWorldX;

@@ -52,7 +52,7 @@ export default function Game() {
         <Tower
           key={tower.id}
           towerId={tower.id}
-          position={[tower.x * 2 - 4, 0, tower.z * 2 + 2]}
+          position={[tower.x * 2.5 - 5, 0, tower.z * 2.5 + 1.25]}
           level={tower.level}
           type={tower.type}
           isSelected={tower.id === gameState.selectedTower?.id}

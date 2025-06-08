@@ -66,11 +66,11 @@ export default function Grid() {
       gridCells.push(
         <mesh
           key={`${x}-${z}`}
-          position={[x * 2 - 4, 0.01, z * 2 + 2]}
+          position={[x * 2.5 - 5, 0.01, z * 2.5 + 1.25]}
           userData={{ x, z }}
           onClick={handleClick}
         >
-          <boxGeometry args={[1.8, 0.02, 1.8]} />
+          <boxGeometry args={[2.2, 0.02, 2.2]} />
           <meshStandardMaterial
             color={cellColor}
             transparent
@@ -88,17 +88,17 @@ export default function Grid() {
       {/* Grid border lines */}
       <group>
         {/* Vertical border lines */}
-        {[-5, -3, -1, 1, 3, 5].map((x, i) => (
-          <mesh key={`v-${i}`} position={[x, 0.01, 4]}>
-            <boxGeometry args={[0.02, 0.02, 6]} />
+        {[-6.25, -3.75, -1.25, 1.25, 3.75, 6.25].map((x, i) => (
+          <mesh key={`v-${i}`} position={[x, 0.01, 4.375]}>
+            <boxGeometry args={[0.02, 0.02, 7.5]} />
             <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
           </mesh>
         ))}
         
         {/* Horizontal border lines */}
-        {[1, 3, 5, 7].map((z, i) => (
+        {[0, 2.5, 5, 7.5].map((z, i) => (
           <mesh key={`h-${i}`} position={[0, 0.01, z]}>
-            <boxGeometry args={[10, 0.02, 0.02]} />
+            <boxGeometry args={[12.5, 0.02, 0.02]} />
             <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
           </mesh>
         ))}
