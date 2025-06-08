@@ -218,14 +218,12 @@ export default function GameUI() {
         </Card>
       </div>
 
-      {/* Wave Transition Animation - Only for wave 1 */}
-      {wave === 1 && (
-        <WaveTransition
-          wave={wave}
-          show={showWaveTransition}
-          onComplete={() => setShowWaveTransition(false)}
-        />
-      )}
+      {/* Wave Transition Animation */}
+      <WaveTransition
+        wave={wave}
+        show={showWaveTransition}
+        onComplete={() => setShowWaveTransition(false)}
+      />
     </>
   );
 }

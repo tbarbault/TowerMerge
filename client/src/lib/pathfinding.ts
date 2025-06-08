@@ -1,12 +1,11 @@
-// Center path - straight through middle
+// Center path - straight through middle from tunnel
 export function getCenterPath() {
   return [
-    { x: 0, z: -15 },   // Start far back
-    { x: 0, z: -12 },   // Approach zone
-    { x: 0, z: -9 },    // Combat zone begins
-    { x: 0, z: -6 },    // Main combat area
-    { x: 0, z: -4 },    // Enter grid back
-    { x: 0, z: -2 },    // Move through grid
+    { x: -1, z: -12 },  // Start at center-left tunnel
+    { x: -1, z: -9 },   // Combat zone begins
+    { x: -1, z: -6 },   // Main combat area
+    { x: -1, z: -4 },   // Enter grid back
+    { x: -1, z: -2 },   // Move through grid
     { x: 0, z: 0 },     // Center of grid
     { x: 0, z: 2 },     // Continue toward front
     { x: 0, z: 4 },     // Exit grid front
@@ -14,13 +13,12 @@ export function getCenterPath() {
   ];
 }
 
-// Left path - comes from left side
+// Left path - comes from leftmost tunnel
 export function getLeftPath() {
   return [
-    { x: -3, z: -15 },  // Start left far back
-    { x: -3, z: -12 },  // Approach zone
-    { x: -3, z: -9 },   // Combat zone begins
-    { x: -3, z: -6 },   // Main combat area
+    { x: -4, z: -12 },  // Start at leftmost tunnel
+    { x: -4, z: -9 },   // Combat zone begins
+    { x: -4, z: -6 },   // Main combat area
     { x: -3, z: -4 },   // Enter grid back left
     { x: -2, z: -2 },   // Move toward center
     { x: -1, z: 0 },    // Through grid left side
@@ -30,13 +28,12 @@ export function getLeftPath() {
   ];
 }
 
-// Right path - comes from right side
+// Right path - comes from rightmost tunnel
 export function getRightPath() {
   return [
-    { x: 3, z: -15 },   // Start right far back
-    { x: 3, z: -12 },   // Approach zone
-    { x: 3, z: -9 },    // Combat zone begins
-    { x: 3, z: -6 },    // Main combat area
+    { x: 5, z: -12 },   // Start at rightmost tunnel
+    { x: 5, z: -9 },    // Combat zone begins
+    { x: 5, z: -6 },    // Main combat area
     { x: 3, z: -4 },    // Enter grid back right
     { x: 2, z: -2 },    // Move toward center
     { x: 1, z: 0 },     // Through grid right side
@@ -46,26 +43,24 @@ export function getRightPath() {
   ];
 }
 
-// Zigzag path - serpentine movement
+// Zigzag path - serpentine movement from center-right tunnel
 export function getZigzagPath() {
   return [
-    { x: -2, z: -15 },  // Start left far back
-    { x: -2, z: -12 },  // Approach zone
-    { x: 1, z: -9 },    // Zigzag right in combat zone
-    { x: -1, z: -6 },   // Zigzag left in combat zone
-    { x: 2, z: -3 },    // Zigzag right near grid
-    { x: -1, z: -1 },   // Zigzag left
-    { x: 2, z: 1 },     // Zigzag right
-    { x: 0, z: 3 },     // Move to center front
+    { x: 2, z: -12 },   // Start at center-right tunnel
+    { x: 1, z: -9 },    // Zigzag left in combat zone
+    { x: 3, z: -6 },    // Zigzag right in combat zone
+    { x: 1, z: -3 },    // Zigzag left near grid
+    { x: 2, z: -1 },    // Zigzag right
+    { x: 0, z: 1 },     // Zigzag to center
+    { x: 1, z: 3 },     // Move toward front
     { x: 0, z: 6 },     // End position
   ];
 }
 
-// Edge path - goes around the outside
+// Edge path - goes around the outside from leftmost tunnel
 export function getEdgePath() {
   return [
-    { x: -4, z: -15 },  // Start far left back
-    { x: -4, z: -12 },  // Approach zone
+    { x: -4, z: -12 },  // Start at leftmost tunnel
     { x: -4, z: -9 },   // Combat zone begins
     { x: -4, z: -6 },   // Main combat area
     { x: -4, z: -2 },   // Move along left edge

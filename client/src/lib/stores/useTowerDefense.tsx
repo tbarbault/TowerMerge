@@ -529,8 +529,13 @@ export const useTowerDefense = create<TowerDefenseState>()(
         waveProgress: 0,
         waveStartTime: Date.now(),
         waveCompletionTime: null,
-        showWaveTransition: false, // No animation for subsequent waves
+        showWaveTransition: true,
       }));
+      
+      // Auto-hide wave transition after 1 second
+      setTimeout(() => {
+        set(state => ({ ...state, showWaveTransition: false }));
+      }, 1000);
     },
     
     setWaveProgress: (progress) => {
