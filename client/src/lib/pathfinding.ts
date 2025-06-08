@@ -39,7 +39,7 @@ export function getRightPath() {
     { x: 1, z: 2 },     // Through grid right side
     { x: 0, z: 4 },     // Continue through grid
     { x: 0, z: 6 },     // Converge to center front
-    { x: 0, z: 9 },     // End position
+    { x: 0, z: 8.5 },   // End position (just before red line)
   ];
 }
 
