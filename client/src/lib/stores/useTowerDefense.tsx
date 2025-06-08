@@ -96,6 +96,7 @@ interface TowerDefenseState {
   wave: number;
   health: number;
   coins: number;
+  highestWave: number;
   waveStartTime: number;
   waveCompletionTime: number | null;
   showWaveTransition: boolean;
@@ -175,6 +176,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     wave: 1,
     health: 20,
     coins: 75,
+    highestWave: parseInt(localStorage.getItem('highestWave') || '1'),
     waveStartTime: 0,
     waveCompletionTime: null,
     showWaveTransition: false,

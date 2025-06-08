@@ -13,6 +13,7 @@ export default function GameUI() {
     wave,
     health,
     coins,
+    highestWave,
     selectedGridCell,
     canPlaceTower,
     canMergeTowers,
@@ -40,6 +41,11 @@ export default function GameUI() {
             <p className="text-gray-300 mt-2">
               Defend your base against endless waves of enemies!
             </p>
+            {highestWave > 1 && (
+              <p className="text-yellow-400 mt-2 font-semibold">
+                Best Wave: {highestWave}
+              </p>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-sm text-gray-400 space-y-2">
@@ -67,11 +73,19 @@ export default function GameUI() {
             <p className="text-gray-300 mt-2">
               You survived {wave} waves!
             </p>
+            {wave > highestWave && (
+              <p className="text-yellow-400 mt-1 font-semibold">
+                New Record!
+              </p>
+            )}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <p className="text-lg text-gray-300 mb-4">
+              <p className="text-lg text-gray-300 mb-2">
                 Final Score: {coins} coins
+              </p>
+              <p className="text-sm text-gray-400 mb-4">
+                Best Wave: {Math.max(wave, highestWave)}
               </p>
             </div>
             <Button onClick={restartGame} className="w-full" size="lg">

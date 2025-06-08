@@ -13,7 +13,7 @@ import Impact from "./Impact";
 import Obstacle from "./Obstacle";
 import TunnelExits from "./TunnelExits";
 import BackgroundDecor from "./BackgroundDecor";
-import MortarSmoke from "./MortarSmoke";
+
 
 import { updateGameLogic } from "../lib/gameLogic";
 
@@ -103,14 +103,7 @@ export default function Game() {
         />
       ))}
       
-      {/* Render mortar smoke effects */}
-      {gameState.mortarSmokes?.map((smoke) => (
-        <MortarSmoke
-          key={smoke.id}
-          position={smoke.position}
-          onComplete={() => gameState.removeMortarSmoke?.(smoke.id)}
-        />
-      ))}
+
 
     </>
   );
