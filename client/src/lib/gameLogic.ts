@@ -392,9 +392,9 @@ function updateBullets(gameState: any, delta: number) {
         // Play enemy death sound if any enemies were killed by explosion
         if (enemiesKilled > 0) {
           try {
-            const deathAudio = new Audio("/sounds/success.mp3");
-            deathAudio.volume = 0.5;
-            deathAudio.playbackRate = 1.8; // Light bubble sound for multiple deaths
+            const deathAudio = new Audio("/sounds/bubble_death.wav");
+            deathAudio.volume = 0.6;
+            deathAudio.playbackRate = 1.2; // Slightly faster for multiple deaths
             deathAudio.play().catch(() => {});
             console.log("Playing explosion death sound for", enemiesKilled, "enemies");
           } catch (e) {
@@ -470,9 +470,9 @@ function updateBullets(gameState: any, delta: number) {
           
           // Play enemy death sound
           try {
-            const deathAudio = new Audio("/sounds/success.mp3");
-            deathAudio.volume = 0.4;
-            deathAudio.playbackRate = 2.0; // Light bubble sound effect
+            const deathAudio = new Audio("/sounds/bubble_death.wav");
+            deathAudio.volume = 0.5;
+            deathAudio.playbackRate = 1.0;
             deathAudio.play().catch(() => {});
             console.log("Playing enemy death sound");
           } catch (e) {
