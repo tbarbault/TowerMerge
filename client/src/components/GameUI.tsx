@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
+import WaveTransition from "./WaveTransition";
 
 export default function GameUI() {
   const {
@@ -23,7 +24,9 @@ export default function GameUI() {
     waveProgress,
     enemiesInWave,
     enemiesSpawned,
-    waveCompletionTime
+    waveCompletionTime,
+    showWaveTransition,
+    setShowWaveTransition
   } = useTowerDefense();
 
   const { isMuted, toggleMute } = useAudio();
@@ -209,6 +212,13 @@ export default function GameUI() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Wave Transition Animation */}
+      <WaveTransition
+        wave={wave}
+        show={showWaveTransition}
+        onComplete={() => setShowWaveTransition(false)}
+      />
     </>
   );
 }

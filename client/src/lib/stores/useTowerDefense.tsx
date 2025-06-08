@@ -523,6 +523,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         waveProgress: 0,
         waveStartTime: Date.now(),
         waveCompletionTime: null,
+        showWaveTransition: true,
       }));
     },
     
@@ -536,6 +537,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
     
     setWaveCompletionTime: (time) => {
       set({ waveCompletionTime: time });
+    },
+    
+    setShowWaveTransition: (show) => {
+      set({ showWaveTransition: show });
     },
     
     addMuzzleFlash: (flash) => {
