@@ -21,9 +21,7 @@ export default function Lights() {
       
       {/* Hemisphere light for natural lighting */}
       <hemisphereLight
-        skyColor="#87CEEB"
-        groundColor="#2d5016"
-        intensity={0.4}
+        args={["#87CEEB", "#2d5016", 0.4]}
       />
       
       {/* Fill light from opposite side */}

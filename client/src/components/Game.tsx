@@ -13,6 +13,7 @@ import Impact from "./Impact";
 import Obstacle from "./Obstacle";
 import TunnelExits from "./TunnelExits";
 import BackgroundDecor from "./BackgroundDecor";
+import MortarSmoke from "./MortarSmoke";
 
 import { updateGameLogic } from "../lib/gameLogic";
 
