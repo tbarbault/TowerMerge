@@ -63,9 +63,12 @@ export default function GameUI() {
               START
             </Button>
             <Button 
-              onClick={() => setShowEncyclopedia(true)} 
+              onClick={() => {
+                console.log("Encyclopedia button clicked - menu");
+                setShowEncyclopedia(true);
+              }} 
               variant="outline" 
-              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900"
+              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg"
             >
               <BookOpen className="w-4 h-4 mr-2" />
               Enemy Encyclopedia
@@ -104,9 +107,12 @@ export default function GameUI() {
               START
             </Button>
             <Button 
-              onClick={() => setShowEncyclopedia(true)} 
+              onClick={() => {
+                console.log("Encyclopedia button clicked - game over");
+                setShowEncyclopedia(true);
+              }} 
               variant="outline" 
-              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 mt-2"
+              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 mt-2 rounded-lg"
             >
               <BookOpen className="w-4 h-4 mr-2" />
               Enemy Encyclopedia

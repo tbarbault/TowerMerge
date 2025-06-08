@@ -165,6 +165,7 @@ interface EnemyEncyclopediaProps {
 export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: EnemyEncyclopediaProps) {
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyData | null>(null);
 
+  console.log("EnemyEncyclopedia render - isOpen:", isOpen);
   if (!isOpen) return null;
 
   const getDifficultyColor = (difficulty: string) => {
