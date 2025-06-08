@@ -95,15 +95,17 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               console.log(`Merging tower ${towerId} with ${userData.towerId}`);
               mergeTowers(towerId, userData.towerId);
               // Play merge sound effect
-              const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
-                JSON.parse(window.localStorage.getItem('audio-muted') || 'true') : true;
-              if (!audioMuted) {
+              const { isMuted } = useAudio.getState();
+              if (!isMuted) {
                 try {
                   const mergeAudio = new Audio("/sounds/hit.mp3");
                   mergeAudio.volume = 1.0;
-                  mergeAudio.playbackRate = 1.0; // Clear mechanical merge sound
+                  mergeAudio.playbackRate = 1.0;
                   mergeAudio.play().catch(() => {});
-                } catch (e) {}
+                  console.log("Playing tower merge sound");
+                } catch (e) {
+                  console.log("Error playing merge sound:", e);
+                }
               }
               break;
             } else {
