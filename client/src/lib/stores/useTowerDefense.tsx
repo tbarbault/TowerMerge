@@ -210,7 +210,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         muzzleFlashes: [],
         explosions: [],
         impacts: [],
-        waveStartTime: Date.now(),
+        waveStartTime: Date.now() + 3000, // 3 second delay before first wave
         waveCompletionTime: null,
         enemiesSpawned: 0,
         waveProgress: 0,

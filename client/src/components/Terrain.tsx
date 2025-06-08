@@ -30,17 +30,7 @@ export default function Terrain() {
         />
       </mesh>
       
-      {/* Enemy spawn indicator at far back */}
-      <mesh position={[0, 0.02, -15]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[12, 0.2]} />
-        <meshStandardMaterial 
-          color="#22c55e" 
-          transparent 
-          opacity={0.6}
-          emissive="#22c55e"
-          emissiveIntensity={0.2}
-        />
-      </mesh>
+
     </>
   );
 }

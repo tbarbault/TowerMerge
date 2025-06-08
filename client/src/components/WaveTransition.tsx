@@ -18,15 +18,21 @@ export default function WaveTransition({ wave, show, onComplete }: WaveTransitio
   }, [show, onComplete]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {show && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
+        <motion.div 
+          className="fixed inset-0 z-50 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
           {/* Dark overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-black"
           />
 
@@ -36,7 +42,7 @@ export default function WaveTransition({ wave, show, onComplete }: WaveTransitio
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 1.2, opacity: 0 }}
             transition={{ 
-              duration: 0.6,
+              duration: 0.3,
               ease: "easeOut"
             }}
             className="absolute inset-0 flex items-center justify-center"
@@ -105,7 +111,7 @@ export default function WaveTransition({ wave, show, onComplete }: WaveTransitio
               Prepare your defenses!
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   );
