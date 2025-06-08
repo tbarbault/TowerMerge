@@ -404,9 +404,9 @@ function updateBullets(gameState: any, delta: number) {
 
         // Play explosion sound effect for mortars
         try {
-          const explosionAudio = new Audio("/sounds/hit.mp3");
-          explosionAudio.volume = 0.9;
-          explosionAudio.playbackRate = 0.8;
+          const explosionAudio = new Audio("/sounds/explosion.wav");
+          explosionAudio.volume = 0.6;
+          explosionAudio.playbackRate = 1.0;
           explosionAudio.play().catch(() => {});
           console.log("Playing mortar explosion sound");
         } catch (e) {
