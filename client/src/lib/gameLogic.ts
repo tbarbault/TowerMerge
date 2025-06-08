@@ -310,6 +310,15 @@ function updateTowers(gameState: any, currentTime: number) {
 
       gameState.addBullet(bullet);
       gameState.updateTowerLastShot(tower.id, currentTime);
+      
+      // Add mortar smoke effect for mortar towers
+      if (tower.type === 'mortar') {
+        const smokeEffect = {
+          id: Math.random().toString(36).substr(2, 9),
+          position: [barrelEndX, firingHeight + 0.1, barrelEndZ] as [number, number, number]
+        };
+        gameState.addMortarSmoke?.(smokeEffect);
+      }
     }
   });
 }

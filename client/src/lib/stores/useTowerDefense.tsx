@@ -107,6 +107,7 @@ interface TowerDefenseState {
   muzzleFlashes: MuzzleFlash[];
   explosions: Explosion[];
   impacts: Impact[];
+  mortarSmokes: any[];
   obstacles: Obstacle[];
   
   // UI state
@@ -159,6 +160,8 @@ interface TowerDefenseState {
   removeExplosion: (id: string) => void;
   addImpact: (impact: Impact) => void;
   removeImpact: (id: string) => void;
+  addMortarSmoke: (smoke: any) => void;
+  removeMortarSmoke: (id: string) => void;
   
   // Computed properties
   canPlaceTower: boolean;
@@ -182,6 +185,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     muzzleFlashes: [],
     explosions: [],
     impacts: [],
+    mortarSmokes: [],
     obstacles: [],
     
     selectedGridCell: null,
@@ -587,6 +591,18 @@ export const useTowerDefense = create<TowerDefenseState>()(
     removeImpact: (id) => {
       set(state => ({
         impacts: state.impacts.filter(i => i.id !== id)
+      }));
+    },
+    
+    addMortarSmoke: (smoke) => {
+      set(state => ({
+        mortarSmokes: [...state.mortarSmokes, smoke]
+      }));
+    },
+    
+    removeMortarSmoke: (id) => {
+      set(state => ({
+        mortarSmokes: state.mortarSmokes.filter(s => s.id !== id)
       }));
     },
   }))

@@ -102,7 +102,15 @@ export default function Game() {
           onComplete={() => gameState.removeImpact(impact.id)}
         />
       ))}
-
+      
+      {/* Render mortar smoke effects */}
+      {gameState.mortarSmokes?.map((smoke) => (
+        <MortarSmoke
+          key={smoke.id}
+          position={smoke.position}
+          onComplete={() => gameState.removeMortarSmoke?.(smoke.id)}
+        />
+      ))}
 
     </>
   );
