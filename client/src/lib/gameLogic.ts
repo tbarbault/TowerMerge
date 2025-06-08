@@ -137,13 +137,13 @@ function createEnemy(type: string, wave: number) {
   const startPoint = path[0];
   
   const baseConfig = {
-    basic: { health: 300, speed: 1.2, reward: 1 },
-    fast: { health: 240, speed: 2.0, reward: 2 },
-    heavy: { health: 525, speed: 1.0, reward: 2 },
-    armored: { health: 750, speed: 1.1, reward: 3 },
-    elite: { health: 1125, speed: 1.3, reward: 4 },
-    boss: { health: 1800, speed: 0.9, reward: 8 },
-    megaboss: { health: 3600, speed: 0.8, reward: 15 }
+    basic: { health: 220, speed: 1.2, reward: 1 },
+    fast: { health: 180, speed: 2.0, reward: 2 },
+    heavy: { health: 400, speed: 1.0, reward: 2 },
+    armored: { health: 580, speed: 1.1, reward: 3 },
+    elite: { health: 850, speed: 1.3, reward: 4 },
+    boss: { health: 1350, speed: 0.9, reward: 8 },
+    megaboss: { health: 2700, speed: 0.8, reward: 15 }
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;

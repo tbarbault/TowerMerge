@@ -27,11 +27,15 @@ export const useAudio = create<AudioState>((set, get) => ({
   backgroundMusic: null,
   hitSound: null,
   successSound: null,
+  towerPlaceSound: null,
+  enemyDeathSound: null,
   isMuted: true, // Start muted by default
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
   setSuccessSound: (sound) => set({ successSound: sound }),
+  setTowerPlaceSound: (sound) => set({ towerPlaceSound: sound }),
+  setEnemyDeathSound: (sound) => set({ enemyDeathSound: sound }),
   
   toggleMute: () => {
     const { isMuted } = get();

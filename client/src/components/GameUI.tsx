@@ -87,9 +87,8 @@ export default function GameUI() {
                 Best Wave: {Math.max(wave, highestWave)}
               </p>
             </div>
-            <Button onClick={restartGame} className="w-full" size="lg">
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Play Again
+            <Button onClick={restartGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
+              START
             </Button>
           </CardContent>
         </Card>
