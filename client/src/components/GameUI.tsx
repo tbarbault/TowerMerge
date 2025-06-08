@@ -12,8 +12,6 @@ import EnemyEncyclopedia from "./EnemyEncyclopedia";
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
   
-  console.log("GameUI render - showEncyclopedia:", showEncyclopedia);
-  
   const {
     gamePhase,
     wave,
@@ -41,90 +39,106 @@ export default function GameUI() {
 
   if (gamePhase === "menu") {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
-        <Card className="w-96">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-white">Tower Defense 3D</CardTitle>
-            <p className="text-gray-300 mt-2">
-              Defend your base against endless waves of enemies!
-            </p>
-            {highestWave > 1 && (
-              <p className="text-yellow-400 mt-2 font-semibold">
-                Best Wave: {highestWave}
+      <>
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+          <Card className="w-96">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold text-white">Tower Defense 3D</CardTitle>
+              <p className="text-gray-300 mt-2">
+                Defend your base against endless waves of enemies!
               </p>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-sm text-gray-400 space-y-2">
-              <p>• Place towers on the 5x3 grid to defend</p>
-              <p>• Merge same-level towers to upgrade them</p>
-              <p>• Enemies get stronger each wave</p>
-              <p>• Don't let them reach your base!</p>
-            </div>
-            <Button onClick={startGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
-              START
-            </Button>
-            <Button 
-              onClick={() => {
-                console.log("Encyclopedia button clicked - menu, current state:", showEncyclopedia);
-                setShowEncyclopedia(prev => {
-                  console.log("Setting showEncyclopedia from", prev, "to true");
-                  return true;
-                });
-              }} 
-              variant="outline" 
-              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Enemy Encyclopedia
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+              {highestWave > 1 && (
+                <p className="text-yellow-400 mt-2 font-semibold">
+                  Best Wave: {highestWave}
+                </p>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-sm text-gray-400 space-y-2">
+                <p>• Place towers on the 5x3 grid to defend</p>
+                <p>• Merge same-level towers to upgrade them</p>
+                <p>• Enemies get stronger each wave</p>
+                <p>• Don't let them reach your base!</p>
+              </div>
+              <Button onClick={startGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
+                START
+              </Button>
+              <Button 
+                onClick={() => {
+                  console.log("Encyclopedia button clicked - menu, current state:", showEncyclopedia);
+                  setShowEncyclopedia(prev => {
+                    console.log("Setting showEncyclopedia from", prev, "to true");
+                    return true;
+                  });
+                }} 
+                variant="outline" 
+                className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Enemy Encyclopedia
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <EnemyEncyclopedia
+          isOpen={showEncyclopedia}
+          onClose={() => setShowEncyclopedia(false)}
+          currentWave={wave}
+        />
+      </>
     );
   }
 
   if (gamePhase === "gameOver") {
     return (
-      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
-        <Card className="w-96">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-red-400">Game Over</CardTitle>
-            <p className="text-gray-300 mt-2">
-              You survived {wave} waves!
-            </p>
-            {wave > highestWave && (
-              <p className="text-yellow-400 mt-1 font-semibold">
-                New Record!
+      <>
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+          <Card className="w-96">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold text-red-400">Game Over</CardTitle>
+              <p className="text-gray-300 mt-2">
+                You survived {wave} waves!
               </p>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="text-center">
-              <p className="text-lg text-gray-300 mb-2">
-                Final Score: {coins} coins
-              </p>
-              <p className="text-sm text-gray-400 mb-4">
-                Best Wave: {Math.max(wave, highestWave)}
-              </p>
-            </div>
-            <Button onClick={restartGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
-              START
-            </Button>
-            <Button 
-              onClick={() => {
-                console.log("Encyclopedia button clicked - game over");
-                setShowEncyclopedia(true);
-              }} 
-              variant="outline" 
-              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 mt-2 rounded-lg"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Enemy Encyclopedia
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+              {wave > highestWave && (
+                <p className="text-yellow-400 mt-1 font-semibold">
+                  New Record!
+                </p>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="text-center">
+                <p className="text-lg text-gray-300 mb-2">
+                  Final Score: {coins} coins
+                </p>
+                <p className="text-sm text-gray-400 mb-4">
+                  Best Wave: {Math.max(wave, highestWave)}
+                </p>
+              </div>
+              <Button onClick={restartGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
+                START
+              </Button>
+              <Button 
+                onClick={() => {
+                  console.log("Encyclopedia button clicked - game over");
+                  setShowEncyclopedia(true);
+                }} 
+                variant="outline" 
+                className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 mt-2 rounded-lg"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                Enemy Encyclopedia
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <EnemyEncyclopedia
+          isOpen={showEncyclopedia}
+          onClose={() => setShowEncyclopedia(false)}
+          currentWave={wave}
+        />
+      </>
     );
   }
 
