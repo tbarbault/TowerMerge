@@ -54,7 +54,7 @@ export function getZigzagPath() {
     { x: 0, z: 2 },     // Zigzag to center
     { x: 1, z: 4 },     // Move toward front
     { x: 0, z: 6 },     // Exit grid
-    { x: 0, z: 9 },     // End position
+    { x: 0, z: 8.5 },   // End position (just before red line)
   ];
 }
 
@@ -69,7 +69,7 @@ export function getEdgePath() {
     { x: -1, z: 2 },    // Move inward
     { x: 1, z: 4 },     // Cross center
     { x: 0, z: 6 },     // Exit grid
-    { x: 0, z: 9 },     // End position
+    { x: 0, z: 8.5 },   // End position (just before red line)
   ];
 }
 
