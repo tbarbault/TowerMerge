@@ -34,13 +34,13 @@ function App() {
   // Mobile-optimized camera settings
   const cameraSettings = isMobile 
     ? {
-        position: [0, 18, 2] as [number, number, number],
+        position: [0, 12, 12] as [number, number, number],
         fov: 75,
         near: 0.1,
         far: 1000
       }
     : {
-        position: [0, 15, 3] as [number, number, number],
+        position: [0, 10, 10] as [number, number, number],
         fov: 50,
         near: 0.1,
         far: 1000

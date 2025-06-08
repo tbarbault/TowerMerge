@@ -10,7 +10,7 @@ export default function Terrain() {
   return (
     <>
       {/* Main terrain - extended for longer combat zone */}
-      <mesh position={[0, -0.5, -5]} receiveShadow>
+      <mesh position={[0, -0.5, -8]} receiveShadow>
         <boxGeometry args={[30, 1, 35]} />
         <meshStandardMaterial 
           map={grassTexture}
@@ -19,7 +19,7 @@ export default function Terrain() {
       </mesh>
       
       {/* Life line at the front of the grid - enemies crossing this lose player life */}
-      <mesh position={[0, 0.02, 5]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, 0.02, 2]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[12, 0.2]} />
         <meshStandardMaterial 
           color="#ef4444" 
