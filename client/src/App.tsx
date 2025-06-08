@@ -58,7 +58,9 @@ function App() {
               powerPreference: "default"
             }}
           >
+            {/* Improved skybox with gradient effect */}
             <color attach="background" args={["#87CEEB"]} />
+            <fog attach="fog" args={["#87CEEB", 30, 80]} />
             <Suspense fallback={null}>
               <Game />
             </Suspense>

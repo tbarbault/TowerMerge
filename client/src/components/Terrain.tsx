@@ -1,20 +1,28 @@
 import { useTexture } from "@react-three/drei";
+import * as THREE from "three";
 
 export default function Terrain() {
   const grassTexture = useTexture("/textures/grass.png");
   
-  // Configure texture repeat
-  grassTexture.wrapS = grassTexture.wrapT = 1000; // RepeatWrapping
-  grassTexture.repeat.set(8, 6);
+  // Configure texture repeat with proper wrapping
+  grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
+  grassTexture.repeat.set(12, 8);
+  
+  // Add texture filtering for better quality
+  grassTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  grassTexture.magFilter = THREE.LinearFilter;
 
   return (
     <>
-      {/* Main green terrain base */}
+      {/* Main green terrain base with improved texturing */}
       <mesh position={[0, -0.5, -8]} receiveShadow>
         <boxGeometry args={[20, 1, 35]} />
         <meshStandardMaterial 
           map={grassTexture}
           color="#4ade80"
+          roughness={0.8}
+          metalness={0.1}
+
         />
       </mesh>
       
@@ -24,6 +32,8 @@ export default function Terrain() {
         <meshStandardMaterial 
           map={grassTexture}
           color="#65a30d"
+          roughness={0.6}
+          metalness={0.05}
         />
       </mesh>
       

@@ -87,19 +87,31 @@ export default function Grid() {
       
       {/* Grid border lines */}
       <group>
-        {/* Vertical border lines */}
+        {/* Vertical border lines with soft glow */}
         {[-6.25, -3.75, -1.25, 1.25, 3.75, 6.25].map((x, i) => (
           <mesh key={`v-${i}`} position={[x, 0.01, 4.375]}>
             <boxGeometry args={[0.02, 0.02, 7.5]} />
-            <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
+            <meshStandardMaterial 
+              color="#6b7280" 
+              transparent 
+              opacity={0.4} 
+              emissive="#6b7280"
+              emissiveIntensity={0.1}
+            />
           </mesh>
         ))}
         
-        {/* Horizontal border lines */}
+        {/* Horizontal border lines with soft glow */}
         {[0, 2.5, 5, 7.5].map((z, i) => (
           <mesh key={`h-${i}`} position={[0, 0.01, z]}>
             <boxGeometry args={[12.5, 0.02, 0.02]} />
-            <meshStandardMaterial color="#6b7280" transparent opacity={0.5} />
+            <meshStandardMaterial 
+              color="#6b7280" 
+              transparent 
+              opacity={0.4} 
+              emissive="#6b7280"
+              emissiveIntensity={0.1}
+            />
           </mesh>
         ))}
       </group>

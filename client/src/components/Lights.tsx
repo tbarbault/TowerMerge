@@ -1,36 +1,45 @@
 export default function Lights() {
   return (
     <>
-      {/* Ambient light for general illumination */}
-      <ambientLight intensity={0.4} />
+      {/* Enhanced ambient light */}
+      <ambientLight intensity={0.3} color="#f0f8ff" />
       
-      {/* Main directional light (sun) */}
+      {/* Main directional light (sun) with enhanced shadows */}
       <directionalLight
-        position={[10, 10, 5]}
-        intensity={1}
+        position={[15, 20, 10]}
+        intensity={1.2}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={50}
-        shadow-camera-left={-20}
-        shadow-camera-right={20}
-        shadow-camera-top={20}
-        shadow-camera-bottom={-20}
+        shadow-mapSize-width={4096}
+        shadow-mapSize-height={4096}
+        shadow-camera-far={80}
+        shadow-camera-left={-25}
+        shadow-camera-right={25}
+        shadow-camera-top={25}
+        shadow-camera-bottom={-25}
+        shadow-bias={-0.0001}
+      />
+      
+      {/* Hemisphere light for natural lighting */}
+      <hemisphereLight
+        skyColor="#87CEEB"
+        groundColor="#2d5016"
+        intensity={0.4}
       />
       
       {/* Fill light from opposite side */}
       <directionalLight
-        position={[-5, 5, -5]}
+        position={[-10, 5, -15]}
         intensity={0.3}
-        color="#b4d8ff"
+        color="#ff6b35"
       />
       
-      {/* Point light for dynamic lighting */}
+      {/* Combat area spotlight */}
       <pointLight
-        position={[0, 8, 0]}
-        intensity={0.5}
-        distance={20}
+        position={[0, 12, 0]}
+        intensity={0.6}
+        distance={30}
         decay={2}
+        color="#fffacd"
       />
     </>
   );
