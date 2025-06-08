@@ -1,13 +1,17 @@
+import { useState } from "react";
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import WaveTransition from "./WaveTransition";
+import EnemyEncyclopedia from "./EnemyEncyclopedia";
 
 export default function GameUI() {
+  const [showEncyclopedia, setShowEncyclopedia] = useState(false);
+  
   const {
     gamePhase,
     wave,
@@ -57,6 +61,14 @@ export default function GameUI() {
             <Button onClick={startGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
               START
             </Button>
+            <Button 
+              onClick={() => setShowEncyclopedia(true)} 
+              variant="outline" 
+              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Enemy Encyclopedia
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -89,6 +101,14 @@ export default function GameUI() {
             </div>
             <Button onClick={restartGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
               START
+            </Button>
+            <Button 
+              onClick={() => setShowEncyclopedia(true)} 
+              variant="outline" 
+              className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 mt-2"
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Enemy Encyclopedia
             </Button>
           </CardContent>
         </Card>
@@ -141,13 +161,21 @@ export default function GameUI() {
               <div className="flex items-center gap-2 mb-1">
                 <Users className="w-3 h-3 md:w-4 md:h-4 text-blue-400" />
                 <span className="text-white text-xs font-semibold">Enemy Types</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowEncyclopedia(true)}
+                  className="ml-auto p-1 h-6 w-6 text-blue-400 hover:text-blue-300"
+                >
+                  <BookOpen className="w-3 h-3" />
+                </Button>
               </div>
               <div className="flex gap-1 flex-wrap">
                 {getAvailableEnemyTypes(wave).map((type) => (
                   <Badge 
                     key={type} 
                     variant="outline" 
-                    className={`text-xs px-1 py-0 ${
+                    className={`text-xs px-1 py-0 cursor-pointer hover:opacity-80 ${
                       type === 'basic' ? 'border-green-400 text-green-400' :
                       type === 'fast' ? 'border-yellow-400 text-yellow-400' :
                       type === 'heavy' ? 'border-orange-400 text-orange-400' :
@@ -155,6 +183,7 @@ export default function GameUI() {
                       type === 'elite' ? 'border-red-400 text-red-400' :
                       'border-gray-400 text-gray-400'
                     }`}
+                    onClick={() => setShowEncyclopedia(true)}
                   >
                     {type}
                   </Badge>
@@ -235,6 +264,12 @@ export default function GameUI() {
         wave={wave}
         show={showWaveTransition}
         onComplete={() => setShowWaveTransition(false)}
+      />
+      
+      <EnemyEncyclopedia
+        isOpen={showEncyclopedia}
+        onClose={() => setShowEncyclopedia(false)}
+        currentWave={wave}
       />
     </>
   );
