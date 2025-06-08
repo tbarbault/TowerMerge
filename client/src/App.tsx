@@ -31,17 +31,17 @@ function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Mobile-optimized camera settings
+  // Mobile-optimized camera settings - dezoomed slightly
   const cameraSettings = isMobile 
     ? {
-        position: [0, 14, 14] as [number, number, number],
-        fov: 80,
+        position: [0, 16, 16] as [number, number, number],
+        fov: 85,
         near: 0.1,
         far: 1000
       }
     : {
-        position: [0, 12, 12] as [number, number, number],
-        fov: 55,
+        position: [0, 15, 15] as [number, number, number],
+        fov: 60,
         near: 0.1,
         far: 1000
       };

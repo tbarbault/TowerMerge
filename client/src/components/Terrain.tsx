@@ -32,7 +32,7 @@ export default function Terrain() {
         <boxGeometry args={[1.5, 0.8, 35]} />
         <meshStandardMaterial 
           map={grassTexture}
-          color="#365314"
+          color="#1f2937"
         />
       </mesh>
       
@@ -40,9 +40,30 @@ export default function Terrain() {
         <boxGeometry args={[1.5, 0.8, 35]} />
         <meshStandardMaterial 
           map={grassTexture}
-          color="#365314"
+          color="#1f2937"
         />
       </mesh>
+      
+      {/* Lighting on side barriers */}
+      <spotLight
+        position={[-8, 2, -8]}
+        target-position={[-8, 0, -8]}
+        angle={Math.PI / 3}
+        penumbra={0.5}
+        intensity={0.8}
+        color="#fbbf24"
+        castShadow
+      />
+      
+      <spotLight
+        position={[8, 2, -8]}
+        target-position={[8, 0, -8]}
+        angle={Math.PI / 3}
+        penumbra={0.5}
+        intensity={0.8}
+        color="#fbbf24"
+        castShadow
+      />
       
       {/* Track lane dividers */}
       <mesh position={[-3, -0.35, -8]} rotation={[-Math.PI / 2, 0, 0]}>

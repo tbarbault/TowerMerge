@@ -9,7 +9,7 @@ export function getCenterPath() {
     { x: 0, z: 2 },     // Center of grid
     { x: 0, z: 4 },     // Continue toward front
     { x: 0, z: 6 },     // Exit grid front
-    { x: 0, z: 9 },     // End position (in front of player - life lost)
+    { x: 0, z: 8.5 },   // End position (just before red line - life lost at z > 8)
   ];
 }
 

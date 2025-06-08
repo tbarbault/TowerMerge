@@ -12,6 +12,7 @@ import Explosion from "./Explosion";
 import Impact from "./Impact";
 import Obstacle from "./Obstacle";
 import TunnelExits from "./TunnelExits";
+import BackgroundDecor from "./BackgroundDecor";
 
 import { updateGameLogic } from "../lib/gameLogic";
 
@@ -43,6 +44,7 @@ export default function Game() {
   return (
     <>
       <Lights />
+      <BackgroundDecor />
       <Terrain />
       <Grid />
       <TunnelExits />
