@@ -146,8 +146,20 @@ export default function GameUI() {
 
   return (
     <>
+      {/* Pause Button - Top Left */}
+      <div className="absolute top-2 left-2 z-50">
+        <Button
+          onClick={pauseGame}
+          variant="outline"
+          size="sm"
+          className="bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800"
+        >
+          <Pause className="w-4 h-4" />
+        </Button>
+      </div>
+
       {/* Top HUD - Mobile Optimized */}
-      <div className="absolute top-2 left-2 right-2 z-40">
+      <div className="absolute top-2 left-16 right-2 z-40">
         {/* Mobile layout: Stack vertically on small screens */}
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:justify-between md:items-start">
           {/* Left side stats - horizontal on mobile */}
@@ -312,6 +324,34 @@ export default function GameUI() {
         onClose={() => setShowEncyclopedia(false)}
         currentWave={wave}
       />
+
+      {/* Pause Menu Overlay */}
+      {gamePhase === "paused" && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+          <Card className="w-80">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl font-bold text-white">Game Paused</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button
+                onClick={resumeGame}
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Play className="w-4 h-4 mr-2" />
+                Resume Game
+              </Button>
+              <Button
+                onClick={restartGame}
+                variant="outline"
+                className="w-full border-gray-600 text-white hover:bg-gray-800"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Restart Game
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </>
   );
 }
