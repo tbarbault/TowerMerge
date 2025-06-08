@@ -9,7 +9,7 @@ interface AudioState {
   isMuted: boolean;
   
   // Setter functions
-  setBackgroundMusic: (music: HTMLAudioElement) => void;
+  setBackgroundMusic: (music: HTMLAudioElement | null) => void;
   setHitSound: (sound: HTMLAudioElement) => void;
   setSuccessSound: (sound: HTMLAudioElement) => void;
   setTowerPlaceSound: (sound: HTMLAudioElement) => void;

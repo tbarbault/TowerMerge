@@ -25,11 +25,8 @@ export default function Game() {
   useEffect(() => {
     const initializeAudio = async () => {
       try {
-        const bgMusic = new Audio("/sounds/background.mp3");
-        bgMusic.loop = true;
-        bgMusic.volume = 0.3;
-        bgMusic.preload = "auto";
-        setBackgroundMusic(bgMusic);
+        // Background music removed - keeping only essential sound effects
+        setBackgroundMusic(null);
 
         const hitAudio = new Audio("/sounds/hit.mp3");
         hitAudio.volume = 0.5;
@@ -51,9 +48,10 @@ export default function Game() {
         enemyDeathAudio.preload = "auto";
         setEnemyDeathSound(enemyDeathAudio);
 
-        // Enable audio context on first user interaction
+        // Enable audio context on first user interaction for mobile devices
         const enableAudio = () => {
-          bgMusic.play().catch(() => {}); // Attempt to start background music
+          // Test audio playback capability without starting background music
+          hitAudio.play().then(() => hitAudio.pause()).catch(() => {});
           document.removeEventListener('touchstart', enableAudio);
           document.removeEventListener('click', enableAudio);
         };
