@@ -370,6 +370,7 @@ function updateBullets(gameState: any, delta: number) {
           color: bullet.color,
         });
 
+        let enemiesKilled = 0;
         enemiesInRadius.forEach((enemy: any) => {
           const dx = enemy.x - bullet.targetX!;
           const dz = enemy.z - bullet.targetZ!;
@@ -378,21 +379,41 @@ function updateBullets(gameState: any, delta: number) {
           const damageMultiplier = Math.max(0.3, 1 - (distanceToExplosion / bullet.explosionRadius));
           const finalDamage = Math.floor(bullet.damage * damageMultiplier);
           
+          const willDie = enemy.health <= finalDamage;
           gameState.damageEnemy(enemy.id, finalDamage);
           
-          if (enemy.health <= finalDamage) {
+          if (willDie) {
             // Enemy will die, award coins
             gameState.addCoins(enemy.reward);
+            enemiesKilled++;
           }
         });
 
+        // Play enemy death sound if any enemies were killed by explosion
+        if (enemiesKilled > 0) {
+          const audioState = typeof window !== 'undefined' && window.localStorage ? 
+            JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+          if (!audioState) {
+            try {
+              const deathAudio = new Audio("/sounds/success.mp3");
+              deathAudio.volume = 0.9;
+              deathAudio.playbackRate = 0.9; // Slightly lower for multiple deaths
+              deathAudio.play().catch(() => {});
+            } catch (e) {}
+          }
+        }
+
         // Play explosion sound effect for mortars
-        try {
-          const explosionAudio = new Audio("/sounds/hit.mp3");
-          explosionAudio.volume = 0.9;
-          explosionAudio.playbackRate = 0.7; // Lower pitch for explosions
-          explosionAudio.play().catch(() => {});
-        } catch (e) {}
+        const audioState = typeof window !== 'undefined' && window.localStorage ? 
+          JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+        if (!audioState) {
+          try {
+            const explosionAudio = new Audio("/sounds/hit.mp3");
+            explosionAudio.volume = 1.0;
+            explosionAudio.playbackRate = 0.6; // Deep explosion sound
+            explosionAudio.play().catch(() => {});
+          } catch (e) {}
+        }
         
         gameState.removeBullet(bullet.id);
         return;
@@ -442,20 +463,37 @@ function updateBullets(gameState: any, delta: number) {
           startTime: Date.now(),
         });
         
+        const willDie = hitEnemy.health <= bullet.damage;
         gameState.damageEnemy(hitEnemy.id, bullet.damage);
         
-        if (hitEnemy.health <= bullet.damage) {
+        if (willDie) {
           // Enemy will die, award coins
           gameState.addCoins(hitEnemy.reward);
+          
+          // Play enemy death sound
+          const audioState = typeof window !== 'undefined' && window.localStorage ? 
+            JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+          if (!audioState) {
+            try {
+              const deathAudio = new Audio("/sounds/success.mp3");
+              deathAudio.volume = 0.8;
+              deathAudio.playbackRate = 1.1;
+              deathAudio.play().catch(() => {});
+            } catch (e) {}
+          }
         }
 
         // Play impact sound effect for bullets
-        try {
-          const impactAudio = new Audio("/sounds/hit.mp3");
-          impactAudio.volume = 0.3;
-          impactAudio.playbackRate = 1.5; // Higher pitch for bullet impacts
-          impactAudio.play().catch(() => {});
-        } catch (e) {}
+        const audioState = typeof window !== 'undefined' && window.localStorage ? 
+          JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
+        if (!audioState) {
+          try {
+            const impactAudio = new Audio("/sounds/hit.mp3");
+            impactAudio.volume = 0.6;
+            impactAudio.playbackRate = 1.8; // Sharp bullet impact
+            impactAudio.play().catch(() => {});
+          } catch (e) {}
+        }
         
         gameState.removeBullet(bullet.id);
         return;

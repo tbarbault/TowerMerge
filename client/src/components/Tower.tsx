@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
+import { useAudio } from "../lib/stores/useAudio";
 import * as THREE from "three";
 
 interface TowerProps {
@@ -94,12 +95,16 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               console.log(`Merging tower ${towerId} with ${userData.towerId}`);
               mergeTowers(towerId, userData.towerId);
               // Play merge sound effect
-              try {
-                const mergeAudio = new Audio("/sounds/hit.mp3");
-                mergeAudio.volume = 0.8;
-                mergeAudio.playbackRate = 1.1; // Slightly higher pitch for merging
-                mergeAudio.play().catch(() => {});
-              } catch (e) {}
+              const gameState = useTowerDefense.getState();
+              const audioState = useAudio.getState();
+              if (!audioState.isMuted) {
+                try {
+                  const mergeAudio = new Audio("/sounds/hit.mp3");
+                  mergeAudio.volume = 0.9;
+                  mergeAudio.playbackRate = 1.2; // Mechanical merge sound
+                  mergeAudio.play().catch(() => {});
+                } catch (e) {}
+              }
               break;
             } else {
               console.log("Towers must be adjacent (no diagonal merging)");

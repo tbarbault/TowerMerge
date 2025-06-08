@@ -249,12 +249,14 @@ export default function GameUI() {
                     onClick={() => {
                       selectTowerType('turret');
                       buyTower();
-                      try {
-                        const audio = new Audio("/sounds/success.mp3");
-                        audio.volume = 0.7;
-                        audio.playbackRate = 1.3; // Higher pitch for turret placement
-                        audio.play().catch(() => {});
-                      } catch (e) {}
+                      if (!isMuted) {
+                        try {
+                          const audio = new Audio("/sounds/hit.mp3");
+                          audio.volume = 0.8;
+                          audio.playbackRate = 1.8; // High pitch for mechanical placement sound
+                          audio.play().catch(() => {});
+                        } catch (e) {}
+                      }
                     }}
                     className={`${selectedTowerType === 'turret' ? 'bg-green-700 border-2 border-green-400' : 'bg-green-600 hover:bg-green-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
                     disabled={coins < 15}
@@ -266,12 +268,14 @@ export default function GameUI() {
                     onClick={() => {
                       selectTowerType('mortar');
                       buyTower();
-                      try {
-                        const audio = new Audio("/sounds/success.mp3");
-                        audio.volume = 0.8;
-                        audio.playbackRate = 0.9; // Lower pitch for mortar placement
-                        audio.play().catch(() => {});
-                      } catch (e) {}
+                      if (!isMuted) {
+                        try {
+                          const audio = new Audio("/sounds/hit.mp3");
+                          audio.volume = 0.9;
+                          audio.playbackRate = 1.4; // Mechanical sound for mortar placement
+                          audio.play().catch(() => {});
+                        } catch (e) {}
+                      }
                     }}
                     className={`${selectedTowerType === 'mortar' ? 'bg-orange-700 border-2 border-orange-400' : 'bg-orange-600 hover:bg-orange-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
                     disabled={coins < 25}
