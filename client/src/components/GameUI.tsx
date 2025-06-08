@@ -249,6 +249,7 @@ export default function GameUI() {
                     onClick={() => {
                       selectTowerType('turret');
                       buyTower();
+                      playTowerPlace();
                     }}
                     className={`${selectedTowerType === 'turret' ? 'bg-green-700 border-2 border-green-400' : 'bg-green-600 hover:bg-green-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
                     disabled={coins < 15}
@@ -260,6 +261,7 @@ export default function GameUI() {
                     onClick={() => {
                       selectTowerType('mortar');
                       buyTower();
+                      playTowerPlace();
                     }}
                     className={`${selectedTowerType === 'mortar' ? 'bg-orange-700 border-2 border-orange-400' : 'bg-orange-600 hover:bg-orange-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
                     disabled={coins < 25}

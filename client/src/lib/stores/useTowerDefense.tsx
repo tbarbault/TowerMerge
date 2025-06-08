@@ -316,6 +316,16 @@ export const useTowerDefense = create<TowerDefenseState>()(
         type: state.selectedTowerType,
       };
       
+      // Play tower placement sound
+      try {
+        const audioStore = (window as any).audioStore;
+        if (audioStore && audioStore.playTowerPlace) {
+          audioStore.playTowerPlace();
+        }
+      } catch (e) {
+        console.log("Audio playback failed:", e);
+      }
+      
       // Update state after placing tower
       set({
         towers: [...state.towers, newTower],
