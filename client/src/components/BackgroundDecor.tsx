@@ -16,7 +16,7 @@ export default function BackgroundDecor() {
           (Math.random() - 0.5) * 18, // x: spread across width
           0,
           -20 - Math.random() * 8 // z: behind combat area
-        ],
+        ] as [number, number, number],
         scale: 0.8 + Math.random() * 0.4,
         rotation: Math.random() * Math.PI * 2
       });
@@ -31,7 +31,7 @@ export default function BackgroundDecor() {
           side * (12 + Math.random() * 4), // x: on the sides
           0,
           -15 + Math.random() * 25 // z: scattered along length
-        ],
+        ] as [number, number, number],
         scale: 0.3 + Math.random() * 0.4,
         rotation: Math.random() * Math.PI * 2
       });
@@ -45,7 +45,7 @@ export default function BackgroundDecor() {
           (Math.random() - 0.5) * 30, // x: wide spread
           -2,
           -35 - Math.random() * 10 // z: far behind
-        ],
+        ] as [number, number, number],
         scale: 2 + Math.random() * 1.5,
         rotation: Math.random() * Math.PI * 2
       });
@@ -59,7 +59,7 @@ export default function BackgroundDecor() {
       {decorItems.map((item, index) => {
         if (item.type === 'tree') {
           return (
-            <group key={`tree-${index}`} position={item.position} rotation={[0, item.rotation, 0]} scale={item.scale}>
+            <group key={`tree-${index}`} position={item.position as [number, number, number]} rotation={[0, item.rotation, 0]} scale={item.scale}>
               {/* Tree trunk */}
               <mesh position={[0, 1, 0]}>
                 <cylinderGeometry args={[0.15, 0.2, 2, 8]} />
@@ -84,7 +84,7 @@ export default function BackgroundDecor() {
           return (
             <mesh 
               key={`rock-${index}`} 
-              position={item.position} 
+              position={item.position as [number, number, number]} 
               rotation={[0, item.rotation, 0]} 
               scale={item.scale}
             >
@@ -98,7 +98,7 @@ export default function BackgroundDecor() {
           return (
             <mesh 
               key={`hill-${index}`} 
-              position={item.position} 
+              position={item.position as [number, number, number]} 
               rotation={[0, item.rotation, 0]} 
               scale={item.scale}
             >
