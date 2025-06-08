@@ -176,7 +176,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "boss",
     name: "Crimson Overlord",
-    health: 1531,
+    health: 1454,
     speed: 0.9,
     reward: 8,
     color: "#dc2626",
@@ -195,7 +195,7 @@ const enemyDatabase: EnemyData[] = [
   {
     type: "megaboss",
     name: "Void Leviathan",
-    health: 3062,
+    health: 2909,
     speed: 0.8,
     reward: 15,
     color: "#7c3aed",
