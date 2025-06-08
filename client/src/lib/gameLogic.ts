@@ -449,10 +449,11 @@ function updateBullets(gameState: any, delta: number) {
           gameState.addCoins(hitEnemy.reward);
         }
 
-        // Play impact sound effect
+        // Play impact sound effect for bullets
         try {
           const impactAudio = new Audio("/sounds/hit.mp3");
-          impactAudio.volume = 0.4;
+          impactAudio.volume = 0.3;
+          impactAudio.playbackRate = 1.5; // Higher pitch for bullet impacts
           impactAudio.play().catch(() => {});
         } catch (e) {}
         
