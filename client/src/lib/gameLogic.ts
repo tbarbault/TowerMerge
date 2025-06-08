@@ -447,6 +447,13 @@ function updateBullets(gameState: any, delta: number) {
           // Enemy will die, award coins
           gameState.addCoins(hitEnemy.reward);
         }
+
+        // Play impact sound effect
+        try {
+          const impactAudio = new Audio("/sounds/hit.mp3");
+          impactAudio.volume = 0.4;
+          impactAudio.play().catch(() => {});
+        } catch (e) {}
         
         gameState.removeBullet(bullet.id);
         return;
