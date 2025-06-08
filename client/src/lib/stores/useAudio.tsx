@@ -29,7 +29,8 @@ export const useAudio = create<AudioState>((set, get) => ({
   successSound: null,
   towerPlaceSound: null,
   enemyDeathSound: null,
-  isMuted: true, // Start muted by default
+  isMuted: typeof window !== 'undefined' ? 
+    JSON.parse(window.localStorage.getItem('audio-muted') || 'true') : true, // Load from localStorage or default to muted
   
   setBackgroundMusic: (music) => set({ backgroundMusic: music }),
   setHitSound: (sound) => set({ hitSound: sound }),
@@ -41,7 +42,12 @@ export const useAudio = create<AudioState>((set, get) => ({
     const { isMuted } = get();
     const newMutedState = !isMuted;
     
-    // Just update the muted state
+    // Persist mute state in localStorage
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('audio-muted', JSON.stringify(newMutedState));
+    }
+    
+    // Update the muted state
     set({ isMuted: newMutedState });
     
     // Log the change
