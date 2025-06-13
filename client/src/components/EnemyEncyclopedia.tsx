@@ -241,7 +241,7 @@ export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: Enem
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-2 md:p-4">
       <Card className="w-full h-full md:max-w-5xl md:max-h-[95vh] overflow-hidden bg-gray-900 border-gray-700 md:rounded-lg">
-        <CardHeader className="flex flex-row items-center justify-between bg-gray-800 border-b border-gray-700 px-3 py-2 md:px-4 md:py-3">
+        <CardHeader className="flex flex-row items-center justify-between bg-gray-800 border-b border-gray-700 px-3 pt-8 pb-2 md:px-4 md:pt-10 md:pb-3">
           <CardTitle className="text-lg md:text-2xl font-bold text-white flex items-center gap-2">
             <Info className="w-5 h-5 md:w-6 md:h-6 text-blue-400" />
             Enemy Encyclopedia
