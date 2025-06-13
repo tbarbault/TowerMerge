@@ -147,7 +147,7 @@ export default function GameUI() {
   return (
     <>
       {/* Pause Button - Top Left */}
-      <div className="absolute top-2 left-2 z-50">
+      <div className="absolute top-12 left-2 z-50">
         <Button
           onClick={pauseGame}
           variant="outline"
@@ -159,7 +159,7 @@ export default function GameUI() {
       </div>
 
       {/* Top HUD - Mobile Optimized */}
-      <div className="absolute top-2 left-16 right-2 z-40">
+      <div className="absolute top-12 left-16 right-2 z-40">
         {/* Mobile layout: Stack vertically on small screens */}
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:justify-between md:items-start">
           {/* Left side stats - horizontal on mobile */}
