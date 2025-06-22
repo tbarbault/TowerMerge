@@ -90,6 +90,15 @@ export interface Obstacle {
   type: 'rock' | 'tree' | 'barrier';
 }
 
+export interface Mine {
+  id: string;
+  x: number;
+  z: number;
+  damage: number;
+  explosionRadius: number;
+  triggered: boolean;
+}
+
 interface TowerDefenseState {
   // Game state
   gamePhase: GamePhase;
@@ -109,6 +118,7 @@ interface TowerDefenseState {
   explosions: Explosion[];
   impacts: Impact[];
   obstacles: Obstacle[];
+  mines: Mine[];
   
   // UI state
   selectedGridCell: GridCell | null;
@@ -138,6 +148,12 @@ interface TowerDefenseState {
   selectObstacleSlot: (x: number, z: number) => void;
   buyObstacle: () => void;
   removeObstacle: (id: string) => void;
+  
+  // Mine actions
+  minesPurchased: number;
+  buyMine: () => void;
+  triggerMine: (id: string) => void;
+  removeMine: (id: string) => void;
   
   // Game logic
   spawnEnemy: (enemy: Enemy) => void;
@@ -187,6 +203,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     explosions: [],
     impacts: [],
     obstacles: [],
+    mines: [],
     
     selectedGridCell: null,
     selectedTower: null,
@@ -197,6 +214,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     enemiesInWave: 5,
     enemiesSpawned: 0,
     waveProgress: 0,
+    minesPurchased: 0,
     
     canPlaceTower: false,
     canMergeTowers: false,
@@ -623,6 +641,73 @@ export const useTowerDefense = create<TowerDefenseState>()(
     removeImpact: (id) => {
       set(state => ({
         impacts: state.impacts.filter(i => i.id !== id)
+      }));
+    },
+    
+    // Mine actions
+    buyMine: () => {
+      const state = get();
+      const baseCost = 10;
+      const costMultiplier = 1.5;
+      const mineCost = Math.floor(baseCost * Math.pow(costMultiplier, state.minesPurchased));
+      
+      if (state.coins >= mineCost) {
+        // Find random empty tile on the map
+        const gridSize = { width: 5, height: 3 };
+        const occupiedPositions = new Set();
+        
+        // Mark occupied positions
+        state.towers.forEach(tower => {
+          occupiedPositions.add(`${tower.x},${tower.z}`);
+        });
+        state.obstacles.forEach(obstacle => {
+          occupiedPositions.add(`${obstacle.x},${obstacle.z}`);
+        });
+        state.mines.forEach(mine => {
+          occupiedPositions.add(`${mine.x},${mine.z}`);
+        });
+        
+        // Find available positions
+        const availablePositions = [];
+        for (let x = 0; x < gridSize.width; x++) {
+          for (let z = 0; z < gridSize.height; z++) {
+            if (!occupiedPositions.has(`${x},${z}`)) {
+              availablePositions.push({ x, z });
+            }
+          }
+        }
+        
+        if (availablePositions.length > 0) {
+          const randomPos = availablePositions[Math.floor(Math.random() * availablePositions.length)];
+          const newMine: Mine = {
+            id: `mine-${Date.now()}-${Math.random()}`,
+            x: randomPos.x,
+            z: randomPos.z,
+            damage: 150 + (state.minesPurchased * 25),
+            explosionRadius: 2.5,
+            triggered: false
+          };
+          
+          set({
+            mines: [...state.mines, newMine],
+            coins: state.coins - mineCost,
+            minesPurchased: state.minesPurchased + 1
+          });
+        }
+      }
+    },
+    
+    triggerMine: (id) => {
+      set(state => ({
+        mines: state.mines.map(mine => 
+          mine.id === id ? { ...mine, triggered: true } : mine
+        )
+      }));
+    },
+    
+    removeMine: (id) => {
+      set(state => ({
+        mines: state.mines.filter(mine => mine.id !== id)
       }));
     },
   }))
