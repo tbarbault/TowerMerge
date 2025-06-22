@@ -652,48 +652,29 @@ export const useTowerDefense = create<TowerDefenseState>()(
       const mineCost = Math.floor(baseCost * Math.pow(costMultiplier, state.minesPurchased));
       
       if (state.coins >= mineCost) {
-        // Find random empty tile on the map
-        const gridSize = { width: 5, height: 3 };
-        const occupiedPositions = new Set();
+        // Place mines in front of the grid (enemy spawn area)
+        // Generate random positions in the area before the grid where enemies approach
+        const spawnAreaWidth = 10; // Width of spawn area
+        const spawnAreaDepth = 8;  // Depth before grid starts
         
-        // Mark occupied positions
-        state.towers.forEach(tower => {
-          occupiedPositions.add(`${tower.x},${tower.z}`);
-        });
-        state.obstacles.forEach(obstacle => {
-          occupiedPositions.add(`${obstacle.x},${obstacle.z}`);
-        });
-        state.mines.forEach(mine => {
-          occupiedPositions.add(`${mine.x},${mine.z}`);
-        });
+        // Random position in front of the grid
+        const randomX = (Math.random() - 0.5) * spawnAreaWidth; // -5 to 5
+        const randomZ = -spawnAreaDepth + (Math.random() * 3); // -8 to -5 (before grid)
         
-        // Find available positions
-        const availablePositions = [];
-        for (let x = 0; x < gridSize.width; x++) {
-          for (let z = 0; z < gridSize.height; z++) {
-            if (!occupiedPositions.has(`${x},${z}`)) {
-              availablePositions.push({ x, z });
-            }
-          }
-        }
+        const newMine: Mine = {
+          id: `mine-${Date.now()}-${Math.random()}`,
+          x: randomX,
+          z: randomZ,
+          damage: 150 + (state.minesPurchased * 25),
+          explosionRadius: 2.5,
+          triggered: false
+        };
         
-        if (availablePositions.length > 0) {
-          const randomPos = availablePositions[Math.floor(Math.random() * availablePositions.length)];
-          const newMine: Mine = {
-            id: `mine-${Date.now()}-${Math.random()}`,
-            x: randomPos.x,
-            z: randomPos.z,
-            damage: 150 + (state.minesPurchased * 25),
-            explosionRadius: 2.5,
-            triggered: false
-          };
-          
-          set({
-            mines: [...state.mines, newMine],
-            coins: state.coins - mineCost,
-            minesPurchased: state.minesPurchased + 1
-          });
-        }
+        set({
+          mines: [...state.mines, newMine],
+          coins: state.coins - mineCost,
+          minesPurchased: state.minesPurchased + 1
+        });
       }
     },
     

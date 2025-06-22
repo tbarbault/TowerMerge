@@ -315,7 +315,7 @@ export default function GameUI() {
       </div>
 
       {/* Mine Purchase Button - Right Side */}
-      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 z-40">
+      <div className="absolute right-2 top-32 z-40">
         <Card className="bg-black bg-opacity-90 border-gray-700">
           <CardContent className="p-3">
             <div className="flex flex-col items-center gap-2">

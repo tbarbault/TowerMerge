@@ -32,16 +32,13 @@ function updateMines(gameState: any) {
   gameState.mines.forEach((mine: any) => {
     if (mine.triggered) return; // Skip already triggered mines
     
-    // Convert mine grid position to world position
-    const mineWorldX = mine.x * 2.5 - 5;
-    const mineWorldZ = mine.z * 2.5 + 1.25;
     const triggerRadius = 1.0; // Distance at which mine triggers
     
     // Check if any enemy is within trigger range
     const nearbyEnemy = gameState.enemies.find((enemy: any) => {
       const distance = Math.sqrt(
-        Math.pow(enemy.x - mineWorldX, 2) +
-        Math.pow(enemy.z - mineWorldZ, 2)
+        Math.pow(enemy.x - mine.x, 2) +
+        Math.pow(enemy.z - mine.z, 2)
       );
       return distance <= triggerRadius;
     });
