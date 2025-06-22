@@ -35,7 +35,7 @@ function App() {
   const cameraSettings = isMobile 
     ? {
         position: [0, 20, 20] as [number, number, number],
-        fov: 65,
+        fov: 75,
         near: 0.1,
         far: 1000
       }
