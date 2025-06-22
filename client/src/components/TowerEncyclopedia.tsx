@@ -4,6 +4,84 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { X, Target, Bomb, Zap, Shield, Eye, Clock } from "lucide-react";
 
+// Tower visual components
+const TurretIcon = ({ level }: { level: number }) => {
+  const colors = ['#4ade80', '#22c55e', '#16a34a', '#15803d', '#166534'];
+  const color = colors[level - 1] || colors[0];
+  
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" className="border rounded bg-gray-800">
+      {/* Base */}
+      <rect x="18" y="38" width="12" height="6" fill={color} opacity="0.8"/>
+      {/* Tower body */}
+      <rect x="20" y="28" width="8" height="10" fill={color}/>
+      {/* Barrel - gets longer and thicker with level */}
+      <rect 
+        x="22" 
+        y={24 - level} 
+        width={2 + level * 0.5} 
+        height={4 + level * 2} 
+        fill={color}
+      />
+      {/* Level indicator dots */}
+      {Array.from({ length: level }, (_, i) => (
+        <circle 
+          key={i} 
+          cx={16 + i * 4} 
+          cy="42" 
+          r="1" 
+          fill="#fbbf24"
+        />
+      ))}
+    </svg>
+  );
+};
+
+const MortarIcon = ({ level }: { level: number }) => {
+  const colors = ['#fb7185', '#f43f5e', '#e11d48', '#be123c', '#9f1239'];
+  const color = colors[level - 1] || colors[0];
+  
+  return (
+    <svg width="48" height="48" viewBox="0 0 48 48" className="border rounded bg-gray-800">
+      {/* Base platform */}
+      <rect x="16" y="36" width="16" height="8" fill={color} opacity="0.8"/>
+      {/* Mortar tube - gets wider and more elaborate with level */}
+      <ellipse 
+        cx="24" 
+        cy="32" 
+        rx={4 + level * 0.5} 
+        ry={8 + level} 
+        fill={color}
+      />
+      {/* Muzzle */}
+      <ellipse 
+        cx="24" 
+        cy={24 - level} 
+        rx={2 + level * 0.3} 
+        ry="2" 
+        fill={color}
+      />
+      {/* Support struts for higher levels */}
+      {level >= 3 && (
+        <>
+          <line x1="20" y1="36" x2="18" y2="30" stroke={color} strokeWidth="2"/>
+          <line x1="28" y1="36" x2="30" y2="30" stroke={color} strokeWidth="2"/>
+        </>
+      )}
+      {/* Level indicator dots */}
+      {Array.from({ length: level }, (_, i) => (
+        <circle 
+          key={i} 
+          cx={16 + i * 4} 
+          cy="42" 
+          r="1" 
+          fill="#fbbf24"
+        />
+      ))}
+    </svg>
+  );
+};
+
 interface TowerData {
   type: 'turret' | 'mortar';
   name: string;
@@ -301,17 +379,31 @@ export default function TowerEncyclopedia({ isOpen, onClose }: TowerEncyclopedia
                   <div className="space-y-2">
                     {selectedTower.upgradePath.map((upgrade, index) => (
                       <div key={upgrade.level} className="bg-gray-800 p-3 rounded-lg">
-                        <div className="flex items-center justify-between mb-2">
-                          <Badge className="bg-yellow-600 text-yellow-100">
-                            Level {upgrade.level}
-                          </Badge>
-                          <div className="flex gap-4 text-xs">
-                            <span className="text-red-400">{upgrade.damage} DMG</span>
-                            <span className="text-blue-400">{upgrade.range} RNG</span>
-                            <span className="text-green-400">{(upgrade.fireRate / 1000).toFixed(1)}s</span>
+                        <div className="flex items-center gap-3 mb-2">
+                          {/* Tower Icon */}
+                          <div className="flex-shrink-0">
+                            {selectedTower.type === 'turret' ? (
+                              <TurretIcon level={upgrade.level} />
+                            ) : (
+                              <MortarIcon level={upgrade.level} />
+                            )}
+                          </div>
+                          
+                          {/* Level and Stats */}
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <Badge className="bg-yellow-600 text-yellow-100">
+                                Level {upgrade.level}
+                              </Badge>
+                              <div className="flex gap-4 text-xs">
+                                <span className="text-red-400">{upgrade.damage} DMG</span>
+                                <span className="text-blue-400">{upgrade.range} RNG</span>
+                                <span className="text-green-400">{(upgrade.fireRate / 1000).toFixed(1)}s</span>
+                              </div>
+                            </div>
+                            <p className="text-gray-300 text-sm">{upgrade.description}</p>
                           </div>
                         </div>
-                        <p className="text-gray-300 text-sm">{upgrade.description}</p>
                       </div>
                     ))}
                   </div>
