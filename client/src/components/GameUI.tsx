@@ -4,13 +4,15 @@ import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import WaveTransition from "./WaveTransition";
 import EnemyEncyclopedia from "./EnemyEncyclopedia";
+import TowerEncyclopedia from "./TowerEncyclopedia";
 
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
+  const [showTowerEncyclopedia, setShowTowerEncyclopedia] = useState(false);
   
   const {
     gamePhase,
@@ -256,9 +258,19 @@ export default function GameUI() {
             <div className="space-y-3 md:space-y-4">
               {/* Towers Section */}
               <div>
-                <div className="text-sm text-gray-300 mb-2 font-semibold flex items-center gap-2">
-                  <Target className="w-4 h-4" />
-                  Towers
+                <div className="text-sm text-gray-300 mb-2 font-semibold flex items-center gap-2 justify-between">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    Towers
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTowerEncyclopedia(true)}
+                    className="p-1 h-6 w-6 text-blue-400 hover:text-blue-300"
+                  >
+                    <Shield className="w-3 h-3" />
+                  </Button>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Button 
@@ -360,6 +372,11 @@ export default function GameUI() {
         isOpen={showEncyclopedia}
         onClose={() => setShowEncyclopedia(false)}
         currentWave={wave}
+      />
+
+      <TowerEncyclopedia
+        isOpen={showTowerEncyclopedia}
+        onClose={() => setShowTowerEncyclopedia(false)}
       />
 
       {/* Pause Menu Overlay */}
