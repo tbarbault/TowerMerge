@@ -11,6 +11,7 @@ import Bullet from "./Bullet";
 import Explosion from "./Explosion";
 import Impact from "./Impact";
 import Obstacle from "./Obstacle";
+import Mine from "./Mine";
 import TunnelExits from "./TunnelExits";
 import BackgroundDecor from "./BackgroundDecor";
 
@@ -134,8 +135,42 @@ export default function Game() {
           onComplete={() => gameState.removeImpact(impact.id)}
         />
       ))}
-      
 
+      {/* Render mines */}
+      {gameState.mines.map((mine) => (
+        <Mine
+          key={mine.id}
+          position={[mine.x * 2.5 - 5, 0, mine.z * 2.5 + 1.25]}
+          triggered={mine.triggered}
+          onExplode={() => {
+            // Create explosion effect
+            gameState.addExplosion({
+              id: `mine-explosion-${Date.now()}`,
+              x: mine.x * 2.5 - 5,
+              y: 0.5,
+              z: mine.z * 2.5 + 1.25,
+              radius: mine.explosionRadius,
+              startTime: Date.now(),
+              color: "#ff4400"
+            });
+            
+            // Damage nearby enemies
+            gameState.enemies.forEach((enemy) => {
+              const distance = Math.sqrt(
+                Math.pow(enemy.x - (mine.x * 2.5 - 5), 2) +
+                Math.pow(enemy.z - (mine.z * 2.5 + 1.25), 2)
+              );
+              
+              if (distance <= mine.explosionRadius) {
+                gameState.damageEnemy(enemy.id, mine.damage);
+              }
+            });
+            
+            // Remove the mine
+            gameState.removeMine(mine.id);
+          }}
+        />
+      ))}
 
     </>
   );

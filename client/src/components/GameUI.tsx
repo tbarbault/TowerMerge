@@ -34,7 +34,9 @@ export default function GameUI() {
     enemiesSpawned,
     waveCompletionTime,
     showWaveTransition,
-    setShowWaveTransition
+    setShowWaveTransition,
+    minesPurchased,
+    buyMine
   } = useTowerDefense();
 
   const { isMuted, toggleMute, playTowerPlace } = useAudio();
@@ -307,6 +309,41 @@ export default function GameUI() {
               </div>
 
 
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Mine Purchase Button - Right Side */}
+      <div className="absolute right-2 top-1/2 transform -translate-y-1/2 z-40">
+        <Card className="bg-black bg-opacity-90 border-gray-700">
+          <CardContent className="p-3">
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-xs text-gray-300 font-semibold text-center">
+                Mines
+              </div>
+              {(() => {
+                const baseCost = 10;
+                const costMultiplier = 1.5;
+                const mineCost = Math.floor(baseCost * Math.pow(costMultiplier, minesPurchased));
+                
+                return (
+                  <Button
+                    onClick={buyMine}
+                    className="bg-red-700 hover:bg-red-600 text-white text-xs p-3 flex flex-col items-center gap-1 min-h-[60px] rounded-lg"
+                    disabled={coins < mineCost}
+                  >
+                    <Zap className="w-4 h-4" />
+                    <span>Buy Mine</span>
+                    <span className="text-xs opacity-80">{mineCost}💰</span>
+                  </Button>
+                );
+              })()}
+              {minesPurchased > 0 && (
+                <div className="text-xs text-gray-400 text-center">
+                  Placed: {minesPurchased}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

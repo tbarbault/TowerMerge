@@ -17,6 +17,9 @@ export function updateGameLogic(gameState: any, delta: number) {
   // Update bullets
   updateBullets(gameState, delta);
 
+  // Update mines (check for enemy proximity)
+  updateMines(gameState);
+
   // Check wave completion
   checkWaveCompletion(gameState);
 
