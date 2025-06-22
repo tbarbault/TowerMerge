@@ -34,8 +34,8 @@ function App() {
   // Mobile-optimized camera settings - adjusted to show all tiles
   const cameraSettings = isMobile 
     ? {
-        position: [0, 15, 15] as [number, number, number],
-        fov: 70,
+        position: [0, 12, 12] as [number, number, number],
+        fov: 65,
         near: 0.1,
         far: 1000
       }
