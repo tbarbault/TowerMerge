@@ -4,7 +4,7 @@ import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield, Diamond } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import WaveTransition from "./WaveTransition";
 import EnemyEncyclopedia from "./EnemyEncyclopedia";
@@ -14,12 +14,14 @@ import ResearchTree from "./ResearchTree";
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
   const [showTowerEncyclopedia, setShowTowerEncyclopedia] = useState(false);
+  const [showResearchTree, setShowResearchTree] = useState(false);
   
   const {
     gamePhase,
     wave,
     health,
     coins,
+    diamonds,
     highestWave,
     selectedGridCell,
     canPlaceTower,
@@ -70,7 +72,7 @@ export default function GameUI() {
               <Button onClick={startGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
                 START
               </Button>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-2">
                 <Button 
                   onClick={() => {
                     console.log("Encyclopedia button clicked - menu, current state:", showEncyclopedia);
@@ -80,18 +82,26 @@ export default function GameUI() {
                     });
                   }} 
                   variant="outline" 
-                  className="border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg"
+                  className="border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg text-xs"
                 >
-                  <BookOpen className="w-4 h-4 mr-2" />
+                  <BookOpen className="w-3 h-3 mr-1" />
                   Enemies
                 </Button>
                 <Button 
                   onClick={() => setShowTowerEncyclopedia(true)} 
                   variant="outline" 
-                  className="border-green-500 text-green-400 hover:bg-green-900 rounded-lg"
+                  className="border-green-500 text-green-400 hover:bg-green-900 rounded-lg text-xs"
                 >
-                  <Shield className="w-4 h-4 mr-2" />
+                  <Shield className="w-3 h-3 mr-1" />
                   Towers
+                </Button>
+                <Button 
+                  onClick={() => setShowResearchTree(true)} 
+                  variant="outline" 
+                  className="border-purple-500 text-purple-400 hover:bg-purple-900 rounded-lg text-xs"
+                >
+                  <Diamond className="w-3 h-3 mr-1" />
+                  Research
                 </Button>
               </div>
             </CardContent>
@@ -107,6 +117,11 @@ export default function GameUI() {
         <TowerEncyclopedia
           isOpen={showTowerEncyclopedia}
           onClose={() => setShowTowerEncyclopedia(false)}
+        />
+        
+        <ResearchTree
+          isOpen={showResearchTree}
+          onClose={() => setShowResearchTree(false)}
         />
       </>
     );
@@ -211,6 +226,22 @@ export default function GameUI() {
               <CardContent className="p-2 md:p-3 flex items-center gap-2">
                 <Coins className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
                 <span className="text-white font-bold text-sm md:text-base">{coins}</span>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-black bg-opacity-80 border-gray-700">
+              <CardContent className="p-2 md:p-3 flex items-center gap-2">
+                <Diamond className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
+                <span className="text-white font-bold text-sm md:text-base">{diamonds}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowResearchTree(true)}
+                  className="p-1 h-6 w-6 text-blue-400 hover:text-blue-300 ml-1"
+                  title="Research Tree"
+                >
+                  <Zap className="w-3 h-3" />
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -393,6 +424,11 @@ export default function GameUI() {
       <TowerEncyclopedia
         isOpen={showTowerEncyclopedia}
         onClose={() => setShowTowerEncyclopedia(false)}
+      />
+
+      <ResearchTree
+        isOpen={showResearchTree}
+        onClose={() => setShowResearchTree(false)}
       />
 
       {/* Pause Menu Overlay */}
