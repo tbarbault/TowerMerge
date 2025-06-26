@@ -208,7 +208,16 @@ export default function GameUI() {
                 </div>
                 <div className="text-xs text-gray-300">
                   {waveCompletionTime ? (
-                    `Next wave in ${Math.max(0, Math.ceil((3000 - (Date.now() - waveCompletionTime)) / 1000))}s`
+                    (() => {
+                      const getPauseTime = (wave: number) => {
+                        if (wave <= 10) return 3000;
+                        if (wave <= 20) return 2000;
+                        if (wave <= 30) return 1500;
+                        return 1000;
+                      };
+                      const pauseTime = getPauseTime(wave);
+                      return `Next wave in ${Math.max(0, Math.ceil((pauseTime - (Date.now() - waveCompletionTime)) / 1000))}s`;
+                    })()
                   ) : (
                     `Enemies: ${enemiesSpawned}/${enemiesInWave}`
                   )}
