@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
+import { ResearchNode, researchTreeData, calculateResearchBonuses, unlockResearchNodes, getDiamondsForWave } from "../researchTree";
 
 export type GamePhase = "menu" | "playing" | "paused" | "gameOver";
 
@@ -105,10 +106,14 @@ interface TowerDefenseState {
   wave: number;
   health: number;
   coins: number;
+  diamonds: number;
   highestWave: number;
   waveStartTime: number;
   waveCompletionTime: number | null;
   showWaveTransition: boolean;
+  
+  // Research tree
+  researchNodes: ResearchNode[];
   
   // Game objects
   towers: Tower[];
@@ -155,6 +160,17 @@ interface TowerDefenseState {
   triggerMine: (id: string) => void;
   removeMine: (id: string) => void;
   
+  // Research tree actions
+  purchaseResearchNode: (nodeId: string) => void;
+  getResearchBonuses: () => {
+    turretDamageMultiplier: number;
+    turretFireRateMultiplier: number;
+    mortarDamageMultiplier: number;
+    mortarFireRateMultiplier: number;
+    mineDamageMultiplier: number;
+    mineCostMultiplier: number;
+  };
+  
   // Game logic
   spawnEnemy: (enemy: Enemy) => void;
   removeBullet: (id: string) => void;
@@ -191,10 +207,14 @@ export const useTowerDefense = create<TowerDefenseState>()(
     wave: 1,
     health: 20,
     coins: 75,
+    diamonds: parseInt(localStorage.getItem('diamonds') || '0'),
     highestWave: parseInt(localStorage.getItem('highestWave') || '1'),
     waveStartTime: 0,
     waveCompletionTime: null,
     showWaveTransition: false,
+    
+    // Research tree
+    researchNodes: JSON.parse(localStorage.getItem('researchNodes') || JSON.stringify(researchTreeData)),
     
     towers: [],
     enemies: [],
@@ -690,6 +710,35 @@ export const useTowerDefense = create<TowerDefenseState>()(
       set(state => ({
         mines: state.mines.filter(mine => mine.id !== id)
       }));
+    },
+    
+    // Research tree actions
+    purchaseResearchNode: (nodeId) => {
+      const state = get();
+      const node = state.researchNodes.find(n => n.id === nodeId);
+      
+      if (node && !node.purchased && node.unlocked && state.diamonds >= node.cost) {
+        const updatedNodes = state.researchNodes.map(n => 
+          n.id === nodeId ? { ...n, purchased: true } : n
+        );
+        
+        // Unlock any nodes that now have their prerequisites met
+        const unlockedNodes = unlockResearchNodes(updatedNodes);
+        
+        set({
+          diamonds: state.diamonds - node.cost,
+          researchNodes: unlockedNodes
+        });
+        
+        // Save to localStorage
+        localStorage.setItem('diamonds', (state.diamonds - node.cost).toString());
+        localStorage.setItem('researchNodes', JSON.stringify(unlockedNodes));
+      }
+    },
+    
+    getResearchBonuses: () => {
+      const state = get();
+      return calculateResearchBonuses(state.researchNodes);
     },
   }))
 );
