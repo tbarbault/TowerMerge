@@ -41,7 +41,8 @@ export default function GameUI() {
     showWaveTransition,
     setShowWaveTransition,
     minesPurchased,
-    buyMine
+    buyMine,
+    getResearchBonuses
   } = useTowerDefense();
 
   const { isMuted, toggleMute, playTowerPlace } = useAudio();
@@ -382,19 +383,20 @@ export default function GameUI() {
                 Mines
               </div>
               {(() => {
+                const bonuses = getResearchBonuses();
                 const baseCost = 10;
                 const costMultiplier = 1.5;
-                const mineCost = Math.floor(baseCost * Math.pow(costMultiplier, minesPurchased));
+                const adjustedCost = Math.floor(baseCost * Math.pow(costMultiplier, minesPurchased) * bonuses.mineCostMultiplier);
                 
                 return (
                   <Button
                     onClick={buyMine}
                     className="bg-red-700 hover:bg-red-600 text-white text-xs p-3 flex flex-col items-center gap-1 min-h-[60px] rounded-lg"
-                    disabled={coins < mineCost}
+                    disabled={coins < adjustedCost}
                   >
                     <Zap className="w-4 h-4" />
                     <span>Buy Mine</span>
-                    <span className="text-xs opacity-80">{mineCost}💰</span>
+                    <span className="text-xs opacity-80">{adjustedCost}💰</span>
                   </Button>
                 );
               })()}
