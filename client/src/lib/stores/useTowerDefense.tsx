@@ -594,9 +594,19 @@ export const useTowerDefense = create<TowerDefenseState>()(
           localStorage.setItem('highestWave', newWave.toString());
         }
         
+        // Award diamonds every 5 waves
+        const diamondsEarned = getDiamondsForWave(newWave);
+        let newDiamonds = state.diamonds;
+        if (diamondsEarned > 0) {
+          newDiamonds += diamondsEarned;
+          localStorage.setItem('diamonds', newDiamonds.toString());
+          console.log(`Wave ${newWave} completed! Earned ${diamondsEarned} diamonds!`);
+        }
+        
         return {
           wave: newWave,
           highestWave: newHighestWave,
+          diamonds: newDiamonds,
           enemiesInWave: Math.floor(5 + state.wave * 1.5),
           enemiesSpawned: 0,
           waveProgress: 0,
@@ -667,11 +677,12 @@ export const useTowerDefense = create<TowerDefenseState>()(
     // Mine actions
     buyMine: () => {
       const state = get();
+      const bonuses = calculateResearchBonuses(state.researchNodes);
       const baseCost = 10;
       const costMultiplier = 1.5;
-      const mineCost = Math.floor(baseCost * Math.pow(costMultiplier, state.minesPurchased));
+      const adjustedCost = Math.floor(baseCost * Math.pow(costMultiplier, state.minesPurchased) * bonuses.mineCostMultiplier);
       
-      if (state.coins >= mineCost) {
+      if (state.coins >= adjustedCost) {
         // Place mines in front of the grid (enemy spawn area)
         // Generate random positions in the area before the grid where enemies approach
         const spawnAreaWidth = 10; // Width of spawn area
@@ -681,18 +692,21 @@ export const useTowerDefense = create<TowerDefenseState>()(
         const randomX = (Math.random() - 0.5) * spawnAreaWidth; // -5 to 5
         const randomZ = -spawnAreaDepth + (Math.random() * 3); // -8 to -5 (before grid)
         
+        const baseDamage = 150 + (state.minesPurchased * 25);
+        const enhancedDamage = Math.floor(baseDamage * bonuses.mineDamageMultiplier);
+        
         const newMine: Mine = {
           id: `mine-${Date.now()}-${Math.random()}`,
           x: randomX,
           z: randomZ,
-          damage: 150 + (state.minesPurchased * 25),
+          damage: enhancedDamage,
           explosionRadius: 2.5,
           triggered: false
         };
         
         set({
           mines: [...state.mines, newMine],
-          coins: state.coins - mineCost,
+          coins: state.coins - adjustedCost,
           minesPurchased: state.minesPurchased + 1
         });
       }

@@ -297,8 +297,14 @@ function updateEnemies(gameState: any, delta: number) {
 }
 
 function updateTowers(gameState: any, currentTime: number) {
+  const bonuses = gameState.getResearchBonuses();
+  
   gameState.towers.forEach((tower: any) => {
-    if (currentTime - tower.lastShot < tower.fireRate) return;
+    // Apply research bonuses to fire rate
+    const fireRateMultiplier = tower.type === 'turret' ? bonuses.turretFireRateMultiplier : bonuses.mortarFireRateMultiplier;
+    const adjustedFireRate = tower.fireRate / fireRateMultiplier;
+    
+    if (currentTime - tower.lastShot < adjustedFireRate) return;
 
     // Find enemies in range (tower world position conversion)
     const towerWorldX = tower.x * 2.5 - 5;
@@ -379,6 +385,10 @@ function updateTowers(gameState: any, currentTime: number) {
       const towerHeight = getTowerHeight(tower.type, tower.level);
       const firingHeight = towerHeight + 0.05; // Slightly above tower top
 
+      // Apply research bonuses to damage
+      const damageMultiplier = tower.type === 'turret' ? bonuses.turretDamageMultiplier : bonuses.mortarDamageMultiplier;
+      const enhancedDamage = Math.floor(tower.damage * damageMultiplier);
+
       const bullet = {
         id: Math.random().toString(36).substr(2, 9),
         x: barrelEndX,
@@ -386,7 +396,7 @@ function updateTowers(gameState: any, currentTime: number) {
         z: barrelEndZ,
         directionX: normalizedDx,
         directionZ: normalizedDz,
-        damage: tower.damage,
+        damage: enhancedDamage,
         speed: tower.type === 'mortar' ? 4 : 12, // Faster turret bullets
         color: tower.level === 1 ? "#22c55e" : tower.level === 2 ? "#3b82f6" : tower.level === 3 ? "#a855f7" : tower.level === 4 ? "#ef4444" : "#f59e0b",
         type: tower.type === 'mortar' ? 'mortar' : 'bullet',

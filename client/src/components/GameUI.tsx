@@ -9,6 +9,7 @@ import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import WaveTransition from "./WaveTransition";
 import EnemyEncyclopedia from "./EnemyEncyclopedia";
 import TowerEncyclopedia from "./TowerEncyclopedia";
+import ResearchTree from "./ResearchTree";
 
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
