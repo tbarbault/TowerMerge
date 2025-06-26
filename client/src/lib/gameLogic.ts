@@ -99,26 +99,47 @@ export function getAvailableEnemyTypes(wave: number): string[] {
 
 function spawnEnemies(gameState: any, currentTime: number) {
   const timeSinceWaveStart = currentTime - gameState.waveStartTime;
-  const spawnInterval = Math.max(1500 - gameState.wave * 50, 500); // Slower spawning with more time between waves
+  // Aggressive spawn rate scaling for challenging late game
+  const getSpawnInterval = (wave: number) => {
+    if (wave <= 10) {
+      return Math.max(1500 - wave * 50, 800); // Waves 1-10: Gentle reduction
+    } else if (wave <= 20) {
+      return Math.max(800 - (wave - 10) * 40, 400); // Waves 11-20: Faster spawning
+    } else if (wave <= 30) {
+      return Math.max(400 - (wave - 20) * 20, 200); // Waves 21-30: Very fast spawning
+    } else {
+      return Math.max(200 - (wave - 30) * 5, 100); // Waves 31+: Extreme spawning
+    }
+  };
+  
+  const spawnInterval = getSpawnInterval(gameState.wave);
   const expectedSpawned = Math.floor(timeSinceWaveStart / spawnInterval);
   
+  // Burst spawning for high waves - spawn multiple enemies at once
+  const burstSize = gameState.wave >= 15 ? Math.min(3, Math.floor(gameState.wave / 10)) : 1;
+  const enemiesToSpawn = Math.min(burstSize, gameState.enemiesInWave - gameState.enemiesSpawned);
+  
   if (expectedSpawned > gameState.enemiesSpawned && gameState.enemiesSpawned < gameState.enemiesInWave) {
-    // Get available enemy types for this wave
-    const enemyTypes = getAvailableEnemyTypes(gameState.wave);
-    
-    // Select enemy type with weighted distribution
-    let finalType = selectWeightedEnemyType(enemyTypes, gameState.wave);
-    
-    // Special bosses at milestone waves
-    if (gameState.wave % 10 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
-      finalType = "megaboss";
-    } else if (gameState.wave % 5 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
-      finalType = "boss";
+    for (let i = 0; i < enemiesToSpawn; i++) {
+      if (gameState.enemiesSpawned >= gameState.enemiesInWave) break;
+      
+      // Get available enemy types for this wave
+      const enemyTypes = getAvailableEnemyTypes(gameState.wave);
+      
+      // Select enemy type with weighted distribution
+      let finalType = selectWeightedEnemyType(enemyTypes, gameState.wave);
+      
+      // Special bosses at milestone waves
+      if (gameState.wave % 10 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
+        finalType = "megaboss";
+      } else if (gameState.wave % 5 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
+        finalType = "boss";
+      }
+      
+      const enemy = createEnemy(finalType, gameState.wave);
+      gameState.spawnEnemy(enemy);
+      gameState.setEnemiesSpawned(gameState.enemiesSpawned + 1);
     }
-    
-    const enemy = createEnemy(finalType, gameState.wave);
-    gameState.spawnEnemy(enemy);
-    gameState.setEnemiesSpawned(gameState.enemiesSpawned + 1);
   }
 
   // Update wave progress
@@ -182,17 +203,17 @@ function selectWeightedEnemyType(availableTypes: string[], wave: number) {
     };
     return getWeightedRandomType(availableTypes, weights);
   }
-  // Wave 30+: All enemies including titans
+  // Wave 30+: All enemies including titans - favor stronger enemies
   else {
     const weights = {
-      basic: 5,
-      fast: 10,
-      heavy: 15,
-      armored: 20,
+      basic: 2,
+      fast: 5,
+      heavy: 8,
+      armored: 15,
       elite: 20,
-      stealth: 10,
-      berserker: 15,
-      titan: 5
+      stealth: 12,
+      berserker: 20,
+      titan: 18
     };
     return getWeightedRandomType(availableTypes, weights);
   }
@@ -235,11 +256,30 @@ function createEnemy(type: string, wave: number) {
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
   
-  // Scale with wave - more gradual scaling
-  const healthScaling = Math.min(0.15, 0.05 + (wave - 1) * 0.01); // Start at 5%, increase by 1% per wave, cap at 15%
-  const scaledHealth = Math.floor(config.health * (1 + (wave - 1) * healthScaling));
-  const speedScaling = Math.min(0.05, (wave - 1) * 0.005); // Very gradual speed increase
-  const scaledSpeed = config.speed * (1 + speedScaling);
+  // Aggressive difficulty scaling for challenging late game
+  let healthMultiplier = 1;
+  let speedMultiplier = 1;
+  
+  if (wave <= 10) {
+    // Waves 1-10: Gentle scaling (old behavior)
+    healthMultiplier = 1 + (wave - 1) * 0.08; // 8% per wave
+    speedMultiplier = 1 + (wave - 1) * 0.02; // 2% per wave
+  } else if (wave <= 20) {
+    // Waves 11-20: Moderate scaling
+    healthMultiplier = 1.72 + (wave - 10) * 0.15; // Start at 172%, +15% per wave
+    speedMultiplier = 1.18 + (wave - 10) * 0.03; // Start at 118%, +3% per wave
+  } else if (wave <= 30) {
+    // Waves 21-30: Aggressive scaling
+    healthMultiplier = 3.22 + (wave - 20) * 0.25; // Start at 322%, +25% per wave
+    speedMultiplier = 1.48 + (wave - 20) * 0.04; // Start at 148%, +4% per wave
+  } else {
+    // Waves 31+: Extreme scaling
+    healthMultiplier = 5.72 + (wave - 30) * 0.35; // Start at 572%, +35% per wave
+    speedMultiplier = 1.88 + (wave - 30) * 0.05; // Start at 188%, +5% per wave
+  }
+  
+  const scaledHealth = Math.floor(config.health * healthMultiplier);
+  const scaledSpeed = config.speed * speedMultiplier;
 
   return {
     id: Math.random().toString(36).substr(2, 9),
@@ -625,8 +665,16 @@ function checkWaveCompletion(gameState: any) {
       return;
     }
     
-    // Wait 3 seconds before starting next wave
-    if (now - gameState.waveCompletionTime >= 3000) {
+    // Dynamic wave pause time - shorter for high waves
+    const getPauseTime = (wave: number) => {
+      if (wave <= 10) return 3000; // 3 seconds for early waves
+      if (wave <= 20) return 2000; // 2 seconds for mid waves
+      if (wave <= 30) return 1500; // 1.5 seconds for late waves
+      return 1000; // 1 second for extreme waves
+    };
+    
+    const pauseTime = getPauseTime(gameState.wave);
+    if (now - gameState.waveCompletionTime >= pauseTime) {
       gameState.nextWave();
     }
   }
