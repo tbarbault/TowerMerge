@@ -6,78 +6,191 @@ import { X, Target, Bomb, Zap, Shield, Eye, Clock } from "lucide-react";
 
 // Tower visual components
 const TurretIcon = ({ level }: { level: number }) => {
-  const colors = ['#4ade80', '#22c55e', '#16a34a', '#15803d', '#166534'];
-  const color = colors[level - 1] || colors[0];
+  const baseColors = ['#6b7280', '#6b7280', '#6b7280', '#6b7280', '#6b7280']; // Gray base for all levels
+  const barrelColors = ['#4b5563', '#374151', '#111827', '#0f172a', '#020617']; // Darker barrels by level
+  const baseColor = baseColors[level - 1] || baseColors[0];
+  const barrelColor = barrelColors[level - 1] || barrelColors[0];
   
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" className="border rounded bg-gray-800">
-      {/* Base */}
-      <rect x="18" y="38" width="12" height="6" fill={color} opacity="0.8"/>
-      {/* Tower body */}
-      <rect x="20" y="28" width="8" height="10" fill={color}/>
-      {/* Barrel - gets longer and thicker with level */}
+    <svg width="48" height="48" viewBox="0 0 48 48" className="border rounded bg-gray-900">
+      {/* Foundation */}
+      <rect x="16" y="40" width="16" height="4" fill="#1f2937" rx="1"/>
+      
+      {/* Base platform */}
+      <rect x="18" y="36" width="12" height="4" fill={baseColor} rx="1"/>
+      
+      {/* Main turret body */}
+      <circle cx="24" cy="30" r="6" fill={baseColor}/>
+      <circle cx="24" cy="30" r="5" fill="#4b5563" opacity="0.8"/>
+      
+      {/* Armor plating detail */}
+      <rect x="20" y="26" width="8" height="2" fill="#374151" rx="1"/>
+      <rect x="21" y="32" width="6" height="1" fill="#374151" rx="0.5"/>
+      
+      {/* Main barrel - length and thickness increase with level */}
       <rect 
-        x="22" 
-        y={24 - level} 
-        width={2 + level * 0.5} 
-        height={4 + level * 2} 
-        fill={color}
+        x={24 - (1 + level * 0.2)} 
+        y={18 - level * 0.5} 
+        width={2 + level * 0.4} 
+        height={12 + level * 1.5} 
+        fill={barrelColor}
+        rx="1"
       />
-      {/* Level indicator dots */}
-      {Array.from({ length: level }, (_, i) => (
-        <circle 
-          key={i} 
-          cx={16 + i * 4} 
-          cy="42" 
-          r="1" 
-          fill="#fbbf24"
-        />
-      ))}
+      
+      {/* Barrel tip/muzzle */}
+      <rect 
+        x={24 - (0.8 + level * 0.15)} 
+        y={17 - level * 0.5} 
+        width={1.6 + level * 0.3} 
+        height="2" 
+        fill="#000000"
+        rx="1"
+      />
+      
+      {/* Barrel support/mount */}
+      <rect x="22" y="24" width="4" height="3" fill="#374151" rx="0.5"/>
+      
+      {/* Secondary details for higher levels */}
+      {level >= 2 && (
+        <>
+          <circle cx="20" cy="28" r="1" fill="#ef4444"/>
+          <circle cx="28" cy="28" r="1" fill="#22c55e"/>
+        </>
+      )}
+      
+      {level >= 3 && (
+        <>
+          <rect x="22" y="20" width="4" height="1" fill="#fbbf24" rx="0.5"/>
+          <rect x="18" y="30" width="2" height="6" fill="#6b7280" rx="1"/>
+          <rect x="28" y="30" width="2" height="6" fill="#6b7280" rx="1"/>
+        </>
+      )}
+      
+      {level >= 4 && (
+        <>
+          <polygon points="24,16 26,18 22,18" fill="#ef4444"/>
+          <rect x="19" y="25" width="10" height="1" fill="#14b8a6" rx="0.5"/>
+        </>
+      )}
+      
+      {level >= 5 && (
+        <>
+          <rect x="16" y="28" width="16" height="1" fill="#f59e0b" rx="0.5"/>
+          <circle cx="24" cy="30" r="2" fill="#dc2626" opacity="0.6"/>
+          <polygon points="24,14 27,17 21,17" fill="#dc2626"/>
+        </>
+      )}
+      
+      {/* Level indicator */}
+      <rect x="2" y="2" width="12" height="8" fill="#000000" opacity="0.8" rx="2"/>
+      <text x="8" y="8" textAnchor="middle" fill="#fbbf24" fontSize="8" fontWeight="bold">
+        {level}
+      </text>
     </svg>
   );
 };
 
 const MortarIcon = ({ level }: { level: number }) => {
-  const colors = ['#fb7185', '#f43f5e', '#e11d48', '#be123c', '#9f1239'];
-  const color = colors[level - 1] || colors[0];
+  const baseColors = ['#6b7280', '#6b7280', '#6b7280', '#6b7280', '#6b7280']; // Gray base for all levels
+  const tubeColors = ['#4b5563', '#374151', '#111827', '#0f172a', '#020617']; // Darker tubes by level
+  const baseColor = baseColors[level - 1] || baseColors[0];
+  const tubeColor = tubeColors[level - 1] || tubeColors[0];
   
   return (
-    <svg width="48" height="48" viewBox="0 0 48 48" className="border rounded bg-gray-800">
-      {/* Base platform */}
-      <rect x="16" y="36" width="16" height="8" fill={color} opacity="0.8"/>
-      {/* Mortar tube - gets wider and more elaborate with level */}
+    <svg width="48" height="48" viewBox="0 0 48 48" className="border rounded bg-gray-900">
+      {/* Foundation */}
+      <rect x="14" y="40" width="20" height="4" fill="#1f2937" rx="2"/>
+      
+      {/* Base platform with stabilizers */}
+      <rect x="16" y="36" width="16" height="4" fill={baseColor} rx="1"/>
+      
+      {/* Platform legs/supports */}
+      <rect x="16" y="36" width="2" height="6" fill="#374151" rx="1"/>
+      <rect x="30" y="36" width="2" height="6" fill="#374151" rx="1"/>
+      <rect x="23" y="36" width="2" height="6" fill="#374151" rx="1"/>
+      
+      {/* Main mortar tube - gets larger and more elaborate with level */}
       <ellipse 
         cx="24" 
-        cy="32" 
-        rx={4 + level * 0.5} 
-        ry={8 + level} 
-        fill={color}
+        cy="28" 
+        rx={3 + level * 0.4} 
+        ry={6 + level * 0.8} 
+        fill={tubeColor}
       />
-      {/* Muzzle */}
+      
+      {/* Tube inner detail */}
       <ellipse 
         cx="24" 
-        cy={24 - level} 
+        cy="28" 
         rx={2 + level * 0.3} 
-        ry="2" 
-        fill={color}
+        ry={5 + level * 0.6} 
+        fill="#4b5563"
+        opacity="0.8"
       />
-      {/* Support struts for higher levels */}
-      {level >= 3 && (
+      
+      {/* Muzzle opening - gets wider with level */}
+      <ellipse 
+        cx="24" 
+        cy={22 - level * 0.5} 
+        rx={1.5 + level * 0.3} 
+        ry="1.5" 
+        fill="#000000"
+      />
+      
+      {/* Breach/loading mechanism */}
+      <rect x="22" y="32" width="4" height="2" fill="#374151" rx="1"/>
+      
+      {/* Elevation adjustment mechanism */}
+      <circle cx="20" cy="30" r="1.5" fill="#6b7280"/>
+      <circle cx="28" cy="30" r="1.5" fill="#6b7280"/>
+      
+      {/* Level 2+ additions */}
+      {level >= 2 && (
         <>
-          <line x1="20" y1="36" x2="18" y2="30" stroke={color} strokeWidth="2"/>
-          <line x1="28" y1="36" x2="30" y2="30" stroke={color} strokeWidth="2"/>
+          <rect x="20" y="26" width="8" height="1" fill="#ef4444" rx="0.5"/>
+          <circle cx="18" cy="28" r="1" fill="#22c55e"/>
+          <circle cx="30" cy="28" r="1" fill="#22c55e"/>
         </>
       )}
-      {/* Level indicator dots */}
-      {Array.from({ length: level }, (_, i) => (
-        <circle 
-          key={i} 
-          cx={16 + i * 4} 
-          cy="42" 
-          r="1" 
-          fill="#fbbf24"
-        />
-      ))}
+      
+      {/* Level 3+ additions */}
+      {level >= 3 && (
+        <>
+          <line x1="18" y1="36" x2="14" y2="32" stroke="#6b7280" strokeWidth="2"/>
+          <line x1="30" y1="36" x2="34" y2="32" stroke="#6b7280" strokeWidth="2"/>
+          <rect x="22" y="24" width="4" height="1" fill="#fbbf24" rx="0.5"/>
+          <polygon points="24,20 26,22 22,22" fill="#f59e0b"/>
+        </>
+      )}
+      
+      {/* Level 4+ additions */}
+      {level >= 4 && (
+        <>
+          <rect x="19" y="28" width="10" height="2" fill="#14b8a6" rx="1"/>
+          <circle cx="16" cy="30" r="1.5" fill="#ef4444"/>
+          <circle cx="32" cy="30" r="1.5" fill="#ef4444"/>
+          <rect x="12" y="34" width="4" height="2" fill="#6b7280" rx="1"/>
+          <rect x="32" y="34" width="4" height="2" fill="#6b7280" rx="1"/>
+        </>
+      )}
+      
+      {/* Level 5+ additions */}
+      {level >= 5 && (
+        <>
+          <rect x="18" y="25" width="12" height="1" fill="#dc2626" rx="0.5"/>
+          <ellipse cx="24" cy="28" rx="1" ry="3" fill="#dc2626" opacity="0.6"/>
+          <polygon points="24,18 27,21 21,21" fill="#dc2626"/>
+          <rect x="10" y="32" width="28" height="1" fill="#f59e0b" rx="0.5"/>
+          <circle cx="14" cy="28" r="1" fill="#fbbf24"/>
+          <circle cx="34" cy="28" r="1" fill="#fbbf24"/>
+        </>
+      )}
+      
+      {/* Level indicator */}
+      <rect x="2" y="2" width="12" height="8" fill="#000000" opacity="0.8" rx="2"/>
+      <text x="8" y="8" textAnchor="middle" fill="#fbbf24" fontSize="8" fontWeight="bold">
+        {level}
+      </text>
     </svg>
   );
 };
