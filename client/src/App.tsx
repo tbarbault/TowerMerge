@@ -34,8 +34,8 @@ function App() {
   // Mobile-optimized camera settings - iPhone optimized positioning
   const cameraSettings = isMobile 
     ? {
-        position: [0, 16, 16] as [number, number, number],
-        fov: 65,
+        position: [0, 22, 22] as [number, number, number],
+        fov: 55,
         near: 0.1,
         far: 1000
       }
