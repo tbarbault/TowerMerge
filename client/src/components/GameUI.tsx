@@ -182,8 +182,8 @@ export default function GameUI() {
 
   return (
     <>
-      {/* Pause Button - Top Left */}
-      <div className="absolute top-12 left-2 z-50">
+      {/* Control Buttons - Top Left */}
+      <div className="absolute top-12 left-2 z-50 flex flex-col gap-2">
         <Button
           onClick={pauseGame}
           variant="outline"
@@ -192,10 +192,18 @@ export default function GameUI() {
         >
           <Pause className="w-4 h-4" />
         </Button>
+        <Button
+          onClick={toggleMute}
+          variant="outline"
+          size="sm"
+          className="bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800"
+        >
+          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+        </Button>
       </div>
 
       {/* Top HUD - Mobile Optimized */}
-      <div className="absolute top-12 left-16 right-2 z-40">
+      <div className="absolute top-12 left-20 right-2 z-40">
         {/* Mobile layout: Stack vertically on small screens */}
         <div className="flex flex-col md:flex-row gap-2 md:gap-4 md:justify-between md:items-start">
           {/* Left side stats - horizontal on mobile */}
@@ -233,25 +241,26 @@ export default function GameUI() {
             </Card>
 
             <Card className="bg-black bg-opacity-80 border-gray-700">
-              <CardContent className="p-2 md:p-3 flex items-center gap-2">
-                <Coins className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
-                <span className="text-white font-bold text-sm md:text-base">{coins}</span>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-black bg-opacity-80 border-gray-700">
-              <CardContent className="p-2 md:p-3 flex items-center gap-2">
-                <Diamond className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
-                <span className="text-white font-bold text-sm md:text-base">{diamonds}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowResearchTree(true)}
-                  className="p-1 h-6 w-6 text-blue-400 hover:text-blue-300 ml-1"
-                  title="Research Tree"
-                >
-                  <Zap className="w-3 h-3" />
-                </Button>
+              <CardContent className="p-2 md:p-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
+                    <Coins className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
+                    <span className="text-white font-bold text-sm md:text-base">{coins}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Diamond className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
+                    <span className="text-white font-bold text-sm md:text-base">{diamonds}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowResearchTree(true)}
+                      className="p-1 h-6 w-6 text-blue-400 hover:text-blue-300 ml-1"
+                      title="Research Tree"
+                    >
+                      <Zap className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -294,16 +303,7 @@ export default function GameUI() {
           </Card>
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            onClick={toggleMute}
-            variant="outline"
-            size="sm"
-            className="bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800"
-          >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </Button>
-        </div>
+
       </div>
 
 
