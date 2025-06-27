@@ -156,17 +156,35 @@ export default function GameUI() {
               <Button onClick={restartGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
                 START
               </Button>
-              <Button 
-                onClick={() => {
-                  console.log("Encyclopedia button clicked - game over");
-                  setShowEncyclopedia(true);
-                }} 
-                variant="outline" 
-                className="w-full border-blue-500 text-blue-400 hover:bg-blue-900 mt-2 rounded-lg"
-              >
-                <BookOpen className="w-4 h-4 mr-2" />
-                Enemy Encyclopedia
-              </Button>
+              <div className="grid grid-cols-3 gap-2">
+                <Button 
+                  onClick={() => {
+                    console.log("Encyclopedia button clicked - game over");
+                    setShowEncyclopedia(true);
+                  }} 
+                  variant="outline" 
+                  className="border-blue-500 text-blue-400 hover:bg-blue-900 rounded-lg text-xs"
+                >
+                  <BookOpen className="w-3 h-3 mr-1" />
+                  Enemies
+                </Button>
+                <Button 
+                  onClick={() => setShowTowerEncyclopedia(true)} 
+                  variant="outline" 
+                  className="border-green-500 text-green-400 hover:bg-green-900 rounded-lg text-xs"
+                >
+                  <Shield className="w-3 h-3 mr-1" />
+                  Towers
+                </Button>
+                <Button 
+                  onClick={() => setShowResearchTree(true)} 
+                  variant="outline" 
+                  className="border-purple-500 text-purple-400 hover:bg-purple-900 rounded-lg text-xs"
+                >
+                  <Diamond className="w-3 h-3 mr-1" />
+                  Research
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -175,6 +193,16 @@ export default function GameUI() {
           isOpen={showEncyclopedia}
           onClose={() => setShowEncyclopedia(false)}
           currentWave={wave}
+        />
+        
+        <TowerEncyclopedia
+          isOpen={showTowerEncyclopedia}
+          onClose={() => setShowTowerEncyclopedia(false)}
+        />
+
+        <ResearchTree
+          isOpen={showResearchTree}
+          onClose={() => setShowResearchTree(false)}
         />
       </>
     );
