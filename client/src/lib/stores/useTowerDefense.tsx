@@ -607,7 +607,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
           wave: newWave,
           highestWave: newHighestWave,
           diamonds: newDiamonds,
-          enemiesInWave: Math.floor(5 + state.wave * 2.0 + Math.pow(Math.max(0, state.wave - 10), 1.2)),
+          enemiesInWave: Math.floor(5 + state.wave * 2.0 + Math.pow(Math.max(0, state.wave - 10), 1.8)),
           enemiesSpawned: 0,
           waveProgress: 0,
           waveStartTime: Date.now(),
