@@ -270,14 +270,14 @@ export default function GameUI() {
 
             <Card className="bg-black bg-opacity-80 border-gray-700">
               <CardContent className="p-2 md:p-3">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 w-24 md:w-28">
                   <div className="flex items-center gap-1">
                     <Coins className="w-4 h-4 md:w-5 md:h-5 text-yellow-400" />
-                    <span className="text-white font-bold text-sm md:text-base">{coins}</span>
+                    <span className="text-white font-bold text-sm md:text-base min-w-[20px] text-right">{coins}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Diamond className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
-                    <span className="text-white font-bold text-sm md:text-base">{diamonds}</span>
+                    <span className="text-white font-bold text-sm md:text-base min-w-[16px] text-right">{diamonds}</span>
                     <Button
                       variant="ghost"
                       size="sm"

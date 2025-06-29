@@ -1,84 +1,99 @@
 // Center path - straight through middle from tunnel
 export function getCenterPath() {
-  // Force distribution across red line - bias toward left side for center path
-  const targetX = Math.random() < 0.7 ? (Math.random() * 3 - 2) : (Math.random() * 5 + 1); // Bias left or spread right
+  // Add more randomness to path selection and waypoints
+  const targetX = Math.random() < 0.6 ? (Math.random() * 4 - 2) : (Math.random() * 6 + 1);
+  const randomOffsetX = () => (Math.random() - 0.5) * 1.5; // Random offset ±0.75
+  const randomOffsetZ = () => (Math.random() - 0.5) * 0.8; // Random offset ±0.4
+  
   return [
-    { x: -1, z: -12 },  // Start at center-left tunnel
-    { x: -1, z: -9 },   // Combat zone begins
-    { x: -1, z: -6 },   // Approach grid
-    { x: -1, z: -3 },   // Enter grid back
-    { x: 0, z: 0 },     // Move through grid
-    { x: targetX * 0.2, z: 2 },     // Early angle toward target
-    { x: targetX * 0.5, z: 4 },     // Continue angling
-    { x: targetX * 0.8, z: 6 },     // Strong angle toward target
+    { x: -1 + randomOffsetX() * 0.5, z: -12 },  // Start with slight randomness
+    { x: -1 + randomOffsetX(), z: -9 + randomOffsetZ() },   // Combat zone with variation
+    { x: -1 + randomOffsetX(), z: -6 + randomOffsetZ() },   // Approach grid with variation
+    { x: -1 + randomOffsetX(), z: -3 + randomOffsetZ() },   // Enter grid back with variation
+    { x: 0 + randomOffsetX(), z: 0 + randomOffsetZ() },     // Move through grid with variation
+    { x: targetX * 0.2 + randomOffsetX() * 0.5, z: 2 + randomOffsetZ() },     // Early angle with variation
+    { x: targetX * 0.5 + randomOffsetX() * 0.3, z: 4 + randomOffsetZ() },     // Continue angling with variation
+    { x: targetX * 0.8 + randomOffsetX() * 0.2, z: 6 + randomOffsetZ() },     // Strong angle with slight variation
     { x: targetX, z: 8.5 },   // End at distributed point on red line
   ];
 }
 
 // Left path - comes from leftmost tunnel
 export function getLeftPath() {
-  // Force left side distribution - heavily bias toward left side of red line
-  const targetX = Math.random() < 0.8 ? (Math.random() * 2.5 - 2) : (Math.random() * 3 + 2);
+  // Force left side distribution with more variation
+  const targetX = Math.random() < 0.7 ? (Math.random() * 3 - 2) : (Math.random() * 4 + 1);
+  const randomOffsetX = () => (Math.random() - 0.5) * 1.2;
+  const randomOffsetZ = () => (Math.random() - 0.5) * 0.6;
+  
   return [
-    { x: -4, z: -12 },  // Start at leftmost tunnel
-    { x: -4, z: -9 },   // Combat zone begins
-    { x: -4, z: -6 },   // Approach grid
-    { x: -3, z: -3 },   // Enter grid back left
-    { x: -2, z: 0 },    // Move toward center
-    { x: targetX * 0.3, z: 2 },    // Early angle toward target
-    { x: targetX * 0.6, z: 4 },     // Continue angling toward target
-    { x: targetX * 0.9, z: 6 },     // Strong angle toward target
+    { x: -4 + randomOffsetX() * 0.3, z: -12 },  // Start with variation
+    { x: -4 + randomOffsetX(), z: -9 + randomOffsetZ() },   // Combat zone with variation
+    { x: -4 + randomOffsetX(), z: -6 + randomOffsetZ() },   // Approach grid with variation
+    { x: -3 + randomOffsetX(), z: -3 + randomOffsetZ() },   // Enter grid back left with variation
+    { x: -2 + randomOffsetX(), z: 0 + randomOffsetZ() },    // Move toward center with variation
+    { x: targetX * 0.3 + randomOffsetX() * 0.4, z: 2 + randomOffsetZ() },    // Early angle with variation
+    { x: targetX * 0.6 + randomOffsetX() * 0.3, z: 4 + randomOffsetZ() },     // Continue angling with variation
+    { x: targetX * 0.9 + randomOffsetX() * 0.2, z: 6 + randomOffsetZ() },     // Strong angle with variation
     { x: targetX, z: 8.5 },     // End at left-biased point on red line
   ];
 }
 
 // Right path - comes from rightmost tunnel
 export function getRightPath() {
-  // Force right side distribution - heavily bias toward right side of red line
-  const targetX = Math.random() < 0.8 ? (Math.random() * 4 + 2) : (Math.random() * 2 - 1);
+  // Force right side distribution with more variation
+  const targetX = Math.random() < 0.7 ? (Math.random() * 4 + 1) : (Math.random() * 3 - 1);
+  const randomOffsetX = () => (Math.random() - 0.5) * 1.2;
+  const randomOffsetZ = () => (Math.random() - 0.5) * 0.6;
+  
   return [
-    { x: 5, z: -12 },   // Start at rightmost tunnel
-    { x: 5, z: -9 },    // Combat zone begins
-    { x: 5, z: -6 },    // Approach grid
-    { x: 3, z: -3 },    // Enter grid back right
-    { x: 2, z: 0 },     // Move toward center
-    { x: targetX * 0.4, z: 2 },     // Early angle toward target
-    { x: targetX * 0.7, z: 4 },     // Continue angling toward target
-    { x: targetX * 0.9, z: 6 },     // Strong angle toward target
+    { x: 5 + randomOffsetX() * 0.3, z: -12 },   // Start with variation
+    { x: 5 + randomOffsetX(), z: -9 + randomOffsetZ() },    // Combat zone with variation
+    { x: 5 + randomOffsetX(), z: -6 + randomOffsetZ() },    // Approach grid with variation
+    { x: 3 + randomOffsetX(), z: -3 + randomOffsetZ() },    // Enter grid back right with variation
+    { x: 2 + randomOffsetX(), z: 0 + randomOffsetZ() },     // Move toward center with variation
+    { x: targetX * 0.4 + randomOffsetX() * 0.4, z: 2 + randomOffsetZ() },     // Early angle with variation
+    { x: targetX * 0.7 + randomOffsetX() * 0.3, z: 4 + randomOffsetZ() },     // Continue angling with variation
+    { x: targetX * 0.9 + randomOffsetX() * 0.2, z: 6 + randomOffsetZ() },     // Strong angle with variation
     { x: targetX, z: 8.5 },   // End at right-biased point on red line
   ];
 }
 
 // Zigzag path - serpentine movement from center-right tunnel
 export function getZigzagPath() {
-  // Force center-spread distribution - avoid center clustering
-  const targetX = Math.random() < 0.5 ? (Math.random() * 2 - 2) : (Math.random() * 3 + 3);
+  // Force center-spread distribution with enhanced randomness
+  const targetX = Math.random() < 0.4 ? (Math.random() * 3 - 2) : (Math.random() * 4 + 2);
+  const randomOffsetX = () => (Math.random() - 0.5) * 1.8; // Larger variation for zigzag
+  const randomOffsetZ = () => (Math.random() - 0.5) * 0.8;
+  
   return [
-    { x: 2, z: -12 },   // Start at center-right tunnel
-    { x: 1, z: -9 },    // Zigzag left in combat zone
-    { x: 3, z: -6 },    // Zigzag right near grid
-    { x: 1, z: -3 },    // Zigzag left approaching grid
-    { x: 2, z: 0 },     // Zigzag right in grid
-    { x: targetX * 0.3, z: 2 },     // Early spread toward target
-    { x: targetX * 0.6, z: 4 },     // Continue spreading toward target
-    { x: targetX * 0.9, z: 6 },     // Strong spread toward target
+    { x: 2 + randomOffsetX() * 0.4, z: -12 },   // Start with variation
+    { x: 1 + randomOffsetX(), z: -9 + randomOffsetZ() },    // Zigzag left with heavy variation
+    { x: 3 + randomOffsetX(), z: -6 + randomOffsetZ() },    // Zigzag right with heavy variation
+    { x: 1 + randomOffsetX(), z: -3 + randomOffsetZ() },    // Zigzag left with heavy variation
+    { x: 2 + randomOffsetX(), z: 0 + randomOffsetZ() },     // Zigzag right with heavy variation
+    { x: targetX * 0.3 + randomOffsetX() * 0.5, z: 2 + randomOffsetZ() },     // Early spread with variation
+    { x: targetX * 0.6 + randomOffsetX() * 0.4, z: 4 + randomOffsetZ() },     // Continue spreading with variation
+    { x: targetX * 0.9 + randomOffsetX() * 0.2, z: 6 + randomOffsetZ() },     // Strong spread with variation
     { x: targetX, z: 8.5 },   // End at edge-biased point on red line
   ];
 }
 
 // Edge path - goes around the outside from leftmost tunnel
 export function getEdgePath() {
-  // Force extreme edge distribution - far left or far right only
-  const targetX = Math.random() < 0.5 ? (Math.random() * 1.5 - 2) : (Math.random() * 1.5 + 4.5);
+  // Force extreme edge distribution with variation
+  const targetX = Math.random() < 0.4 ? (Math.random() * 2 - 2.5) : (Math.random() * 2 + 4);
+  const randomOffsetX = () => (Math.random() - 0.5) * 1.0;
+  const randomOffsetZ = () => (Math.random() - 0.5) * 0.5;
+  
   return [
-    { x: -4, z: -12 },  // Start at leftmost tunnel
-    { x: -4, z: -9 },   // Combat zone begins
-    { x: -4, z: -6 },   // Main combat area
-    { x: -4, z: -3 },   // Move along left edge
-    { x: -3, z: 0 },    // Turn toward center
-    { x: targetX * 0.4, z: 2 },    // Early angle toward extreme target
-    { x: targetX * 0.7, z: 4 },     // Continue toward extreme target
-    { x: targetX * 0.95, z: 6 },     // Strong angle toward extreme target
+    { x: -4 + randomOffsetX() * 0.3, z: -12 },  // Start with variation
+    { x: -4 + randomOffsetX(), z: -9 + randomOffsetZ() },   // Combat zone with variation
+    { x: -4 + randomOffsetX(), z: -6 + randomOffsetZ() },   // Main combat area with variation
+    { x: -4 + randomOffsetX(), z: -3 + randomOffsetZ() },   // Move along left edge with variation
+    { x: -3 + randomOffsetX(), z: 0 + randomOffsetZ() },    // Turn toward center with variation
+    { x: targetX * 0.4 + randomOffsetX() * 0.4, z: 2 + randomOffsetZ() },    // Early angle with variation
+    { x: targetX * 0.7 + randomOffsetX() * 0.3, z: 4 + randomOffsetZ() },     // Continue with variation
+    { x: targetX * 0.95 + randomOffsetX() * 0.1, z: 6 + randomOffsetZ() },     // Strong angle with variation
     { x: targetX, z: 8.5 },   // End at extreme edge point on red line
   ];
 }
