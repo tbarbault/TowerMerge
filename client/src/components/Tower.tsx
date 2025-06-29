@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useTexture, useGLTF } from "@react-three/drei";
+import { useTexture } from "@react-three/drei";
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { useAudio } from "../lib/stores/useAudio";
 import * as THREE from "three";
@@ -23,9 +23,6 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
   const [targetRotation, setTargetRotation] = useState(0);
   const animationGroupRef = useRef<THREE.Group>(null);
-  
-  // Load 3D model for level 1 turrets
-  const turretModel = type === 'turret' && level === 1 ? useGLTF("/models/turret_level1.glb") : null;
   
   // Calculate tower range based on type and level
   const baseRange = type === 'turret' ? 6.0 : 7.0;
@@ -322,14 +319,6 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       {type === 'turret' ? (
         // Turret - Military Style Design for all levels (20% larger)
         <group scale={1.2}>
-          {/* Level 1 turrets use 3D model, others use geometric design */}
-          {level === 1 && turretModel ? (
-            <group ref={turretRef} scale={2.5} position={[0, 0, 0]}>
-              <primitive object={turretModel.scene.clone()} />
-            </group>
-          ) : (
-            <>
-              {/* Geometric design for other levels */}
           {/* Hexagonal Base Platform */}
           <mesh position={[0, 0.05, 0]} userData={{ towerId }}>
             <cylinderGeometry args={[0.8, 0.9, 0.1, 6]} />
@@ -590,8 +579,6 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               );
             })}
           </group>
-            </>
-          )}
         </group>
       ) : type === 'mortar' ? (
         // Mortar - Artillery Style Design for all levels
