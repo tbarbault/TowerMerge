@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useTexture } from "@react-three/drei";
+import { useTexture, useGLTF } from "@react-three/drei";
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { useAudio } from "../lib/stores/useAudio";
 import * as THREE from "three";
