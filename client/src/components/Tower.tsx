@@ -322,14 +322,14 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
       {type === 'turret' ? (
         // Turret - Military Style Design for all levels (20% larger)
         <group scale={1.2}>
-          {/* Use 3D model for level 1 turrets */}
+          {/* Level 1 turrets use 3D model, others use geometric design */}
           {level === 1 && turretModel ? (
             <group ref={turretRef} scale={2.5} position={[0, 0, 0]}>
               <primitive object={turretModel.scene.clone()} />
             </group>
           ) : (
             <>
-              {/* Fallback to geometric design for other levels or if model fails to load */}
+              {/* Geometric design for other levels */}
           {/* Hexagonal Base Platform */}
           <mesh position={[0, 0.05, 0]} userData={{ towerId }}>
             <cylinderGeometry args={[0.8, 0.9, 0.1, 6]} />
