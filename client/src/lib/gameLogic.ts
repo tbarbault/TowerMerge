@@ -265,17 +265,17 @@ function createEnemy(type: string, wave: number) {
     healthMultiplier = 1 + (wave - 1) * 0.08; // 8% per wave
     speedMultiplier = 1 + (wave - 1) * 0.02; // 2% per wave
   } else if (wave <= 20) {
-    // Waves 11-20: Moderate scaling
-    healthMultiplier = 1.72 + (wave - 10) * 0.15; // Start at 172%, +15% per wave
-    speedMultiplier = 1.18 + (wave - 10) * 0.03; // Start at 118%, +3% per wave
+    // Waves 11-20: Aggressive scaling (increased from moderate)
+    healthMultiplier = 1.72 + (wave - 10) * 0.25; // Start at 172%, +25% per wave (was +15%)
+    speedMultiplier = 1.18 + (wave - 10) * 0.05; // Start at 118%, +5% per wave (was +3%)
   } else if (wave <= 30) {
-    // Waves 21-30: Aggressive scaling
-    healthMultiplier = 3.22 + (wave - 20) * 0.25; // Start at 322%, +25% per wave
-    speedMultiplier = 1.48 + (wave - 20) * 0.04; // Start at 148%, +4% per wave
+    // Waves 21-30: Very aggressive scaling (increased)
+    healthMultiplier = 4.22 + (wave - 20) * 0.35; // Start at 422%, +35% per wave (was 322%, +25%)
+    speedMultiplier = 1.68 + (wave - 20) * 0.06; // Start at 168%, +6% per wave (was 148%, +4%)
   } else {
-    // Waves 31+: Extreme scaling
-    healthMultiplier = 5.72 + (wave - 30) * 0.35; // Start at 572%, +35% per wave
-    speedMultiplier = 1.88 + (wave - 30) * 0.05; // Start at 188%, +5% per wave
+    // Waves 31+: Extreme scaling (increased)
+    healthMultiplier = 7.72 + (wave - 30) * 0.45; // Start at 772%, +45% per wave (was 572%, +35%)
+    speedMultiplier = 2.28 + (wave - 30) * 0.07; // Start at 228%, +7% per wave (was 188%, +5%)
   }
   
   const scaledHealth = Math.floor(config.health * healthMultiplier);
