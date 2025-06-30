@@ -148,39 +148,67 @@ function spawnEnemies(gameState: any, currentTime: number) {
 }
 
 function selectWeightedEnemyType(availableTypes: string[], wave: number) {
+  // Generate different wave themes randomly
+  const waveThemes = ['balanced', 'speed', 'tank', 'swarm', 'elite'];
+  const theme = waveThemes[Math.floor(Math.random() * waveThemes.length)];
+  
+  let baseWeights = getBaseWeights(wave);
+  
+  // Apply theme modifiers
+  switch (theme) {
+    case 'speed':
+      baseWeights.fast *= 2;
+      baseWeights.stealth *= 1.5;
+      break;
+    case 'tank':
+      baseWeights.heavy *= 2;
+      baseWeights.armored *= 1.8;
+      baseWeights.titan *= 1.5;
+      break;
+    case 'swarm':
+      baseWeights.basic *= 3;
+      baseWeights.fast *= 1.5;
+      break;
+    case 'elite':
+      baseWeights.elite *= 2;
+      baseWeights.berserker *= 1.5;
+      break;
+  }
+  
+  return getWeightedRandomType(availableTypes, baseWeights);
+}
+
+function getBaseWeights(wave: number) {
   // Early waves favor weaker enemies
   if (wave <= 3) {
-    const weights = {
+    return {
       basic: 70,
       fast: 25,
       heavy: 5
     };
-    return getWeightedRandomType(availableTypes, weights);
   }
   // Mid waves balance enemy types
   else if (wave <= 7) {
-    const weights = {
+    return {
       basic: 40,
       fast: 30,
       heavy: 20,
       armored: 10
     };
-    return getWeightedRandomType(availableTypes, weights);
   }
   // Later waves favor stronger enemies with new enemy types
   else if (wave <= 14) {
-    const weights = {
+    return {
       basic: 20,
       fast: 25,
       heavy: 25,
       armored: 20,
       elite: 10
     };
-    return getWeightedRandomType(availableTypes, weights);
   }
   // Wave 15-19: Introduce stealth enemies
   else if (wave <= 19) {
-    const weights = {
+    return {
       basic: 15,
       fast: 20,
       heavy: 20,
@@ -188,11 +216,10 @@ function selectWeightedEnemyType(availableTypes: string[], wave: number) {
       elite: 15,
       stealth: 10
     };
-    return getWeightedRandomType(availableTypes, weights);
   }
   // Wave 20-29: Introduce berserkers
   else if (wave <= 29) {
-    const weights = {
+    return {
       basic: 10,
       fast: 15,
       heavy: 20,
@@ -201,11 +228,10 @@ function selectWeightedEnemyType(availableTypes: string[], wave: number) {
       stealth: 10,
       berserker: 10
     };
-    return getWeightedRandomType(availableTypes, weights);
   }
   // Wave 30+: All enemies including titans - favor stronger enemies
   else {
-    const weights = {
+    return {
       basic: 2,
       fast: 5,
       heavy: 8,
@@ -215,7 +241,6 @@ function selectWeightedEnemyType(availableTypes: string[], wave: number) {
       berserker: 20,
       titan: 18
     };
-    return getWeightedRandomType(availableTypes, weights);
   }
 }
 

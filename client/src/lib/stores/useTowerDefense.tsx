@@ -102,7 +102,7 @@ export interface Mine {
 
 interface TowerDefenseState {
   // Game state
-  gamePhase: GamePhase;
+  gamePhase: "menu" | "playing" | "paused" | "gameOver";
   wave: number;
   health: number;
   coins: number;
@@ -112,10 +112,10 @@ interface TowerDefenseState {
   waveCompletionTime: number | null;
   showWaveTransition: boolean;
   lastUpdateTime?: number; // For iOS performance optimization
-  
+
   // Research tree
   researchNodes: ResearchNode[];
-  
+
   // Game objects
   towers: Tower[];
   enemies: Enemy[];
@@ -125,19 +125,31 @@ interface TowerDefenseState {
   impacts: Impact[];
   obstacles: Obstacle[];
   mines: Mine[];
-  
+
   // UI state
   selectedGridCell: GridCell | null;
   selectedTower: Tower | null;
   selectedTowerType: 'turret' | 'mortar';
   selectedObstacleSlot: { x: number; z: number } | null;
   obstacleMode: boolean;
-  
+
   // Wave management
   enemiesInWave: number;
   enemiesSpawned: number;
   waveProgress: number;
-  
+
+  // Game variety
+  currentMapConfig: any | null;
+  activeEvents: any[];
+  activeMutators: any[];
+  gameModifiers: {
+    enemySpeedMultiplier: number;
+    enemyHealthMultiplier: number;
+    towerDamageMultiplier: number;
+    coinMultiplier: number;
+    spawnRateMultiplier: number;
+  };
+
   // Actions
   startGame: () => void;
   restartGame: () => void;
@@ -148,30 +160,29 @@ interface TowerDefenseState {
   selectTowerType: (type: 'turret' | 'mortar') => void;
   buyTower: () => void;
   mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => void;
-  
+
   // Obstacle actions
   toggleObstacleMode: () => void;
   selectObstacleSlot: (x: number, z: number) => void;
   buyObstacle: () => void;
   removeObstacle: (id: string) => void;
-  
+
   // Mine actions
   minesPurchased: number;
   buyMine: () => void;
   triggerMine: (id: string) => void;
   removeMine: (id: string) => void;
-  
+
   // Research tree actions
   purchaseResearchNode: (nodeId: string) => void;
   getResearchBonuses: () => {
     turretDamageMultiplier: number;
     turretFireRateMultiplier: number;
     mortarDamageMultiplier: number;
-    mortarFireRateMultiplier: number;
     mineDamageMultiplier: number;
     mineCostMultiplier: number;
   };
-  
+
   // Game logic
   spawnEnemy: (enemy: Enemy) => void;
   removeBullet: (id: string) => void;
@@ -195,7 +206,7 @@ interface TowerDefenseState {
   removeExplosion: (id: string) => void;
   addImpact: (impact: Impact) => void;
   removeImpact: (id: string) => void;
-  
+
   // Computed properties
   canPlaceTower: boolean;
   canMergeTowers: boolean;
@@ -214,10 +225,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
     waveCompletionTime: null,
     showWaveTransition: false,
     lastUpdateTime: undefined,
-    
+
     // Research tree
     researchNodes: JSON.parse(localStorage.getItem('researchNodes') || JSON.stringify(researchTreeData)),
-    
+
     towers: [],
     enemies: [],
     bullets: [],
@@ -226,21 +237,33 @@ export const useTowerDefense = create<TowerDefenseState>()(
     impacts: [],
     obstacles: [],
     mines: [],
-    
+
     selectedGridCell: null,
     selectedTower: null,
     selectedTowerType: 'turret',
     selectedObstacleSlot: null,
     obstacleMode: false,
-    
+
     enemiesInWave: 5,
     enemiesSpawned: 0,
     waveProgress: 0,
     minesPurchased: 0,
-    
+
+    // Game variety
+    currentMapConfig: null,
+    activeEvents: [],
+    activeMutators: [],
+    gameModifiers: {
+      enemySpeedMultiplier: 1,
+      enemyHealthMultiplier: 1,
+      towerDamageMultiplier: 1,
+      coinMultiplier: 1,
+      spawnRateMultiplier: 1,
+    },
+
     canPlaceTower: false,
     canMergeTowers: false,
-    
+
     // Actions
     startGame: () => {
       set({
@@ -260,40 +283,40 @@ export const useTowerDefense = create<TowerDefenseState>()(
         waveProgress: 0,
         showWaveTransition: true,
       });
-      
+
       // Auto-hide wave transition after 1 second
       setTimeout(() => {
         set(state => ({ ...state, showWaveTransition: false }));
       }, 1000);
     },
-    
+
     restartGame: () => {
       const state = get();
       state.startGame();
     },
-    
+
     pauseGame: () => {
       set({ gamePhase: "paused" });
     },
-    
+
     resumeGame: () => {
       set({ gamePhase: "playing" });
     },
-    
+
     endGame: () => {
       set({ gamePhase: "gameOver" });
     },
-    
+
     selectGridCell: (x: number, z: number) => {
       const state = get();
       const existingTower = state.towers.find(t => t.x === x && t.z === z);
-      
+
       // Calculate canPlaceTower
       const towerExists = !!existingTower;
       const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
       const hasEnoughCoins = state.coins >= towerCost;
       const canPlace = !towerExists && hasEnoughCoins;
-      
+
       // Calculate canMergeTowers
       let canMerge = false;
       if (existingTower && existingTower.level < 5) {
@@ -304,9 +327,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
         });
         canMerge = adjacentTowers.some(tower => tower.level === existingTower.level);
       }
-      
+
       console.log("Grid cell selected:", { x, z, canPlace, canMerge, towerExists, hasEnoughCoins });
-      
+
       set({
         selectedGridCell: { x, z },
         selectedTower: existingTower || null,
@@ -317,7 +340,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
     selectTowerType: (type) => {
       const state = get();
-      
+
       // Recalculate canPlaceTower with new tower type
       let canPlace = false;
       if (state.selectedGridCell) {
@@ -325,13 +348,13 @@ export const useTowerDefense = create<TowerDefenseState>()(
         const towerCost = type === 'turret' ? 15 : 25;
         canPlace = !existingTower && state.coins >= towerCost;
       }
-      
+
       set({ 
         selectedTowerType: type,
         canPlaceTower: canPlace,
       });
     },
-    
+
     buyTower: () => {
       const state = get();
       if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 15) {
@@ -342,9 +365,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
         });
         return;
       }
-      
+
       console.log(`Buying tower at grid (${state.selectedGridCell.x}, ${state.selectedGridCell.z})`);
-      
+
       const getTowerStats = (type: 'turret' | 'mortar') => {
         if (type === 'turret') {
           return { damage: 8, range: 6.0, fireRate: 250 }; // Doubled fire rate, halved damage
@@ -365,7 +388,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         lastShot: 0,
         type: state.selectedTowerType,
       };
-      
+
       // Play tower placement sound
       try {
         const audioStore = (window as any).audioStore;
@@ -375,7 +398,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       } catch (e) {
         console.log("Audio playback failed:", e);
       }
-      
+
       // Update state after placing tower
       set({
         towers: [...state.towers, newTower],
@@ -387,20 +410,20 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
 
     },
-    
+
     mergeTowers: (sourceTowerId?: string, targetTowerId?: string) => {
       const state = get();
-      
+
       // If specific tower IDs are provided (drag and drop), use those
       if (sourceTowerId && targetTowerId) {
         const sourceTower = state.towers.find(t => t.id === sourceTowerId);
         const targetTower = state.towers.find(t => t.id === targetTowerId);
-        
+
         if (!sourceTower || !targetTower || sourceTower.level !== targetTower.level || sourceTower.level >= 5 || targetTower.level >= 5 || sourceTower.type !== targetTower.type) {
           console.log("Cannot merge towers:", { sourceTower, targetTower, reason: "different types or levels" });
           return;
         }
-        
+
         const upgradedTower: Tower = {
           ...targetTower, // Keep the target tower's position
           level: targetTower.level + 1,
@@ -408,9 +431,9 @@ export const useTowerDefense = create<TowerDefenseState>()(
           range: targetTower.range * 1.15,
           fireRate: Math.max(targetTower.fireRate * 0.85, 150),
         };
-        
+
         console.log(`Merged towers: ${sourceTowerId} + ${targetTowerId} = Level ${upgradedTower.level}`);
-        
+
         set({
           towers: state.towers
             .filter(t => t.id !== sourceTower.id && t.id !== targetTower.id)
@@ -421,29 +444,29 @@ export const useTowerDefense = create<TowerDefenseState>()(
         });
         return;
       }
-      
+
       // Original adjacent merging logic for button clicks
       if (!state.canMergeTowers || !state.selectedGridCell) return;
-      
+
       const adjacentTowers = state.towers.filter(tower => {
         const dx = Math.abs(tower.x - state.selectedGridCell!.x);
         const dz = Math.abs(tower.z - state.selectedGridCell!.z);
         return (dx === 1 && dz === 0) || (dx === 0 && dz === 1);
       });
-      
+
       const currentTower = state.towers.find(
         t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z
       );
-      
+
       if (!currentTower) return;
-      
+
       const mergeableTower = adjacentTowers.find(t => 
         t.level === currentTower.level && 
         t.level < 5 && 
         t.type === currentTower.type
       );
       if (!mergeableTower) return;
-      
+
       const upgradedTower: Tower = {
         ...currentTower,
         level: currentTower.level + 1,
@@ -451,7 +474,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         range: currentTower.range * 1.15,
         fireRate: Math.max(currentTower.fireRate * 0.85, 150),
       };
-      
+
       set({
         towers: state.towers
           .filter(t => t.id !== currentTower.id && t.id !== mergeableTower.id)
@@ -461,64 +484,64 @@ export const useTowerDefense = create<TowerDefenseState>()(
         canMergeTowers: false,
       });
     },
-    
+
     // Obstacle actions
     toggleObstacleMode: () => {
       set(state => ({ obstacleMode: !state.obstacleMode, selectedGridCell: null }));
     },
-    
+
     selectObstacleSlot: (x, z) => {
       set({ selectedObstacleSlot: { x, z } });
     },
-    
+
     buyObstacle: () => {
       const state = get();
       if (!state.selectedObstacleSlot || state.coins < 10) return;
-      
+
       const existingObstacle = state.obstacles.find(
         o => o.x === state.selectedObstacleSlot!.x && o.z === state.selectedObstacleSlot!.z
       );
       if (existingObstacle) return;
-      
+
       const newObstacle: Obstacle = {
         id: Math.random().toString(36).substr(2, 9),
         x: state.selectedObstacleSlot.x,
         z: state.selectedObstacleSlot.z,
         type: 'rock',
       };
-      
+
       set(state => ({
         obstacles: [...state.obstacles, newObstacle],
         coins: state.coins - 10,
         selectedObstacleSlot: null,
       }));
     },
-    
+
     removeObstacle: (id) => {
       set(state => ({
         obstacles: state.obstacles.filter(o => o.id !== id)
       }));
     },
-    
+
     // Game logic actions
     spawnEnemy: (enemy) => {
       set(state => ({
         enemies: [...state.enemies, enemy]
       }));
     },
-    
+
     removeBullet: (id) => {
       set(state => ({
         bullets: state.bullets.filter(b => b.id !== id)
       }));
     },
-    
+
     removeEnemy: (id) => {
       set(state => ({
         enemies: state.enemies.filter(e => e.id !== id)
       }));
     },
-    
+
     damageEnemy: (id, damage) => {
       set(state => ({
         enemies: state.enemies.map(enemy =>
@@ -528,13 +551,13 @@ export const useTowerDefense = create<TowerDefenseState>()(
         )
       }));
     },
-    
+
     addBullet: (bullet) => {
       set(state => ({
         bullets: [...state.bullets, bullet]
       }));
     },
-    
+
     updateBullet: (id, x, y, z) => {
       set(state => ({
         bullets: state.bullets.map(bullet =>
@@ -542,7 +565,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         )
       }));
     },
-    
+
     updateEnemy: (id, x, z, pathIndex) => {
       set(state => ({
         enemies: state.enemies.map(enemy =>
@@ -550,7 +573,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         )
       }));
     },
-    
+
     updateTowerLastShot: (id, time) => {
       set(state => ({
         towers: state.towers.map(tower =>
@@ -558,7 +581,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         )
       }));
     },
-    
+
     updateTowerRotation: (id, currentRotation, targetRotation) => {
       set(state => ({
         towers: state.towers.map(tower => 
@@ -570,7 +593,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         )
       }));
     },
-    
+
     takeDamage: (amount) => {
       set(state => {
         const newHealth = Math.max(0, state.health - amount);
@@ -580,22 +603,22 @@ export const useTowerDefense = create<TowerDefenseState>()(
         return { health: newHealth };
       });
     },
-    
+
     addCoins: (amount) => {
       set(state => ({ coins: state.coins + amount }));
     },
-    
+
     nextWave: () => {
       set(state => {
         const newWave = state.wave + 1;
         let newHighestWave = state.highestWave;
-        
+
         // Update highest wave if current wave exceeds it
         if (newWave > state.highestWave) {
           newHighestWave = newWave;
           localStorage.setItem('highestWave', newWave.toString());
         }
-        
+
         // Award diamonds every 5 waves
         const diamondsEarned = getDiamondsForWave(newWave);
         let newDiamonds = state.diamonds;
@@ -604,7 +627,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
           localStorage.setItem('diamonds', newDiamonds.toString());
           console.log(`Wave ${newWave} completed! Earned ${diamondsEarned} diamonds!`);
         }
-        
+
         return {
           wave: newWave,
           highestWave: newHighestWave,
@@ -617,65 +640,65 @@ export const useTowerDefense = create<TowerDefenseState>()(
           showWaveTransition: true,
         };
       });
-      
+
       // Auto-hide wave transition after 1 second
       setTimeout(() => {
         set(state => ({ ...state, showWaveTransition: false }));
       }, 1000);
     },
-    
+
     setWaveProgress: (progress) => {
       set({ waveProgress: progress });
     },
-    
+
     setEnemiesSpawned: (count) => {
       set({ enemiesSpawned: count });
     },
-    
+
     setWaveCompletionTime: (time) => {
       set({ waveCompletionTime: time });
     },
-    
+
     setShowWaveTransition: (show) => {
       set({ showWaveTransition: show });
     },
-    
+
     addMuzzleFlash: (flash) => {
       set(state => ({
         muzzleFlashes: [...state.muzzleFlashes, flash]
       }));
     },
-    
+
     removeMuzzleFlash: (id) => {
       set(state => ({
         muzzleFlashes: state.muzzleFlashes.filter(f => f.id !== id)
       }));
     },
-    
+
     addExplosion: (explosion) => {
       set(state => ({
         explosions: [...state.explosions, explosion]
       }));
     },
-    
+
     removeExplosion: (id) => {
       set(state => ({
         explosions: state.explosions.filter(e => e.id !== id)
       }));
     },
-    
+
     addImpact: (impact) => {
       set(state => ({
         impacts: [...state.impacts, impact]
       }));
     },
-    
+
     removeImpact: (id) => {
       set(state => ({
         impacts: state.impacts.filter(i => i.id !== id)
       }));
     },
-    
+
     // Mine actions
     buyMine: () => {
       const state = get();
@@ -683,20 +706,20 @@ export const useTowerDefense = create<TowerDefenseState>()(
       const baseCost = 10;
       const costMultiplier = 1.5;
       const adjustedCost = Math.floor(baseCost * Math.pow(costMultiplier, state.minesPurchased) * bonuses.mineCostMultiplier);
-      
+
       if (state.coins >= adjustedCost) {
         // Place mines in front of the grid (enemy spawn area)
         // Generate random positions in the area before the grid where enemies approach
         const spawnAreaWidth = 10; // Width of spawn area
         const spawnAreaDepth = 8;  // Depth before grid starts
-        
+
         // Random position in front of the grid
         const randomX = (Math.random() - 0.5) * spawnAreaWidth; // -5 to 5
         const randomZ = -spawnAreaDepth + (Math.random() * 3); // -8 to -5 (before grid)
-        
+
         const baseDamage = 150 + (state.minesPurchased * 25);
         const enhancedDamage = Math.floor(baseDamage * bonuses.mineDamageMultiplier);
-        
+
         const newMine: Mine = {
           id: `mine-${Date.now()}-${Math.random()}`,
           x: randomX,
@@ -705,7 +728,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
           explosionRadius: 2.5,
           triggered: false
         };
-        
+
         set({
           mines: [...state.mines, newMine],
           coins: state.coins - adjustedCost,
@@ -713,7 +736,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         });
       }
     },
-    
+
     triggerMine: (id) => {
       set(state => ({
         mines: state.mines.map(mine => 
@@ -721,37 +744,37 @@ export const useTowerDefense = create<TowerDefenseState>()(
         )
       }));
     },
-    
+
     removeMine: (id) => {
       set(state => ({
         mines: state.mines.filter(mine => mine.id !== id)
       }));
     },
-    
+
     // Research tree actions
     purchaseResearchNode: (nodeId) => {
       const state = get();
       const node = state.researchNodes.find(n => n.id === nodeId);
-      
+
       if (node && !node.purchased && node.unlocked && state.diamonds >= node.cost) {
         const updatedNodes = state.researchNodes.map(n => 
           n.id === nodeId ? { ...n, purchased: true } : n
         );
-        
+
         // Unlock any nodes that now have their prerequisites met
         const unlockedNodes = unlockResearchNodes(updatedNodes);
-        
+
         set({
           diamonds: state.diamonds - node.cost,
           researchNodes: unlockedNodes
         });
-        
+
         // Save to localStorage
         localStorage.setItem('diamonds', (state.diamonds - node.cost).toString());
         localStorage.setItem('researchNodes', JSON.stringify(unlockedNodes));
       }
     },
-    
+
     getResearchBonuses: () => {
       const state = get();
       return calculateResearchBonuses(state.researchNodes);
