@@ -842,7 +842,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         });
 
         // Hide event display after 5 seconds and start wave
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           set(state => {
             const newHighestWave = newWave > state.highestWave ? newWave : state.highestWave;
             if (newWave > state.highestWave) {
