@@ -20,52 +20,38 @@ import { updateGameLogic } from "../lib/gameLogic";
 
 export default function Game() {
   const gameState = useTowerDefense();
-  const { setBackgroundMusic, setHitSound, setSuccessSound, setTowerPlaceSound, setEnemyDeathSound } = useAudio();
+  const { initialize, enableAudio, isIOS, cleanup } = useAudio();
 
   // Initialize audio with mobile support
   useEffect(() => {
     const initializeAudio = async () => {
       try {
-        // Background music removed - keeping only essential sound effects
-        setBackgroundMusic(null);
-
-        const hitAudio = new Audio("/sounds/hit.mp3");
-        hitAudio.volume = 0.5;
-        hitAudio.preload = "auto";
-        setHitSound(hitAudio);
-
-        const successAudio = new Audio("/sounds/success.mp3");
-        successAudio.volume = 0.7;
-        successAudio.preload = "auto";
-        setSuccessSound(successAudio);
-
-        const towerPlaceAudio = new Audio("/sounds/hit.mp3");
-        towerPlaceAudio.volume = 0.6;
-        towerPlaceAudio.preload = "auto";
-        setTowerPlaceSound(towerPlaceAudio);
-
-        const enemyDeathAudio = new Audio("/sounds/success.mp3");
-        enemyDeathAudio.volume = 0.4;
-        enemyDeathAudio.preload = "auto";
-        setEnemyDeathSound(enemyDeathAudio);
+        await initialize();
 
         // Enable audio context on first user interaction for mobile devices
-        const enableAudio = () => {
-          // Test audio playback capability without starting background music
-          hitAudio.play().then(() => hitAudio.pause()).catch(() => {});
-          document.removeEventListener('touchstart', enableAudio);
-          document.removeEventListener('click', enableAudio);
+        const enableAudioHandler = () => {
+          enableAudio();
+          document.removeEventListener('touchstart', enableAudioHandler);
+          document.removeEventListener('click', enableAudioHandler);
         };
 
-        document.addEventListener('touchstart', enableAudio, { once: true });
-        document.addEventListener('click', enableAudio, { once: true });
+        // Add event listeners for user interaction
+        document.addEventListener('touchstart', enableAudioHandler, { once: true });
+        document.addEventListener('click', enableAudioHandler, { once: true });
+        
+        console.log(`Game initialized for ${isIOS ? 'iOS' : 'desktop'} device`);
       } catch (error) {
         console.warn("Audio initialization failed:", error);
       }
     };
 
     initializeAudio();
-  }, [setBackgroundMusic, setHitSound, setSuccessSound, setTowerPlaceSound, setEnemyDeathSound]);
+
+    // Cleanup on unmount
+    return () => {
+      cleanup();
+    };
+  }, [initialize, enableAudio, isIOS, cleanup]);
 
   // Game loop
   useFrame((state, delta) => {

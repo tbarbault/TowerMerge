@@ -45,7 +45,7 @@ export default function GameUI() {
     getResearchBonuses
   } = useTowerDefense();
 
-  const { isMuted, toggleMute, playTowerPlace } = useAudio();
+  const { isMuted, toggleMute, playTowerPlace, isIOS, audioEnabled } = useAudio();
 
   if (gamePhase === "menu") {
     return (

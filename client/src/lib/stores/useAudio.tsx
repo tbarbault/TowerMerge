@@ -1,42 +1,139 @@
 import { create } from "zustand";
 
+// Audio pool for better memory management on mobile
+class AudioPool {
+  private pool: HTMLAudioElement[] = [];
+  private maxSize: number;
+  private src: string;
+  private volume: number;
+
+  constructor(src: string, volume: number = 0.5, maxSize: number = 3) {
+    this.src = src;
+    this.volume = volume;
+    this.maxSize = maxSize;
+  }
+
+  private createAudio(): HTMLAudioElement {
+    const audio = new Audio(this.src);
+    audio.volume = this.volume;
+    audio.preload = "none"; // Load on demand for better iOS performance
+    return audio;
+  }
+
+  play(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Find available audio or create new one
+      let audio = this.pool.find(a => a.paused);
+      
+      if (!audio && this.pool.length < this.maxSize) {
+        audio = this.createAudio();
+        this.pool.push(audio);
+      } else if (!audio) {
+        // All are playing, use the oldest one
+        audio = this.pool[0];
+        audio.currentTime = 0;
+      }
+
+      audio.currentTime = 0;
+      audio.play()
+        .then(() => resolve())
+        .catch(error => {
+          console.log("Audio play prevented:", error);
+          reject(error);
+        });
+    });
+  }
+
+  cleanup() {
+    this.pool.forEach(audio => {
+      audio.pause();
+      audio.src = "";
+    });
+    this.pool = [];
+  }
+}
+
+// Detect iOS devices
+const isIOS = (): boolean => {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+};
+
 interface AudioState {
-  backgroundMusic: HTMLAudioElement | null;
-  hitSound: HTMLAudioElement | null;
-  successSound: HTMLAudioElement | null;
-  towerPlaceSound: HTMLAudioElement | null;
-  enemyDeathSound: HTMLAudioElement | null;
+  isInitialized: boolean;
   isMuted: boolean;
+  isIOS: boolean;
+  audioEnabled: boolean;
   
-  // Setter functions
-  setBackgroundMusic: (music: HTMLAudioElement | null) => void;
-  setHitSound: (sound: HTMLAudioElement) => void;
-  setSuccessSound: (sound: HTMLAudioElement) => void;
-  setTowerPlaceSound: (sound: HTMLAudioElement) => void;
-  setEnemyDeathSound: (sound: HTMLAudioElement) => void;
+  // Audio pools for better performance
+  hitPool: AudioPool | null;
+  successPool: AudioPool | null;
+  towerPlacePool: AudioPool | null;
+  enemyDeathPool: AudioPool | null;
   
   // Control functions
+  initialize: () => Promise<void>;
   toggleMute: () => void;
+  enableAudio: () => void;
   playHit: () => void;
   playSuccess: () => void;
   playTowerPlace: () => void;
   playEnemyDeath: () => void;
+  cleanup: () => void;
 }
 
 export const useAudio = create<AudioState>((set, get) => ({
-  backgroundMusic: null,
-  hitSound: null,
-  successSound: null,
-  towerPlaceSound: null,
-  enemyDeathSound: null,
+  isInitialized: false,
   isMuted: false, // Start unmuted by default
+  isIOS: isIOS(),
+  audioEnabled: false,
   
-  setBackgroundMusic: (music) => set({ backgroundMusic: music }),
-  setHitSound: (sound) => set({ hitSound: sound }),
-  setSuccessSound: (sound) => set({ successSound: sound }),
-  setTowerPlaceSound: (sound) => set({ towerPlaceSound: sound }),
-  setEnemyDeathSound: (sound) => set({ enemyDeathSound: sound }),
+  hitPool: null,
+  successPool: null,
+  towerPlacePool: null,
+  enemyDeathPool: null,
   
+  initialize: async () => {
+    const { isInitialized, isIOS: deviceIsIOS } = get();
+    if (isInitialized) return;
+
+    try {
+      // Load mute state from localStorage
+      if (typeof window !== 'undefined') {
+        const savedMuted = window.localStorage.getItem('audio-muted');
+        if (savedMuted) {
+          set({ isMuted: JSON.parse(savedMuted) });
+        }
+      }
+
+      // Create audio pools with iOS-optimized settings
+      const poolSize = deviceIsIOS ? 2 : 3; // Smaller pool size on iOS
+      const hitVolume = deviceIsIOS ? 0.2 : 0.3; // Lower volume on iOS
+      
+      const hitPool = new AudioPool("/sounds/bullet_impact.wav", hitVolume, poolSize);
+      const successPool = new AudioPool("/sounds/success.mp3", 0.5, poolSize);
+      const towerPlacePool = new AudioPool("/sounds/hit.mp3", 0.3, poolSize);
+      const enemyDeathPool = new AudioPool("/sounds/bubble_death.wav", 0.4, poolSize);
+
+      set({
+        hitPool,
+        successPool,
+        towerPlacePool,
+        enemyDeathPool,
+        isInitialized: true
+      });
+
+      console.log(`Audio initialized for ${deviceIsIOS ? 'iOS' : 'desktop'} device`);
+    } catch (error) {
+      console.warn("Audio initialization failed:", error);
+    }
+  },
+
+  enableAudio: () => {
+    set({ audioEnabled: true });
+    console.log("Audio enabled by user interaction");
+  },
+
   toggleMute: () => {
     const { isMuted } = get();
     const newMutedState = !isMuted;
@@ -54,58 +151,67 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playHit: () => {
-    const { hitSound, isMuted } = get();
-    if (hitSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Hit sound skipped (muted)");
-        return;
-      }
-      
-      // Clone the sound to allow overlapping playback
-      const soundClone = hitSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
-      soundClone.play().catch(error => {
-        console.log("Hit sound play prevented:", error);
-      });
+    const { hitPool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
+    if (!hitPool || isMuted || (deviceIsIOS && !audioEnabled)) {
+      return;
     }
+    
+    hitPool.play().catch(() => {
+      // Silently fail for better performance
+    });
   },
   
   playSuccess: () => {
-    const { successSound, isMuted } = get();
-    if (successSound) {
-      // If sound is muted, don't play anything
-      if (isMuted) {
-        console.log("Success sound skipped (muted)");
-        return;
-      }
-      
-      successSound.currentTime = 0;
-      successSound.play().catch(error => {
-        console.log("Success sound play prevented:", error);
-      });
+    const { successPool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
+    if (!successPool || isMuted || (deviceIsIOS && !audioEnabled)) {
+      return;
     }
+    
+    successPool.play().catch(() => {
+      // Silently fail for better performance
+    });
   },
   
   playTowerPlace: () => {
-    const { towerPlaceSound, isMuted } = get();
-    if (towerPlaceSound && !isMuted) {
-      towerPlaceSound.currentTime = 0;
-      towerPlaceSound.volume = 0.4;
-      towerPlaceSound.play().catch(error => {
-        console.log("Tower place sound play prevented:", error);
-      });
+    const { towerPlacePool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
+    if (!towerPlacePool || isMuted || (deviceIsIOS && !audioEnabled)) {
+      return;
     }
+    
+    console.log(`Playing ${towerPlacePool === get().towerPlacePool ? 'turret' : 'mortar'} placement sound`);
+    towerPlacePool.play().catch(() => {
+      // Silently fail for better performance
+    });
   },
   
   playEnemyDeath: () => {
-    const { enemyDeathSound, isMuted } = get();
-    if (enemyDeathSound && !isMuted) {
-      const soundClone = enemyDeathSound.cloneNode() as HTMLAudioElement;
-      soundClone.volume = 0.3;
-      soundClone.play().catch(error => {
-        console.log("Enemy death sound play prevented:", error);
-      });
+    const { enemyDeathPool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
+    if (!enemyDeathPool || isMuted || (deviceIsIOS && !audioEnabled)) {
+      return;
     }
+    
+    enemyDeathPool.play().catch(() => {
+      // Silently fail for better performance
+    });
   },
+
+  cleanup: () => {
+    const { hitPool, successPool, towerPlacePool, enemyDeathPool } = get();
+    
+    hitPool?.cleanup();
+    successPool?.cleanup();
+    towerPlacePool?.cleanup();
+    enemyDeathPool?.cleanup();
+    
+    set({
+      hitPool: null,
+      successPool: null,
+      towerPlacePool: null,
+      enemyDeathPool: null,
+      isInitialized: false,
+      audioEnabled: false
+    });
+    
+    console.log("Audio resources cleaned up");
+  }
 }));

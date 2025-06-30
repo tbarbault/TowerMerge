@@ -20,10 +20,14 @@ const controls = [
 
 function App() {
   const [isMobile, setIsMobile] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
+      // Detect iOS devices
+      setIsIOS(/iPad|iPhone|iPod/.test(navigator.userAgent) || 
+               (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
     };
     
     checkMobile();
@@ -51,11 +55,20 @@ function App() {
       <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
         <KeyboardControls map={controls}>
           <Canvas
-            shadows
+            shadows={!isIOS} // Disable shadows on iOS for better performance
             camera={cameraSettings}
             gl={{
-              antialias: true,
-              powerPreference: "default"
+              antialias: !isIOS, // Disable antialiasing on iOS for better performance
+              powerPreference: isIOS ? "low-power" : "default",
+              alpha: false, // Disable alpha channel for better performance
+              stencil: false, // Disable stencil buffer for better performance
+              preserveDrawingBuffer: false, // Don't preserve drawing buffer
+              failIfMajorPerformanceCaveat: false,
+              ...(isIOS && {
+                // iOS-specific optimizations
+                precision: "mediump", // Use medium precision for better performance
+                logarithmicDepthBuffer: false,
+              })
             }}
           >
             {/* Improved skybox with gradient effect */}
