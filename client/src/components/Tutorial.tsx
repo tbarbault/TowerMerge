@@ -83,8 +83,8 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
   const step = tutorialSteps[currentStep];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-6">
-      <Card className="bg-gradient-to-br from-blue-900 to-purple-900 border-blue-500 max-w-md w-full max-h-[80vh] overflow-y-auto mx-4">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-8">
+      <Card className="bg-gradient-to-br from-blue-900 to-purple-900 border-blue-500 max-w-sm w-full mx-4">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-white">
             Tutorial ({currentStep + 1}/{tutorialSteps.length})
@@ -98,12 +98,12 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold text-yellow-400">
+        <CardContent className="space-y-4 p-4">
+          <div className="text-center space-y-3">
+            <h3 className="text-lg font-bold text-yellow-400">
               {step.title}
             </h3>
-            <p className="text-gray-200 leading-relaxed">
+            <p className="text-gray-200 leading-relaxed text-sm">
               {step.content}
             </p>
           </div>
@@ -113,37 +113,29 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 0}
+              size="sm"
               className="bg-transparent border-gray-400 text-white hover:bg-white/20 rounded-lg"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ArrowLeft className="h-3 w-3 mr-1" />
               Previous
             </Button>
-
-            <div className="flex space-x-2">
-              {tutorialSteps.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full ${
-                    index === currentStep ? "bg-yellow-400" : "bg-gray-600"
-                  }`}
-                />
-              ))}
-            </div>
 
             <div className="flex space-x-2">
               <Button
                 variant="outline"
                 onClick={skipTutorial}
+                size="sm"
                 className="bg-transparent border-gray-400 text-white hover:bg-white/20 rounded-lg"
               >
                 Skip
               </Button>
               <Button
                 onClick={nextStep}
+                size="sm"
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
               >
                 {currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}
-                <ArrowRight className="h-4 w-4 ml-2" />
+                <ArrowRight className="h-3 w-3 ml-1" />
               </Button>
             </div>
           </div>
