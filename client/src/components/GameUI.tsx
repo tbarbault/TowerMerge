@@ -71,6 +71,13 @@ export default function GameUI() {
 
   const towerCosts = getTowerCosts();
 
+  // Show tutorial for first-time users
+  useEffect(() => {
+    if (!tutorialCompleted && gamePhase === "menu") {
+      showTutorialModal();
+    }
+  }, [tutorialCompleted, gamePhase, showTutorialModal]);
+
   if (gamePhase === "menu") {
     return (
       <>
@@ -124,7 +131,7 @@ export default function GameUI() {
                   </p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <Button 
                   onClick={() => {
                     console.log("Encyclopedia button clicked - menu, current state:", showEncyclopedia);
@@ -154,6 +161,14 @@ export default function GameUI() {
                 >
                   <Diamond className="w-3 h-3 mr-1" />
                   Research
+                </Button>
+                <Button 
+                  onClick={showTutorialModal} 
+                  variant="outline" 
+                  className="border-yellow-500 text-yellow-400 hover:bg-yellow-900 rounded-lg text-xs"
+                >
+                  <BookOpen className="w-3 h-3 mr-1" />
+                  Tutorial
                 </Button>
               </div>
             </CardContent>
@@ -593,6 +608,13 @@ export default function GameUI() {
           </Card>
         </div>
       )}
+
+      {/* Tutorial Modal */}
+      <Tutorial 
+        isOpen={showTutorial}
+        onClose={hideTutorialModal}
+        onComplete={completeTutorial}
+      />
     </>
   );
 }
