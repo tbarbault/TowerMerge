@@ -109,9 +109,12 @@ export default function GameUI() {
                     </Button>
                   ))}
                 </div>
-                <p className="text-gray-400 text-xs">
-                  {GAME_MUTATORS.find(m => m.id === selectedGameMode)?.description}
-                </p>
+                <div className="text-gray-400 text-xs space-y-1">
+                  <p>{GAME_MUTATORS.find(m => m.id === selectedGameMode)?.description}</p>
+                  <p className="text-blue-400">
+                    Max Wave Reached: {maxWaves[selectedGameMode] || 1}
+                  </p>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <Button 
@@ -218,9 +221,12 @@ export default function GameUI() {
                     </Button>
                   ))}
                 </div>
-                <p className="text-gray-400 text-xs">
-                  {GAME_MUTATORS.find(m => m.id === selectedGameMode)?.description}
-                </p>
+                <div className="text-gray-400 text-xs space-y-1">
+                  <p>{GAME_MUTATORS.find(m => m.id === selectedGameMode)?.description}</p>
+                  <p className="text-blue-400">
+                    Max Wave Reached: {maxWaves[selectedGameMode] || 1}
+                  </p>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <Button 
@@ -545,6 +551,30 @@ export default function GameUI() {
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Restart Game
               </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Event Display - Shows for 3 seconds before wave */}
+      {eventDisplay.show && eventDisplay.event && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <Card className="bg-gradient-to-br from-purple-900 to-blue-900 border-purple-500 max-w-md">
+            <CardHeader>
+              <CardTitle className="text-center text-white">
+                Wave Event!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <h3 className="text-xl font-bold text-yellow-400">
+                {eventDisplay.event.name}
+              </h3>
+              <p className="text-gray-200">
+                {eventDisplay.event.description}
+              </p>
+              <div className="text-sm text-purple-300">
+                Starting in {Math.ceil(eventDisplay.timeRemaining / 1000)} seconds...
+              </div>
             </CardContent>
           </Card>
         </div>
