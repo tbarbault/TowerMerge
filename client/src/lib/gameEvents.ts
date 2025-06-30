@@ -61,8 +61,8 @@ export function getRandomEvent(wave: number): GameEvent | null {
   // Don't trigger events in first 3 waves
   if (wave <= 3) return null;
   
-  // 15% chance per wave after wave 3
-  if (Math.random() > 0.15) return null;
+  // 50% chance per wave after wave 3
+  if (Math.random() > 0.50) return null;
   
   // Higher waves can get more intense events
   const availableEvents = RANDOM_EVENTS.filter(event => {

@@ -182,6 +182,7 @@ interface TowerDefenseState {
     event: any | null;
     timeRemaining: number;
   };
+  eventTimeoutId: NodeJS.Timeout | null;
   gameModifiers: {
     enemySpeedMultiplier: number;
     enemyHealthMultiplier: number;
@@ -201,6 +202,7 @@ interface TowerDefenseState {
   updateMaxWave: (mode: string, wave: number) => void;
   showEventDisplay: (event: any) => void;
   hideEventDisplay: () => void;
+  skipEventDisplay: () => void;
   selectGridCell: (x: number, z: number) => void;
   selectTowerType: (type: 'turret' | 'mortar') => void;
   buyTower: () => void;
@@ -305,6 +307,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       event: null,
       timeRemaining: 0,
     },
+    eventTimeoutId: null,
     gameModifiers: {
       enemySpeedMultiplier: 1,
       enemyHealthMultiplier: 1,
@@ -445,6 +448,57 @@ export const useTowerDefense = create<TowerDefenseState>()(
           timeRemaining: 0,
         }
       });
+    },
+
+    skipEventDisplay: () => {
+      const state = get();
+      
+      // Clear the timeout if it exists
+      if (state.eventTimeoutId) {
+        clearTimeout(state.eventTimeoutId);
+      }
+
+      // If there's an active event display, start the wave immediately
+      if (state.eventDisplay.show && state.eventDisplay.event) {
+        const newWave = state.wave + 1;
+        const randomEvent = state.eventDisplay.event;
+
+        const newHighestWave = newWave > state.highestWave ? newWave : state.highestWave;
+        if (newWave > state.highestWave) {
+          localStorage.setItem('highestWave', newWave.toString());
+        }
+
+        const diamondsEarned = getDiamondsForWave(newWave);
+        let newDiamonds = state.diamonds;
+        if (diamondsEarned > 0) {
+          newDiamonds += diamondsEarned;
+          localStorage.setItem('diamonds', newDiamonds.toString());
+        }
+
+        set({
+          wave: newWave,
+          highestWave: newHighestWave,
+          diamonds: newDiamonds,
+          enemiesInWave: Math.floor(5 + state.wave * 2.0 + Math.pow(Math.max(0, state.wave - 10), 1.8)),
+          enemiesSpawned: 0,
+          waveProgress: 0,
+          waveStartTime: Date.now(),
+          waveCompletionTime: null,
+          showWaveTransition: true,
+          activeEvents: [randomEvent],
+          eventDisplay: {
+            show: false,
+            event: null,
+            timeRemaining: 0,
+          },
+          eventTimeoutId: null,
+        });
+
+        // Auto-hide wave transition after 1 second
+        setTimeout(() => {
+          set(state => ({ ...state, showWaveTransition: false }));
+        }, 1000);
+      }
     },
 
     selectGridCell: (x: number, z: number) => {
@@ -778,16 +832,16 @@ export const useTowerDefense = create<TowerDefenseState>()(
       const randomEvent = getRandomEvent(newWave);
       
       if (randomEvent) {
-        // Show event display for 3 seconds
+        // Show event display for 5 seconds
         set({
           eventDisplay: {
             show: true,
             event: randomEvent,
-            timeRemaining: 3000,
+            timeRemaining: 5000,
           }
         });
 
-        // Hide event display after 3 seconds and start wave
+        // Hide event display after 5 seconds and start wave
         setTimeout(() => {
           set(state => {
             const newHighestWave = newWave > state.highestWave ? newWave : state.highestWave;
@@ -825,7 +879,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
           setTimeout(() => {
             set(state => ({ ...state, showWaveTransition: false }));
           }, 1000);
-        }, 3000);
+        }, 5000);
       } else {
         // No event, start wave normally
         set(state => {
