@@ -18,6 +18,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const turretRef = useRef<THREE.Group>(null);
   const woodTexture = useTexture("/textures/wood.jpg");
   const { enemies, towers, mergeTowers } = useTowerDefense();
+  const { playSuccess } = useAudio();
   const { camera, raycaster, pointer } = useThree();
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState(new THREE.Vector3());
@@ -95,19 +96,7 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
               console.log(`Merging tower ${towerId} with ${userData.towerId}`);
               mergeTowers(towerId, userData.towerId);
               // Play merge sound effect
-              const audioMuted = typeof window !== 'undefined' && window.localStorage ? 
-                JSON.parse(window.localStorage.getItem('audio-muted') || 'false') : false;
-              if (!audioMuted) {
-                try {
-                  const mergeAudio = new Audio("/sounds/hit.mp3");
-                  mergeAudio.volume = 1.0;
-                  mergeAudio.playbackRate = 1.0;
-                  mergeAudio.play().catch(() => {});
-                  console.log("Playing tower merge sound");
-                } catch (e) {
-                  console.log("Error playing merge sound:", e);
-                }
-              }
+              playSuccess();
               break;
             } else {
               console.log("Towers must be adjacent (no diagonal merging)");

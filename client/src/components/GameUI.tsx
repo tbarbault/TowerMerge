@@ -371,17 +371,7 @@ export default function GameUI() {
                     onClick={() => {
                       selectTowerType('turret');
                       buyTower();
-                      if (!isMuted) {
-                        try {
-                          const audio = new Audio("/sounds/hit.mp3");
-                          audio.volume = 1.0;
-                          audio.playbackRate = 1.4;
-                          audio.play().catch(() => {});
-                          console.log("Playing turret placement sound");
-                        } catch (e) {
-                          console.log("Error playing turret sound:", e);
-                        }
-                      }
+                      playTowerPlace();
                     }}
                     className={`${selectedTowerType === 'turret' ? 'bg-green-700 border-2 border-green-400' : 'bg-green-600 hover:bg-green-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
                     disabled={coins < 15}
@@ -393,17 +383,7 @@ export default function GameUI() {
                     onClick={() => {
                       selectTowerType('mortar');
                       buyTower();
-                      if (!isMuted) {
-                        try {
-                          const audio = new Audio("/sounds/hit.mp3");
-                          audio.volume = 1.0;
-                          audio.playbackRate = 1.1;
-                          audio.play().catch(() => {});
-                          console.log("Playing mortar placement sound");
-                        } catch (e) {
-                          console.log("Error playing mortar sound:", e);
-                        }
-                      }
+                      playTowerPlace();
                     }}
                     className={`${selectedTowerType === 'mortar' ? 'bg-orange-700 border-2 border-orange-400' : 'bg-orange-600 hover:bg-orange-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
                     disabled={coins < 25}
