@@ -83,8 +83,8 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
   const step = tutorialSteps[currentStep];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <Card className="bg-gradient-to-br from-blue-900 to-purple-900 border-blue-500 max-w-lg w-full max-h-[85vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-6">
+      <Card className="bg-gradient-to-br from-blue-900 to-purple-900 border-blue-500 max-w-md w-full max-h-[80vh] overflow-y-auto mx-4">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-white">
             Tutorial ({currentStep + 1}/{tutorialSteps.length})
@@ -113,7 +113,7 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 0}
-              className="bg-transparent border-gray-400 text-white hover:bg-white/20"
+              className="bg-transparent border-gray-400 text-white hover:bg-white/20 rounded-lg"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Previous
@@ -134,13 +134,13 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
               <Button
                 variant="outline"
                 onClick={skipTutorial}
-                className="bg-transparent border-gray-400 text-white hover:bg-white/20"
+                className="bg-transparent border-gray-400 text-white hover:bg-white/20 rounded-lg"
               >
                 Skip
               </Button>
               <Button
                 onClick={nextStep}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
               >
                 {currentStep === tutorialSteps.length - 1 ? "Finish" : "Next"}
                 <ArrowRight className="h-4 w-4 ml-2" />
