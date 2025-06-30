@@ -4,7 +4,7 @@ import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield, Home } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import { GAME_MUTATORS } from "../lib/gameMutators";
 import WaveTransition from "./WaveTransition";

@@ -2,7 +2,18 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { X, Zap, Clock, Target, Bomb, Package, Diamond, Lock, CheckCircle } from "lucide-react";
+import { X, Zap, Clock, Target, Bomb, Package, Lock, CheckCircle } from "lucide-react";
+
+// Custom Diamond Icon Component
+const DiamondIcon = ({ className = "w-4 h-4" }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M6 3h12l4 6-10 12L2 9l4-6z"/>
+  </svg>
+);
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { ResearchNode } from "../lib/researchTree";
 
@@ -55,7 +66,7 @@ export default function ResearchTree({ isOpen, onClose }: ResearchTreeProps) {
   const getNodeIcon = (node: ResearchNode) => {
     if (node.purchased) return <CheckCircle className="w-4 h-4 text-green-400" />;
     if (!node.unlocked) return <Lock className="w-4 h-4 text-gray-400" />;
-    return <Diamond className="w-4 h-4 text-yellow-400" />;
+    return <DiamondIcon className="w-4 h-4 text-yellow-400" />;
   };
 
   const handlePurchase = (nodeId: string) => {
@@ -78,7 +89,7 @@ export default function ResearchTree({ isOpen, onClose }: ResearchTreeProps) {
       <Card className="w-full max-w-6xl h-full max-h-[90vh] bg-gray-900 border-gray-700 overflow-hidden">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="flex items-center gap-3">
-            <Diamond className="w-6 h-6 text-yellow-400" />
+            <DiamondIcon className="w-6 h-6 text-yellow-400" />
             <div>
               <CardTitle className="text-xl md:text-2xl font-bold text-white">
                 Research Tree
@@ -90,7 +101,7 @@ export default function ResearchTree({ isOpen, onClose }: ResearchTreeProps) {
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-lg">
-              <Diamond className="w-4 h-4 text-yellow-400" />
+              <DiamondIcon className="w-4 h-4 text-yellow-400" />
               <span className="text-yellow-400 font-bold">{diamonds}</span>
             </div>
             <Button
@@ -170,7 +181,7 @@ export default function ResearchTree({ isOpen, onClose }: ResearchTreeProps) {
                         Tier {node.tier}
                       </Badge>
                       <div className="flex items-center gap-1">
-                        <Diamond className="w-3 h-3 text-yellow-400" />
+                        <DiamondIcon className="w-3 h-3 text-yellow-400" />
                         <span className="text-yellow-400 font-bold text-sm">{node.cost}</span>
                       </div>
                     </div>
@@ -228,7 +239,7 @@ export default function ResearchTree({ isOpen, onClose }: ResearchTreeProps) {
           {/* Diamond earning info */}
           <div className="mt-4 p-3 bg-gray-800 rounded-lg">
             <p className="text-xs text-gray-400 text-center">
-              <Diamond className="w-3 h-3 inline mr-1 text-yellow-400" />
+              <DiamondIcon className="w-3 h-3 inline mr-1 text-yellow-400" />
               Earn diamonds every 5 waves: 1 for wave 5, 2 for wave 10, 3 for wave 15, etc.
             </p>
           </div>
