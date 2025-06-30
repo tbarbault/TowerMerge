@@ -15,39 +15,31 @@ export interface GameMutator {
 
 export const GAME_MUTATORS: GameMutator[] = [
   {
-    id: 'poverty',
-    name: 'Economic Crisis',
-    description: 'Start with half coins, towers cost 25% more',
+    id: 'normal',
+    name: 'Normal',
+    description: 'Standard game mode with balanced difficulty',
     effects: {
-      startingCoins: 5,
-      towerCostMultiplier: 1.25
+      startingCoins: 75,
+      startingLives: 20
     }
   },
   {
-    id: 'abundance',
-    name: 'Resource Abundance',
-    description: 'Start with double coins, but face 50% more enemies',
+    id: 'hardcore',
+    name: 'Hardcore',
+    description: 'Only 1 life - survive as long as you can!',
     effects: {
-      startingCoins: 20,
-      enemyCountMultiplier: 1.5
+      startingCoins: 75,
+      startingLives: 1
     }
   },
   {
-    id: 'fragile',
-    name: 'Glass Cannon',
-    description: 'Towers do double damage but cost 50% more to upgrade',
+    id: 'legend',
+    name: 'Legend',
+    description: '1 life, 50 coins, turrets cost 20, mortars cost 30',
     effects: {
-      upgradeCostMultiplier: 1.5,
-      specialRules: ['doubleDamage']
-    }
-  },
-  {
-    id: 'rush',
-    name: 'Time Pressure',
-    description: 'Only 2 lives, but enemies give double rewards',
-    effects: {
-      startingLives: 2,
-      specialRules: ['doubleRewards']
+      startingCoins: 50,
+      startingLives: 1,
+      specialRules: ['customTowerCosts']
     }
   }
 ];

@@ -28,14 +28,13 @@ export default function GameUI() {
     canPlaceTower,
     canMergeTowers,
     selectedTowerType,
-    selectedMutator,
+    selectedGameMode,
     startGame,
     restartGame,
     pauseGame,
     resumeGame,
-    showMutatorSelection,
-    selectMutator,
-    startGameWithMutator,
+    selectGameMode,
+    startGameWithMode,
     buyTower,
     mergeTowers,
     selectTowerType,
@@ -75,9 +74,33 @@ export default function GameUI() {
                 <p>• Enemies get stronger each wave</p>
                 <p>• Don't let them reach your base!</p>
               </div>
-              <Button onClick={showMutatorSelection} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
+              <Button onClick={startGameWithMode} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
                 START
               </Button>
+              
+              {/* Game Mode Selection */}
+              <div className="space-y-2">
+                <p className="text-gray-300 text-sm font-semibold">Game Mode:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {GAME_MUTATORS.map((mode) => (
+                    <Button
+                      key={mode.id}
+                      onClick={() => selectGameMode(mode.id)}
+                      variant={selectedGameMode === mode.id ? "default" : "outline"}
+                      className={`text-xs py-2 ${
+                        selectedGameMode === mode.id 
+                          ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                          : "border-blue-500 text-blue-400 hover:bg-blue-900"
+                      }`}
+                    >
+                      {mode.name}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-gray-400 text-xs">
+                  {GAME_MUTATORS.find(m => m.id === selectedGameMode)?.description}
+                </p>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <Button 
                   onClick={() => {
@@ -133,95 +156,7 @@ export default function GameUI() {
     );
   }
 
-  if (gamePhase === "mutatorSelection") {
-    return (
-      <>
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
-          <Card className="w-96 max-h-[80vh] overflow-y-auto">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl font-bold text-white">Select Game Mutator</CardTitle>
-              <p className="text-gray-300 mt-2">
-                Choose a mutator to modify your game experience
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* No Mutator Option */}
-              <div 
-                className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                  selectedMutator === null 
-                    ? 'border-green-500 bg-green-900/20' 
-                    : 'border-gray-600 hover:border-gray-500'
-                }`}
-                onClick={() => selectMutator(null)}
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-white">Normal Game</h3>
-                  <Shield className="w-5 h-5 text-gray-400" />
-                </div>
-                <p className="text-sm text-gray-400 mt-1">
-                  Play with standard rules and difficulty
-                </p>
-              </div>
 
-              {/* Mutator Options */}
-              {GAME_MUTATORS.map((mutator) => (
-                <div 
-                  key={mutator.id}
-                  className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                    selectedMutator?.id === mutator.id 
-                      ? 'border-yellow-500 bg-yellow-900/20' 
-                      : 'border-gray-600 hover:border-gray-500'
-                  }`}
-                  onClick={() => selectMutator(mutator)}
-                >
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-white">{mutator.name}</h3>
-                    <Zap className="w-5 h-5 text-yellow-400" />
-                  </div>
-                  <p className="text-sm text-gray-400 mt-1">
-                    {mutator.description}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {mutator.effects.startingCoins !== undefined && (
-                      <Badge variant="secondary" className="text-xs">
-                        {mutator.effects.startingCoins > 75 ? "+" : ""}{mutator.effects.startingCoins - 75} coins
-                      </Badge>
-                    )}
-                    {mutator.effects.startingLives !== undefined && (
-                      <Badge variant="secondary" className="text-xs">
-                        {mutator.effects.startingLives > 20 ? "+" : ""}{mutator.effects.startingLives - 20} lives
-                      </Badge>
-                    )}
-                    {mutator.effects.towerCostMultiplier !== undefined && (
-                      <Badge variant="secondary" className="text-xs">
-                        {mutator.effects.towerCostMultiplier > 1 ? "+" : ""}{Math.round((mutator.effects.towerCostMultiplier - 1) * 100)}% tower cost
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              <div className="flex gap-2 pt-2">
-                <Button 
-                  onClick={() => useTowerDefense.setState({ gamePhase: "menu" })} 
-                  variant="outline"
-                  className="flex-1 border-gray-600 text-gray-300 hover:bg-gray-800"
-                >
-                  Back
-                </Button>
-                <Button 
-                  onClick={startGameWithMutator}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold"
-                >
-                  Start Game
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </>
-    );
-  }
 
   if (gamePhase === "gameOver") {
     return (

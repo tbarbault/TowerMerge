@@ -142,7 +142,7 @@ interface TowerDefenseState {
   currentMapConfig: any | null;
   activeEvents: any[];
   activeMutators: any[];
-  selectedMutator: any | null;
+  selectedGameMode: string;
   gameModifiers: {
     enemySpeedMultiplier: number;
     enemyHealthMultiplier: number;
@@ -156,9 +156,8 @@ interface TowerDefenseState {
   restartGame: () => void;
   pauseGame: () => void;
   resumeGame: () => void;
-  showMutatorSelection: () => void;
-  selectMutator: (mutator: any) => void;
-  startGameWithMutator: () => void;
+  selectGameMode: (mode: string) => void;
+  startGameWithMode: () => void;
   endGame: () => void;
   selectGridCell: (x: number, z: number) => void;
   selectTowerType: (type: 'turret' | 'mortar') => void;
@@ -257,7 +256,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     currentMapConfig: null,
     activeEvents: [],
     activeMutators: [],
-    selectedMutator: null,
+    selectedGameMode: 'normal',
     gameModifiers: {
       enemySpeedMultiplier: 1,
       enemyHealthMultiplier: 1,
@@ -297,7 +296,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
     restartGame: () => {
       const state = get();
-      state.showMutatorSelection();
+      state.startGameWithMode();
     },
 
     pauseGame: () => {
@@ -308,28 +307,25 @@ export const useTowerDefense = create<TowerDefenseState>()(
       set({ gamePhase: "playing" });
     },
 
-    showMutatorSelection: () => {
-      set({ gamePhase: "mutatorSelection", selectedMutator: null });
+    selectGameMode: (mode: string) => {
+      set({ selectedGameMode: mode });
     },
 
-    selectMutator: (mutator: any) => {
-      set({ selectedMutator: mutator });
-    },
-
-    startGameWithMutator: () => {
+    startGameWithMode: () => {
       const state = get();
-      const mutator = state.selectedMutator;
+      const { GAME_MUTATORS } = require('../gameMutators');
+      const modeData = GAME_MUTATORS.find((m: any) => m.id === state.selectedGameMode);
       
-      // Apply mutator effects
+      // Apply mode effects
       let startingHealth = 20;
       let startingCoins = 75;
       
-      if (mutator) {
-        if (mutator.effects.startingLives) {
-          startingHealth = mutator.effects.startingLives;
+      if (modeData) {
+        if (modeData.effects.startingLives) {
+          startingHealth = modeData.effects.startingLives;
         }
-        if (mutator.effects.startingCoins !== undefined) {
-          startingCoins = mutator.effects.startingCoins;
+        if (modeData.effects.startingCoins !== undefined) {
+          startingCoins = modeData.effects.startingCoins;
         }
       }
 
@@ -344,7 +340,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
         muzzleFlashes: [],
         explosions: [],
         impacts: [],
-        activeMutators: mutator ? [mutator] : [],
+        activeMutators: modeData ? [modeData] : [],
         waveStartTime: Date.now() + 3000,
         waveCompletionTime: null,
         enemiesSpawned: 0,
