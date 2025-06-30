@@ -364,7 +364,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
       // Calculate canPlaceTower
       const towerExists = !!existingTower;
-      const towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
+      let towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
+      if (state.selectedGameMode === 'legend') {
+        towerCost = state.selectedTowerType === 'turret' ? 20 : 30;
+      }
       const hasEnoughCoins = state.coins >= towerCost;
       const canPlace = !towerExists && hasEnoughCoins;
 
@@ -396,7 +399,10 @@ export const useTowerDefense = create<TowerDefenseState>()(
       let canPlace = false;
       if (state.selectedGridCell) {
         const existingTower = state.towers.find(t => t.x === state.selectedGridCell!.x && t.z === state.selectedGridCell!.z);
-        const towerCost = type === 'turret' ? 15 : 25;
+        let towerCost = type === 'turret' ? 15 : 25;
+        if (state.selectedGameMode === 'legend') {
+          towerCost = type === 'turret' ? 20 : 30;
+        }
         canPlace = !existingTower && state.coins >= towerCost;
       }
 
@@ -408,11 +414,19 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
     buyTower: () => {
       const state = get();
-      if (!state.selectedGridCell || !state.canPlaceTower || state.coins < 15) {
+      
+      // Calculate tower cost based on game mode
+      let towerCost = state.selectedTowerType === 'turret' ? 15 : 25;
+      if (state.selectedGameMode === 'legend') {
+        towerCost = state.selectedTowerType === 'turret' ? 20 : 30;
+      }
+      
+      if (!state.selectedGridCell || !state.canPlaceTower || state.coins < towerCost) {
         console.log("Cannot buy tower:", { 
           hasSelectedCell: !!state.selectedGridCell, 
           canPlace: state.canPlaceTower, 
-          coins: state.coins 
+          coins: state.coins,
+          towerCost 
         });
         return;
       }

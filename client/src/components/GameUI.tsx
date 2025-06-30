@@ -51,6 +51,16 @@ export default function GameUI() {
 
   const { isMuted, toggleMute, playTowerPlace, isIOS, audioEnabled } = useAudio();
 
+  // Calculate tower costs based on game mode
+  const getTowerCosts = () => {
+    if (selectedGameMode === 'legend') {
+      return { turret: 20, mortar: 30 };
+    }
+    return { turret: 15, mortar: 25 };
+  };
+
+  const towerCosts = getTowerCosts();
+
   if (gamePhase === "menu") {
     return (
       <>
@@ -186,6 +196,30 @@ export default function GameUI() {
               <Button onClick={restartGame} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-xl py-4" size="lg">
                 START
               </Button>
+              
+              {/* Game Mode Selection */}
+              <div className="space-y-2">
+                <p className="text-gray-300 text-sm font-semibold">Game Mode:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {GAME_MUTATORS.map((mode) => (
+                    <Button
+                      key={mode.id}
+                      onClick={() => selectGameMode(mode.id)}
+                      variant={selectedGameMode === mode.id ? "default" : "outline"}
+                      className={`text-xs py-2 ${
+                        selectedGameMode === mode.id 
+                          ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                          : "border-blue-500 text-blue-400 hover:bg-blue-900"
+                      }`}
+                    >
+                      {mode.name}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-gray-400 text-xs">
+                  {GAME_MUTATORS.find(m => m.id === selectedGameMode)?.description}
+                </p>
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <Button 
                   onClick={() => {
@@ -404,10 +438,10 @@ export default function GameUI() {
                       playTowerPlace();
                     }}
                     className={`${selectedTowerType === 'turret' ? 'bg-green-700 border-2 border-green-400' : 'bg-green-600 hover:bg-green-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
-                    disabled={coins < 15}
+                    disabled={coins < towerCosts.turret}
                   >
                     <Target className="w-3 h-3" />
-                    <span>Turret - 15</span>
+                    <span>Turret - {towerCosts.turret}</span>
                   </Button>
                   <Button 
                     onClick={() => {
@@ -416,10 +450,10 @@ export default function GameUI() {
                       playTowerPlace();
                     }}
                     className={`${selectedTowerType === 'mortar' ? 'bg-orange-700 border-2 border-orange-400' : 'bg-orange-600 hover:bg-orange-700'} text-xs p-3 md:p-2 flex items-center gap-1 min-h-[44px] md:min-h-auto rounded-lg`}
-                    disabled={coins < 25}
+                    disabled={coins < towerCosts.mortar}
                   >
                     <Bomb className="w-3 h-3" />
-                    <span>Mortar - 25</span>
+                    <span>Mortar - {towerCosts.mortar}</span>
                   </Button>
                 </div>
               </div>
