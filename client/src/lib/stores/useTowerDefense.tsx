@@ -467,7 +467,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
       // Update state after placing tower
       set({
         towers: [...state.towers, newTower],
-        coins: state.coins - (state.selectedTowerType === 'turret' ? 15 : 25),
+        coins: state.coins - towerCost,
         selectedTower: newTower,
         canPlaceTower: false,
         canMergeTowers: false,
