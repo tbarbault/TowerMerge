@@ -4,6 +4,38 @@ import { ResearchNode, researchTreeData, calculateResearchBonuses, unlockResearc
 
 export type GamePhase = "menu" | "playing" | "paused" | "gameOver";
 
+// Game mode configurations
+const GAME_MUTATORS = [
+  {
+    id: 'normal',
+    name: 'Normal',
+    description: 'Standard game mode with balanced difficulty',
+    effects: {
+      startingCoins: 75,
+      startingLives: 20
+    }
+  },
+  {
+    id: 'hardcore',
+    name: 'Hardcore',
+    description: 'Only 1 life - survive as long as you can!',
+    effects: {
+      startingCoins: 75,
+      startingLives: 1
+    }
+  },
+  {
+    id: 'legend',
+    name: 'Legend',
+    description: '1 life, 50 coins, turrets cost 20, mortars cost 30',
+    effects: {
+      startingCoins: 50,
+      startingLives: 1,
+      specialRules: ['customTowerCosts']
+    }
+  }
+];
+
 export interface Tower {
   id: string;
   x: number;
@@ -313,7 +345,6 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
     startGameWithMode: () => {
       const state = get();
-      const { GAME_MUTATORS } = require('../gameMutators');
       const modeData = GAME_MUTATORS.find((m: any) => m.id === state.selectedGameMode);
       
       // Apply mode effects
