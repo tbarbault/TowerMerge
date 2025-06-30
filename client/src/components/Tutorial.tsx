@@ -32,7 +32,7 @@ const tutorialSteps: TutorialStep[] = [
   },
   {
     title: "Managing Resources",
-    content: "You start with coins to buy towers. Defeat enemies to earn more coins. Upgrade towers by clicking on them, or drag them together to merge!",
+    content: "You start with coins to buy towers. Defeat enemies to earn more coins. Merge identical towers by dragging them together to create stronger versions!",
     highlight: "resources"
   },
   {

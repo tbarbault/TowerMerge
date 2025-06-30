@@ -4,7 +4,7 @@ import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield, Diamond } from "lucide-react";
+import { Coins, Heart, Zap, Volume2, VolumeX, Play, RotateCcw, Target, Bomb, Users, BookOpen, Pause, Shield } from "lucide-react";
 import { getAvailableEnemyTypes } from "../lib/gameLogic";
 import { GAME_MUTATORS } from "../lib/gameMutators";
 import WaveTransition from "./WaveTransition";
@@ -12,6 +12,17 @@ import EnemyEncyclopedia from "./EnemyEncyclopedia";
 import TowerEncyclopedia from "./TowerEncyclopedia";
 import ResearchTree from "./ResearchTree";
 import Tutorial from "./Tutorial";
+
+// Custom Diamond Icon Component
+const DiamondIcon = ({ className = "w-4 h-4" }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M6 3h12l4 6-10 12L2 9l4-6z"/>
+  </svg>
+);
 
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
@@ -159,7 +170,7 @@ export default function GameUI() {
                   variant="outline" 
                   className="border-purple-500 text-purple-400 hover:bg-purple-900 rounded-lg text-xs"
                 >
-                  <Diamond className="w-3 h-3 mr-1" />
+                  <DiamondIcon className="w-3 h-3 mr-1" />
                   Research
                 </Button>
                 <Button 
@@ -276,7 +287,7 @@ export default function GameUI() {
                   variant="outline" 
                   className="border-purple-500 text-purple-400 hover:bg-purple-900 rounded-lg text-xs"
                 >
-                  <Diamond className="w-3 h-3 mr-1" />
+                  <DiamondIcon className="w-3 h-3 mr-1" />
                   Research
                 </Button>
               </div>
@@ -380,7 +391,7 @@ export default function GameUI() {
                     <span className="text-white font-bold text-sm md:text-base min-w-[20px] text-right">{coins}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Diamond className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
+                    <DiamondIcon className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
                     <span className="text-white font-bold text-sm md:text-base min-w-[16px] text-right">{diamonds}</span>
                     <Button
                       variant="ghost"
