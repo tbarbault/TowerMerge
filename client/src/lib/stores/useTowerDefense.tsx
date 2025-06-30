@@ -175,6 +175,12 @@ interface TowerDefenseState {
   activeEvents: any[];
   activeMutators: any[];
   selectedGameMode: string;
+  maxWaves: { [mode: string]: number }; // Track max wave reached per mode
+  eventDisplay: {
+    show: boolean;
+    event: any | null;
+    timeRemaining: number;
+  };
   gameModifiers: {
     enemySpeedMultiplier: number;
     enemyHealthMultiplier: number;
@@ -191,6 +197,9 @@ interface TowerDefenseState {
   selectGameMode: (mode: string) => void;
   startGameWithMode: () => void;
   endGame: () => void;
+  updateMaxWave: (mode: string, wave: number) => void;
+  showEventDisplay: (event: any) => void;
+  hideEventDisplay: () => void;
   selectGridCell: (x: number, z: number) => void;
   selectTowerType: (type: 'turret' | 'mortar') => void;
   buyTower: () => void;
@@ -289,6 +298,12 @@ export const useTowerDefense = create<TowerDefenseState>()(
     activeEvents: [],
     activeMutators: [],
     selectedGameMode: 'normal',
+    maxWaves: JSON.parse(localStorage.getItem('maxWaves') || '{"normal": 1, "hardcore": 1, "legend": 1}'),
+    eventDisplay: {
+      show: false,
+      event: null,
+      timeRemaining: 0,
+    },
     gameModifiers: {
       enemySpeedMultiplier: 1,
       enemyHealthMultiplier: 1,
@@ -386,7 +401,49 @@ export const useTowerDefense = create<TowerDefenseState>()(
     },
 
     endGame: () => {
-      set({ gamePhase: "gameOver" });
+      const state = get();
+      // Update max wave for current mode before ending game
+      const currentMaxWave = state.maxWaves[state.selectedGameMode] || 1;
+      if (state.wave > currentMaxWave) {
+        const newMaxWaves = { ...state.maxWaves, [state.selectedGameMode]: state.wave };
+        localStorage.setItem('maxWaves', JSON.stringify(newMaxWaves));
+        set({ 
+          gamePhase: "gameOver",
+          maxWaves: newMaxWaves
+        });
+      } else {
+        set({ gamePhase: "gameOver" });
+      }
+    },
+
+    updateMaxWave: (mode: string, wave: number) => {
+      const state = get();
+      const currentMaxWave = state.maxWaves[mode] || 1;
+      if (wave > currentMaxWave) {
+        const newMaxWaves = { ...state.maxWaves, [mode]: wave };
+        localStorage.setItem('maxWaves', JSON.stringify(newMaxWaves));
+        set({ maxWaves: newMaxWaves });
+      }
+    },
+
+    showEventDisplay: (event: any) => {
+      set({
+        eventDisplay: {
+          show: true,
+          event: event,
+          timeRemaining: 3000, // 3 seconds
+        }
+      });
+    },
+
+    hideEventDisplay: () => {
+      set({
+        eventDisplay: {
+          show: false,
+          event: null,
+          timeRemaining: 0,
+        }
+      });
     },
 
     selectGridCell: (x: number, z: number) => {

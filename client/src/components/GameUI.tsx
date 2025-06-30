@@ -29,6 +29,8 @@ export default function GameUI() {
     canMergeTowers,
     selectedTowerType,
     selectedGameMode,
+    maxWaves,
+    eventDisplay,
     startGame,
     restartGame,
     pauseGame,
