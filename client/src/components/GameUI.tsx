@@ -201,6 +201,12 @@ export default function GameUI() {
           isOpen={showResearchTree}
           onClose={() => setShowResearchTree(false)}
         />
+        
+        <Tutorial
+          isOpen={showTutorial}
+          onClose={hideTutorialModal}
+          onComplete={completeTutorial}
+        />
       </>
     );
   }
@@ -584,6 +590,17 @@ export default function GameUI() {
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Restart Game
+              </Button>
+              <Button
+                onClick={() => {
+                  // Reset to menu by restarting the component
+                  window.location.reload();
+                }}
+                variant="outline"
+                className="w-full border-gray-600 text-white hover:bg-gray-800"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Return to Title
               </Button>
             </CardContent>
           </Card>
