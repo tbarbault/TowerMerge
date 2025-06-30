@@ -515,6 +515,23 @@ export const useTowerDefense = create<TowerDefenseState>()(
       }
     },
 
+    // Tutorial actions
+    showTutorialModal: () => {
+      set({ showTutorial: true });
+    },
+
+    hideTutorialModal: () => {
+      set({ showTutorial: false });
+    },
+
+    completeTutorial: () => {
+      localStorage.setItem('tutorialCompleted', 'true');
+      set({ 
+        showTutorial: false,
+        tutorialCompleted: true
+      });
+    },
+
     selectGridCell: (x: number, z: number) => {
       const state = get();
       const existingTower = state.towers.find(t => t.x === x && t.z === z);

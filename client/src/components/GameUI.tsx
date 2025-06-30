@@ -11,6 +11,7 @@ import WaveTransition from "./WaveTransition";
 import EnemyEncyclopedia from "./EnemyEncyclopedia";
 import TowerEncyclopedia from "./TowerEncyclopedia";
 import ResearchTree from "./ResearchTree";
+import Tutorial from "./Tutorial";
 
 export default function GameUI() {
   const [showEncyclopedia, setShowEncyclopedia] = useState(false);
@@ -33,6 +34,11 @@ export default function GameUI() {
     eventDisplay,
     hideEventDisplay,
     skipEventDisplay,
+    showTutorial,
+    tutorialCompleted,
+    showTutorialModal,
+    hideTutorialModal,
+    completeTutorial,
     startGame,
     restartGame,
     pauseGame,
