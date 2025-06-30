@@ -32,6 +32,7 @@ export default function GameUI() {
     maxWaves,
     eventDisplay,
     hideEventDisplay,
+    skipEventDisplay,
     startGame,
     restartGame,
     pauseGame,
@@ -557,9 +558,12 @@ export default function GameUI() {
         </div>
       )}
 
-      {/* Event Display - Shows for 3 seconds before wave */}
+      {/* Event Display - Shows for 5 seconds before wave */}
       {eventDisplay.show && eventDisplay.event && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 cursor-pointer"
+          onClick={skipEventDisplay}
+        >
           <Card className="bg-gradient-to-br from-purple-900 to-blue-900 border-purple-500 max-w-md">
             <CardHeader>
               <CardTitle className="text-center text-white">
@@ -575,6 +579,9 @@ export default function GameUI() {
               </p>
               <div className="text-sm text-purple-300">
                 Starting in {Math.ceil(eventDisplay.timeRemaining / 1000)} seconds...
+              </div>
+              <div className="text-xs text-gray-400 mt-2">
+                Click anywhere to skip
               </div>
             </CardContent>
           </Card>

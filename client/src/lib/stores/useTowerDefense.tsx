@@ -880,6 +880,11 @@ export const useTowerDefense = create<TowerDefenseState>()(
             set(state => ({ ...state, showWaveTransition: false }));
           }, 1000);
         }, 5000);
+
+        // Store the timeout ID so it can be cleared if user clicks to skip
+        set(state => ({
+          eventTimeoutId: timeoutId
+        }));
       } else {
         // No event, start wave normally
         set(state => {
