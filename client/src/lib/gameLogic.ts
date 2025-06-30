@@ -1,5 +1,16 @@
 import { getPath, getRandomPath } from "./pathfinding";
 
+// Function to track enemy types seen across all games
+function trackSeenEnemy(enemyType: string) {
+  const stored = localStorage.getItem('seenEnemies');
+  const seenEnemies: string[] = stored ? JSON.parse(stored) : [];
+  
+  if (!seenEnemies.includes(enemyType)) {
+    seenEnemies.push(enemyType);
+    localStorage.setItem('seenEnemies', JSON.stringify(seenEnemies));
+  }
+}
+
 export function updateGameLogic(gameState: any, delta: number) {
   if (gameState.gamePhase !== "playing") return;
 
@@ -305,6 +316,9 @@ function createEnemy(type: string, wave: number) {
   
   const scaledHealth = Math.floor(config.health * healthMultiplier);
   const scaledSpeed = config.speed * speedMultiplier;
+
+  // Track this enemy type as seen
+  trackSeenEnemy(type);
 
   return {
     id: Math.random().toString(36).substr(2, 9),

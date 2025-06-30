@@ -47,7 +47,7 @@ const tutorialSteps: TutorialStep[] = [
   },
   {
     title: "Strategy Tips",
-    content: "Place turrets early in the path for maximum damage, use mortars to handle groups, and always upgrade your towers when you can afford it!",
+    content: "Place turrets early in the path for maximum damage, use mortars to handle groups, and merge towers whenever possible to increase their power!",
   },
   {
     title: "Ready to Play!",

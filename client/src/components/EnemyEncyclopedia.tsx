@@ -222,6 +222,12 @@ interface EnemyEncyclopediaProps {
 export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: EnemyEncyclopediaProps) {
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyData | null>(null);
 
+  // Get enemies seen across all games from localStorage
+  const getSeenEnemies = (): string[] => {
+    const stored = localStorage.getItem('seenEnemies');
+    return stored ? JSON.parse(stored) : [];
+  };
+
   if (!isOpen) return null;
 
   const getDifficultyColor = (difficulty: string) => {
@@ -236,7 +242,8 @@ export default function EnemyEncyclopedia({ isOpen, onClose, currentWave }: Enem
     }
   };
 
-  const isAvailable = (enemy: EnemyData) => currentWave >= enemy.firstAppearsWave;
+  const seenEnemies = getSeenEnemies();
+  const isAvailable = (enemy: EnemyData) => seenEnemies.includes(enemy.type);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-2 md:p-4">
