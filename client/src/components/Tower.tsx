@@ -29,36 +29,40 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const baseRange = type === 'turret' ? 6.0 : 7.0;
   const towerRange = baseRange * (1.15 ** (level - 1));
 
-  // Find target enemy and calculate rotation - throttled for performance
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Convert grid position to world position
-      const towerWorldX = position[0];
-      const towerWorldZ = position[2];
+  // Find target enemy and calculate rotation - optimized for performance
+  const lastTargetUpdateRef = useRef(0);
+  
+  useFrame(() => {
+    // Throttle targeting updates to improve performance with many enemies
+    const now = Date.now();
+    if (now - lastTargetUpdateRef.current < 100) return; // Update every 100ms
+    
+    lastTargetUpdateRef.current = now;
+    
+    // Convert grid position to world position
+    const towerWorldX = position[0];
+    const towerWorldZ = position[2];
+    
+    const enemiesInRange = enemies.filter((enemy) => {
+      const dx = enemy.x - towerWorldX;
+      const dz = enemy.z - towerWorldZ;
+      const distance = Math.sqrt(dx * dx + dz * dz);
+      return distance <= towerRange;
+    });
+
+    if (enemiesInRange.length > 0) {
+      // Target the enemy furthest along the path
+      const target = enemiesInRange.reduce((closest, enemy) => 
+        enemy.pathIndex > closest.pathIndex ? enemy : closest
+      );
       
-      const enemiesInRange = enemies.filter((enemy) => {
-        const dx = enemy.x - towerWorldX;
-        const dz = enemy.z - towerWorldZ;
-        const distance = Math.sqrt(dx * dx + dz * dz);
-        return distance <= towerRange;
-      });
-
-      if (enemiesInRange.length > 0) {
-        // Target the enemy furthest along the path
-        const target = enemiesInRange.reduce((closest, enemy) => 
-          enemy.pathIndex > closest.pathIndex ? enemy : closest
-        );
-        
-        // Calculate angle to target
-        const dx = target.x - towerWorldX;
-        const dz = target.z - towerWorldZ;
-        const angle = Math.atan2(dx, dz);
-        setTargetRotation(angle);
-      }
-    }, 200); // Update every 200ms instead of every frame
-
-    return () => clearInterval(interval);
-  }, [enemies.length, position, level, type, towerRange]);
+      // Calculate angle to target
+      const dx = target.x - towerWorldX;
+      const dz = target.z - towerWorldZ;
+      const angle = Math.atan2(dx, dz);
+      setTargetRotation(angle);
+    }
+  });
 
   // Handle drag and drop functionality
   const handlePointerDown = (event: any) => {

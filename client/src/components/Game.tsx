@@ -55,8 +55,8 @@ export default function Game() {
 
   // Game loop with iOS performance optimization
   useFrame((state, delta) => {
-    // Only update game logic if not paused
-    if (gameState.gamePhase === "playing") {
+    // Only update game logic if not paused and tutorial is not open
+    if (gameState.gamePhase === "playing" && !gameState.showTutorial) {
       // Throttle updates on iOS devices for better performance
       if (isIOS) {
         // Update at 30fps instead of 60fps on iOS
