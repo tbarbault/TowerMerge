@@ -111,6 +111,7 @@ interface TowerDefenseState {
   waveStartTime: number;
   waveCompletionTime: number | null;
   showWaveTransition: boolean;
+  lastUpdateTime?: number; // For iOS performance optimization
   
   // Research tree
   researchNodes: ResearchNode[];
@@ -212,6 +213,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     waveStartTime: 0,
     waveCompletionTime: null,
     showWaveTransition: false,
+    lastUpdateTime: undefined,
     
     // Research tree
     researchNodes: JSON.parse(localStorage.getItem('researchNodes') || JSON.stringify(researchTreeData)),

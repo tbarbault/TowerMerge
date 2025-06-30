@@ -224,10 +224,19 @@ export default function GameUI() {
           onClick={toggleMute}
           variant="outline"
           size="sm"
-          className="bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800"
+          className={`bg-black bg-opacity-80 border-gray-700 text-white hover:bg-gray-800 ${
+            isIOS && !audioEnabled ? 'border-yellow-500 text-yellow-400' : ''
+          }`}
+          title={isIOS && !audioEnabled ? "Tap to enable audio (iOS)" : "Toggle audio"}
         >
           {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
         </Button>
+        {isIOS && !audioEnabled && (
+          <div className="bg-yellow-900 bg-opacity-90 border border-yellow-600 text-yellow-100 text-xs p-2 rounded-lg max-w-32">
+            <div className="font-semibold mb-1">iPhone Audio</div>
+            <div>Tap sound button to enable audio</div>
+          </div>
+        )}
       </div>
 
       {/* Top HUD - Mobile Optimized */}

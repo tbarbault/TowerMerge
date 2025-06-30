@@ -29,7 +29,12 @@ class AudioPool {
         audio = this.createAudio();
         this.pool.push(audio);
       } else if (!audio) {
-        // All are playing, use the oldest one
+        // All are playing, skip instead of interrupting on iOS for better performance
+        if (isIOS()) {
+          resolve();
+          return;
+        }
+        // On desktop, use the oldest one
         audio = this.pool[0];
         audio.currentTime = 0;
       }
@@ -38,7 +43,10 @@ class AudioPool {
       audio.play()
         .then(() => resolve())
         .catch(error => {
-          console.log("Audio play prevented:", error);
+          // Silently fail on iOS to avoid console spam
+          if (!isIOS()) {
+            console.log("Audio play prevented:", error);
+          }
           reject(error);
         });
     });

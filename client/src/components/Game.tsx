@@ -53,11 +53,21 @@ export default function Game() {
     };
   }, [initialize, enableAudio, isIOS, cleanup]);
 
-  // Game loop
+  // Game loop with iOS performance optimization
   useFrame((state, delta) => {
     // Only update game logic if not paused
     if (gameState.gamePhase === "playing") {
-      updateGameLogic(gameState, delta);
+      // Throttle updates on iOS devices for better performance
+      if (isIOS) {
+        // Update at 30fps instead of 60fps on iOS
+        const now = Date.now();
+        if (!gameState.lastUpdateTime || now - gameState.lastUpdateTime >= 33) {
+          updateGameLogic(gameState, Math.min(delta, 0.033)); // Cap delta to prevent large time jumps
+          gameState.lastUpdateTime = now;
+        }
+      } else {
+        updateGameLogic(gameState, delta);
+      }
     }
   });
 
