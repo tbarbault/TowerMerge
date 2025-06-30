@@ -183,6 +183,10 @@ interface TowerDefenseState {
     timeRemaining: number;
   };
   eventTimeoutId: NodeJS.Timeout | null;
+  
+  // Tutorial state
+  showTutorial: boolean;
+  tutorialCompleted: boolean;
   gameModifiers: {
     enemySpeedMultiplier: number;
     enemyHealthMultiplier: number;
@@ -203,6 +207,11 @@ interface TowerDefenseState {
   showEventDisplay: (event: any) => void;
   hideEventDisplay: () => void;
   skipEventDisplay: () => void;
+  
+  // Tutorial actions
+  showTutorialModal: () => void;
+  hideTutorialModal: () => void;
+  completeTutorial: () => void;
   selectGridCell: (x: number, z: number) => void;
   selectTowerType: (type: 'turret' | 'mortar') => void;
   buyTower: () => void;
@@ -308,6 +317,11 @@ export const useTowerDefense = create<TowerDefenseState>()(
       timeRemaining: 0,
     },
     eventTimeoutId: null,
+    
+    // Tutorial state
+    showTutorial: false,
+    tutorialCompleted: localStorage.getItem('tutorialCompleted') === 'true',
+    
     gameModifiers: {
       enemySpeedMultiplier: 1,
       enemyHealthMultiplier: 1,

@@ -29,32 +29,36 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
   const baseRange = type === 'turret' ? 6.0 : 7.0;
   const towerRange = baseRange * (1.15 ** (level - 1));
 
-  // Find target enemy and calculate rotation
+  // Find target enemy and calculate rotation - throttled for performance
   useEffect(() => {
-    // Convert grid position to world position
-    const towerWorldX = position[0];
-    const towerWorldZ = position[2];
-    
-    const enemiesInRange = enemies.filter((enemy) => {
-      const dx = enemy.x - towerWorldX;
-      const dz = enemy.z - towerWorldZ;
-      const distance = Math.sqrt(dx * dx + dz * dz);
-      return distance <= towerRange;
-    });
-
-    if (enemiesInRange.length > 0) {
-      // Target the enemy furthest along the path
-      const target = enemiesInRange.reduce((closest, enemy) => 
-        enemy.pathIndex > closest.pathIndex ? enemy : closest
-      );
+    const interval = setInterval(() => {
+      // Convert grid position to world position
+      const towerWorldX = position[0];
+      const towerWorldZ = position[2];
       
-      // Calculate angle to target
-      const dx = target.x - towerWorldX;
-      const dz = target.z - towerWorldZ;
-      const angle = Math.atan2(dx, dz);
-      setTargetRotation(angle);
-    }
-  }, [enemies, position, level, type]);
+      const enemiesInRange = enemies.filter((enemy) => {
+        const dx = enemy.x - towerWorldX;
+        const dz = enemy.z - towerWorldZ;
+        const distance = Math.sqrt(dx * dx + dz * dz);
+        return distance <= towerRange;
+      });
+
+      if (enemiesInRange.length > 0) {
+        // Target the enemy furthest along the path
+        const target = enemiesInRange.reduce((closest, enemy) => 
+          enemy.pathIndex > closest.pathIndex ? enemy : closest
+        );
+        
+        // Calculate angle to target
+        const dx = target.x - towerWorldX;
+        const dz = target.z - towerWorldZ;
+        const angle = Math.atan2(dx, dz);
+        setTargetRotation(angle);
+      }
+    }, 200); // Update every 200ms instead of every frame
+
+    return () => clearInterval(interval);
+  }, [enemies.length, position, level, type, towerRange]);
 
   // Handle drag and drop functionality
   const handlePointerDown = (event: any) => {

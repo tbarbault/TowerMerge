@@ -567,7 +567,7 @@ export default function GameUI() {
           <Card className="bg-gradient-to-br from-purple-900 to-blue-900 border-purple-500 max-w-md">
             <CardHeader>
               <CardTitle className="text-center text-white">
-                Wave Event!
+                ALERT !
               </CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
