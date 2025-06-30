@@ -593,8 +593,9 @@ export default function GameUI() {
               </Button>
               <Button
                 onClick={() => {
-                  // Reset to menu by restarting the component
-                  window.location.reload();
+                  // Reset to menu state properly
+                  useTowerDefense.getState().restartGame();
+                  useTowerDefense.setState({ gamePhase: "menu" });
                 }}
                 variant="outline"
                 className="w-full border-gray-600 text-white hover:bg-gray-800"

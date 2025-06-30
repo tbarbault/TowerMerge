@@ -46,10 +46,6 @@ const tutorialSteps: TutorialStep[] = [
     highlight: "events"
   },
   {
-    title: "Strategy Tips",
-    content: "Place turrets early in the path for maximum damage, use mortars to handle groups, and merge towers whenever possible to increase their power!",
-  },
-  {
     title: "Ready to Play!",
     content: "You're all set! Choose a game mode and start defending. Good luck, commander!",
   }
@@ -87,8 +83,8 @@ export default function Tutorial({ isOpen, onClose, onComplete }: TutorialProps)
   const step = tutorialSteps[currentStep];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-      <Card className="bg-gradient-to-br from-blue-900 to-purple-900 border-blue-500 max-w-lg w-full mx-4">
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+      <Card className="bg-gradient-to-br from-blue-900 to-purple-900 border-blue-500 max-w-lg w-full max-h-[85vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-white">
             Tutorial ({currentStep + 1}/{tutorialSteps.length})
