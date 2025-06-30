@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTowerDefense } from "../lib/stores/useTowerDefense";
 import { useAudio } from "../lib/stores/useAudio";
 import { Button } from "./ui/button";
@@ -31,6 +31,7 @@ export default function GameUI() {
     selectedGameMode,
     maxWaves,
     eventDisplay,
+    hideEventDisplay,
     startGame,
     restartGame,
     pauseGame,

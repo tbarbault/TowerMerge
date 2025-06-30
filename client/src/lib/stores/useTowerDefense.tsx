@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 import { ResearchNode, researchTreeData, calculateResearchBonuses, unlockResearchNodes, getDiamondsForWave } from "../researchTree";
+import { getRandomEvent } from "../gameEvents";
 
 export type GamePhase = "menu" | "playing" | "paused" | "gameOver";
 
@@ -762,42 +763,103 @@ export const useTowerDefense = create<TowerDefenseState>()(
     },
 
     nextWave: () => {
-      set(state => {
-        const newWave = state.wave + 1;
-        let newHighestWave = state.highestWave;
+      const state = get();
+      const newWave = state.wave + 1;
+      
+      // Update max wave for current mode
+      const currentMaxWave = state.maxWaves[state.selectedGameMode] || 1;
+      if (newWave > currentMaxWave) {
+        const newMaxWaves = { ...state.maxWaves, [state.selectedGameMode]: newWave };
+        localStorage.setItem('maxWaves', JSON.stringify(newMaxWaves));
+        set({ maxWaves: newMaxWaves });
+      }
 
-        // Update highest wave if current wave exceeds it
-        if (newWave > state.highestWave) {
-          newHighestWave = newWave;
-          localStorage.setItem('highestWave', newWave.toString());
-        }
+      // Check for random event (15% chance)
+      const randomEvent = getRandomEvent(newWave);
+      
+      if (randomEvent) {
+        // Show event display for 3 seconds
+        set({
+          eventDisplay: {
+            show: true,
+            event: randomEvent,
+            timeRemaining: 3000,
+          }
+        });
 
-        // Award diamonds every 5 waves
-        const diamondsEarned = getDiamondsForWave(newWave);
-        let newDiamonds = state.diamonds;
-        if (diamondsEarned > 0) {
-          newDiamonds += diamondsEarned;
-          localStorage.setItem('diamonds', newDiamonds.toString());
-          console.log(`Wave ${newWave} completed! Earned ${diamondsEarned} diamonds!`);
-        }
+        // Hide event display after 3 seconds and start wave
+        setTimeout(() => {
+          set(state => {
+            const newHighestWave = newWave > state.highestWave ? newWave : state.highestWave;
+            if (newWave > state.highestWave) {
+              localStorage.setItem('highestWave', newWave.toString());
+            }
 
-        return {
-          wave: newWave,
-          highestWave: newHighestWave,
-          diamonds: newDiamonds,
-          enemiesInWave: Math.floor(5 + state.wave * 2.0 + Math.pow(Math.max(0, state.wave - 10), 1.8)),
-          enemiesSpawned: 0,
-          waveProgress: 0,
-          waveStartTime: Date.now(),
-          waveCompletionTime: null,
-          showWaveTransition: true,
-        };
-      });
+            const diamondsEarned = getDiamondsForWave(newWave);
+            let newDiamonds = state.diamonds;
+            if (diamondsEarned > 0) {
+              newDiamonds += diamondsEarned;
+              localStorage.setItem('diamonds', newDiamonds.toString());
+            }
 
-      // Auto-hide wave transition after 1 second
-      setTimeout(() => {
-        set(state => ({ ...state, showWaveTransition: false }));
-      }, 1000);
+            return {
+              wave: newWave,
+              highestWave: newHighestWave,
+              diamonds: newDiamonds,
+              enemiesInWave: Math.floor(5 + state.wave * 2.0 + Math.pow(Math.max(0, state.wave - 10), 1.8)),
+              enemiesSpawned: 0,
+              waveProgress: 0,
+              waveStartTime: Date.now(),
+              waveCompletionTime: null,
+              showWaveTransition: true,
+              activeEvents: [randomEvent],
+              eventDisplay: {
+                show: false,
+                event: null,
+                timeRemaining: 0,
+              }
+            };
+          });
+
+          // Auto-hide wave transition after 1 second
+          setTimeout(() => {
+            set(state => ({ ...state, showWaveTransition: false }));
+          }, 1000);
+        }, 3000);
+      } else {
+        // No event, start wave normally
+        set(state => {
+          const newHighestWave = newWave > state.highestWave ? newWave : state.highestWave;
+          if (newWave > state.highestWave) {
+            localStorage.setItem('highestWave', newWave.toString());
+          }
+
+          const diamondsEarned = getDiamondsForWave(newWave);
+          let newDiamonds = state.diamonds;
+          if (diamondsEarned > 0) {
+            newDiamonds += diamondsEarned;
+            localStorage.setItem('diamonds', newDiamonds.toString());
+          }
+
+          return {
+            wave: newWave,
+            highestWave: newHighestWave,
+            diamonds: newDiamonds,
+            enemiesInWave: Math.floor(5 + state.wave * 2.0 + Math.pow(Math.max(0, state.wave - 10), 1.8)),
+            enemiesSpawned: 0,
+            waveProgress: 0,
+            waveStartTime: Date.now(),
+            waveCompletionTime: null,
+            showWaveTransition: true,
+            activeEvents: [],
+          };
+        });
+
+        // Auto-hide wave transition after 1 second
+        setTimeout(() => {
+          set(state => ({ ...state, showWaveTransition: false }));
+        }, 1000);
+      }
     },
 
     setWaveProgress: (progress) => {
