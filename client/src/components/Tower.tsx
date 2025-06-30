@@ -570,11 +570,11 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           </group>
         </group>
       ) : type === 'mortar' ? (
-        // Mortar - Artillery Style Design for all levels
+        // Mortar - Artillery Style Design for all levels with SQUARE BASE
         <>
-          {/* Hexagonal Base Platform */}
+          {/* Square Base Platform */}
           <mesh position={[0, 0.05, 0]} userData={{ towerId }}>
-            <cylinderGeometry args={[0.8, 0.9, 0.1, 6]} />
+            <boxGeometry args={[1.6, 0.1, 1.6]} />
             <meshStandardMaterial 
               color="#8B4513"
               metalness={0.3}
@@ -582,9 +582,9 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             />
           </mesh>
           
-          {/* Main Base Structure */}
+          {/* Main Square Base Structure */}
           <mesh position={[0, 0.12, 0]}>
-            <cylinderGeometry args={[0.7, 0.8, 0.15, 6]} />
+            <boxGeometry args={[1.4, 0.15, 1.4]} />
             <meshStandardMaterial 
               color={level === 1 ? "#556B2F" : level === 2 ? "#4682B4" : level === 3 ? "#9370DB" : level === 4 ? "#DC143C" : "#FF8C00"}
               metalness={0.4}
@@ -595,14 +595,14 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           {/* Progressive mortar base enhancements */}
           {level >= 2 && (
             <>
-              {/* Stabilization legs */}
-              {Array.from({ length: 6 }, (_, i) => (
+              {/* Square Corner Stabilization legs */}
+              {Array.from({ length: 4 }, (_, i) => (
                 <mesh key={i} position={[
-                  Math.cos(i * Math.PI / 3) * 0.75,
+                  (i % 2 === 0 ? 0.7 : -0.7),
                   0.12,
-                  Math.sin(i * Math.PI / 3) * 0.75
-                ]} rotation={[0, i * Math.PI / 3, 0]}>
-                  <boxGeometry args={[0.04, 0.15, 0.06]} />
+                  (Math.floor(i / 2) === 0 ? 0.7 : -0.7)
+                ]} rotation={[0, i * Math.PI / 2, 0]}>
+                  <boxGeometry args={[0.06, 0.15, 0.08]} />
                   <meshStandardMaterial 
                     color="#2F2F2F"
                     metalness={0.8}
@@ -655,14 +655,14 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
           
           {level >= 5 && (
             <>
-              {/* Elite targeting matrix */}
-              {Array.from({ length: 6 }, (_, i) => (
+              {/* Elite square targeting matrix */}
+              {Array.from({ length: 4 }, (_, i) => (
                 <mesh key={i} position={[
-                  Math.cos(i * Math.PI / 3) * 0.55,
+                  (i % 2 === 0 ? 0.55 : -0.55),
                   0.24,
-                  Math.sin(i * Math.PI / 3) * 0.55
+                  (Math.floor(i / 2) === 0 ? 0.55 : -0.55)
                 ]}>
-                  <boxGeometry args={[0.03, 0.02, 0.05]} />
+                  <boxGeometry args={[0.05, 0.03, 0.05]} />
                   <meshStandardMaterial 
                     color="#00FFFF"
                     emissive="#0099BB"
@@ -675,9 +675,9 @@ export default function Tower({ position, level, isSelected = false, towerId, ty
             </>
           )}
           
-          {/* Mortar Support Base */}
+          {/* Square Mortar Support Base */}
           <mesh position={[0, 0.22, 0]}>
-            <cylinderGeometry args={[0.4, 0.5, 0.12, 8]} />
+            <boxGeometry args={[0.8, 0.12, 0.8]} />
             <meshStandardMaterial 
               color={level === 1 ? "#6B8E23" : level === 2 ? "#5A8AC0" : level === 3 ? "#A085DB" : level === 4 ? "#E85A5A" : "#FFA500"}
               metalness={0.5}
