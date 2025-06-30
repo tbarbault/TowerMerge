@@ -102,7 +102,7 @@ export interface Mine {
 
 interface TowerDefenseState {
   // Game state
-  gamePhase: "menu" | "playing" | "paused" | "gameOver";
+  gamePhase: "menu" | "mutatorSelection" | "playing" | "paused" | "gameOver";
   wave: number;
   health: number;
   coins: number;
@@ -142,6 +142,7 @@ interface TowerDefenseState {
   currentMapConfig: any | null;
   activeEvents: any[];
   activeMutators: any[];
+  selectedMutator: any | null;
   gameModifiers: {
     enemySpeedMultiplier: number;
     enemyHealthMultiplier: number;
@@ -155,6 +156,9 @@ interface TowerDefenseState {
   restartGame: () => void;
   pauseGame: () => void;
   resumeGame: () => void;
+  showMutatorSelection: () => void;
+  selectMutator: (mutator: any) => void;
+  startGameWithMutator: () => void;
   endGame: () => void;
   selectGridCell: (x: number, z: number) => void;
   selectTowerType: (type: 'turret' | 'mortar') => void;
@@ -253,6 +257,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
     currentMapConfig: null,
     activeEvents: [],
     activeMutators: [],
+    selectedMutator: null,
     gameModifiers: {
       enemySpeedMultiplier: 1,
       enemyHealthMultiplier: 1,
@@ -292,7 +297,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
     restartGame: () => {
       const state = get();
-      state.startGame();
+      state.showMutatorSelection();
     },
 
     pauseGame: () => {
@@ -301,6 +306,56 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
     resumeGame: () => {
       set({ gamePhase: "playing" });
+    },
+
+    showMutatorSelection: () => {
+      set({ gamePhase: "mutatorSelection", selectedMutator: null });
+    },
+
+    selectMutator: (mutator: any) => {
+      set({ selectedMutator: mutator });
+    },
+
+    startGameWithMutator: () => {
+      const state = get();
+      const mutator = state.selectedMutator;
+      
+      // Apply mutator effects
+      let startingHealth = 20;
+      let startingCoins = 75;
+      
+      if (mutator) {
+        if (mutator.effects.startingLives) {
+          startingHealth = mutator.effects.startingLives;
+        }
+        if (mutator.effects.startingCoins !== undefined) {
+          startingCoins = mutator.effects.startingCoins;
+        }
+      }
+
+      set({
+        gamePhase: "playing",
+        wave: 1,
+        health: startingHealth,
+        coins: startingCoins,
+        towers: [],
+        enemies: [],
+        bullets: [],
+        muzzleFlashes: [],
+        explosions: [],
+        impacts: [],
+        activeMutators: mutator ? [mutator] : [],
+        waveStartTime: Date.now() + 3000,
+        waveCompletionTime: null,
+        enemiesSpawned: 0,
+        waveProgress: 0,
+        showWaveTransition: true,
+      });
+
+      // Auto-hide wave transition after 1 second
+      setTimeout(() => {
+        set(state => ({ ...state, showWaveTransition: false }));
+      }, 1000);
     },
 
     endGame: () => {
