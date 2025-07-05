@@ -474,7 +474,7 @@ export const useTowerDefense = create<TowerDefenseState>()(
 
       // If there's an active event display, start the wave immediately
       if (state.eventDisplay.show && state.eventDisplay.event) {
-        const newWave = state.wave + 1;
+        const newWave = state.wave; // Use current wave, don't increment again
         const randomEvent = state.eventDisplay.event;
 
         const newHighestWave = newWave > state.highestWave ? newWave : state.highestWave;

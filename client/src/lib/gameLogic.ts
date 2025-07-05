@@ -426,7 +426,11 @@ function updateBombEnemy(gameState: any, enemy: any, delta: number) {
     // Check if bomb enemy is close enough to explode
     if (nearestDistance < 1.0) {
       // Explode and destroy the tower
-      gameState.removeTower(nearestTower.towerId);
+      // Remove the tower by filtering it out
+      const currentTowers = gameState.towers;
+      const towersWithoutTarget = currentTowers.filter((t: any) => t.id !== nearestTower.towerId);
+      // Use the zustand set pattern correctly
+      gameState.set((state: any) => ({ towers: towersWithoutTarget }));
       gameState.removeEnemy(enemy.id);
       
       // Add explosion effect

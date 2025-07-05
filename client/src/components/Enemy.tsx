@@ -19,9 +19,9 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
       meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 4) * 0.2;
     }
 
-    // Special animation for bomb enemy - alternating black and red
+    // Special animation for bomb enemy - alternating black and red every 0.6 seconds
     if (type === 'bomb' && materialRef.current) {
-      const flashSpeed = 3; // How fast the color alternates
+      const flashSpeed = 10.47; // Calculated: 2π / 0.6 seconds for full cycle
       const isRed = Math.sin(state.clock.elapsedTime * flashSpeed) > 0;
       const color = isRed ? 0xdc2626 : 0x000000;
       materialRef.current.color.setHex(color);
