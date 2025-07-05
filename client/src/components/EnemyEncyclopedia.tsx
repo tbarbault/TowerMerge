@@ -174,6 +174,25 @@ const enemyDatabase: EnemyData[] = [
     difficulty: "Extreme"
   },
   {
+    type: "bomb",
+    name: "Volatile Demolisher",
+    health: 1000,
+    speed: 1.2,
+    reward: 6,
+    color: "#000000", // Alternates with red
+    size: 0.28,
+    lore: "These unstable explosive units are suicide bombers designed to break your defensive lines. Their bodies contain volatile compounds that react violently on impact. They ignore the normal path and instead hunt for your towers, making them extremely dangerous to your infrastructure.",
+    strengths: ["Targets towers directly", "High explosive damage", "Unpredictable movement"],
+    weaknesses: ["Can be eliminated before reaching towers", "Ignores the main path", "Moderate health"],
+    tacticalNotes: [
+      "Priority target - eliminate immediately when spotted",
+      "Appears only every 3rd wave starting from wave 15",
+      "Maximum 3 per wave - rare but devastating"
+    ],
+    firstAppearsWave: 15,
+    difficulty: "Very Hard"
+  },
+  {
     type: "boss",
     name: "Crimson Overlord",
     health: 1454,

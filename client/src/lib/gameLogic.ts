@@ -102,6 +102,7 @@ export function getAvailableEnemyTypes(wave: number): string[] {
     const types = ["basic", "fast", "heavy", "armored"];
     if (wave >= 8) types.push("elite");
     if (wave >= 15) types.push("stealth"); // New enemy at wave 15
+    if (wave >= 15) types.push("bomb"); // Bomb enemy at wave 15
     if (wave >= 20) types.push("berserker"); // New enemy at wave 20
     if (wave >= 30) types.push("titan"); // New enemy at wave 30
     return types;
@@ -130,6 +131,11 @@ function spawnEnemies(gameState: any, currentTime: number) {
   const burstSize = gameState.wave >= 15 ? Math.min(3, Math.floor(gameState.wave / 10)) : 1;
   const enemiesToSpawn = Math.min(burstSize, gameState.enemiesInWave - gameState.enemiesSpawned);
   
+  // Track bomb enemies spawned this wave
+  if (!gameState.bombsSpawnedThisWave) {
+    gameState.bombsSpawnedThisWave = 0;
+  }
+
   if (expectedSpawned > gameState.enemiesSpawned && gameState.enemiesSpawned < gameState.enemiesInWave) {
     for (let i = 0; i < enemiesToSpawn; i++) {
       if (gameState.enemiesSpawned >= gameState.enemiesInWave) break;
@@ -140,11 +146,23 @@ function spawnEnemies(gameState: any, currentTime: number) {
       // Select enemy type with weighted distribution
       let finalType = selectWeightedEnemyType(enemyTypes, gameState.wave);
       
+      // Limit bomb enemies to max 3 per wave
+      if (finalType === 'bomb' && gameState.bombsSpawnedThisWave >= 3) {
+        // Replace with a different enemy type
+        const nonBombTypes = enemyTypes.filter(type => type !== 'bomb');
+        finalType = selectWeightedEnemyType(nonBombTypes, gameState.wave);
+      }
+      
       // Special bosses at milestone waves
       if (gameState.wave % 10 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
         finalType = "megaboss";
       } else if (gameState.wave % 5 === 0 && gameState.enemiesSpawned === gameState.enemiesInWave - 1) {
         finalType = "boss";
+      }
+      
+      // Track bomb enemy count
+      if (finalType === 'bomb') {
+        gameState.bombsSpawnedThisWave++;
       }
       
       const enemy = createEnemy(finalType, gameState.wave);
@@ -217,7 +235,7 @@ function getBaseWeights(wave: number) {
       elite: 10
     };
   }
-  // Wave 15-19: Introduce stealth enemies
+  // Wave 15-19: Introduce stealth enemies and bomb enemies
   else if (wave <= 19) {
     return {
       basic: 15,
@@ -225,7 +243,8 @@ function getBaseWeights(wave: number) {
       heavy: 20,
       armored: 20,
       elite: 15,
-      stealth: 10
+      stealth: 10,
+      bomb: (wave >= 15 && wave % 3 === 0) ? 3 : 0 // Bomb appears every 3rd wave starting from 15
     };
   }
   // Wave 20-29: Introduce berserkers
@@ -237,7 +256,8 @@ function getBaseWeights(wave: number) {
       armored: 20,
       elite: 15,
       stealth: 10,
-      berserker: 10
+      berserker: 10,
+      bomb: (wave % 3 === 0) ? 3 : 0 // Bomb appears every 3rd wave
     };
   }
   // Wave 30+: All enemies including titans - favor stronger enemies
@@ -250,7 +270,8 @@ function getBaseWeights(wave: number) {
       elite: 20,
       stealth: 12,
       berserker: 20,
-      titan: 18
+      titan: 18,
+      bomb: (wave % 3 === 0) ? 3 : 0 // Bomb appears every 3rd wave
     };
   }
 }
@@ -287,7 +308,8 @@ function createEnemy(type: string, wave: number) {
     // New enemies for increased complexity
     stealth: { health: 361, speed: 1.6, reward: 3 }, // -5% from 380 - Wave 15+ - Fast and moderately tough
     berserker: { health: 684, speed: 1.4, reward: 5 }, // -5% from 720 - Wave 20+ - High damage resistance, fast
-    titan: { health: 1710, speed: 0.7, reward: 12 } // -5% from 1800 - Wave 30+ - Massive health, slow but devastating
+    titan: { health: 1710, speed: 0.7, reward: 12 }, // -5% from 1800 - Wave 30+ - Massive health, slow but devastating
+    bomb: { health: 1000, speed: 1.2, reward: 6 } // Wave 15+ - Targets towers, explodes on contact
   };
 
   const config = baseConfig[type as keyof typeof baseConfig] || baseConfig.basic;
@@ -336,7 +358,13 @@ function createEnemy(type: string, wave: number) {
 
 function updateEnemies(gameState: any, delta: number) {
   gameState.enemies.forEach((enemy: any) => {
-    // Use the enemy's individual path
+    // Special behavior for bomb enemies - target towers
+    if (enemy.type === 'bomb') {
+      updateBombEnemy(gameState, enemy, delta);
+      return;
+    }
+
+    // Use the enemy's individual path for normal enemies
     const path = enemy.path || getPath();
     
     // Check if enemy has crossed the life line (z > 8) - aligned with red line
@@ -373,6 +401,90 @@ function updateEnemies(gameState: any, delta: number) {
       gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
     }
   });
+}
+
+function updateBombEnemy(gameState: any, enemy: any, delta: number) {
+  // Find the nearest tower
+  let nearestTower = null;
+  let nearestDistance = Infinity;
+  
+  gameState.towers.forEach((tower: any) => {
+    const towerWorldX = tower.x * 2.5 - 5;
+    const towerWorldZ = tower.z * 2.5 + 1.25;
+    
+    const dx = enemy.x - towerWorldX;
+    const dz = enemy.z - towerWorldZ;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestTower = { x: towerWorldX, z: towerWorldZ, towerId: tower.id };
+    }
+  });
+  
+  if (nearestTower) {
+    // Check if bomb enemy is close enough to explode
+    if (nearestDistance < 1.0) {
+      // Explode and destroy the tower
+      gameState.removeTower(nearestTower.towerId);
+      gameState.removeEnemy(enemy.id);
+      
+      // Add explosion effect
+      gameState.addExplosion({
+        id: Math.random().toString(36).substr(2, 9),
+        x: enemy.x,
+        z: enemy.z,
+        radius: 2.0,
+        color: "#ff0000"
+      });
+      
+      return;
+    }
+    
+    // Move towards the nearest tower
+    const dx = nearestTower.x - enemy.x;
+    const dz = nearestTower.z - enemy.z;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    
+    if (distance > 0) {
+      const moveDistance = enemy.speed * delta;
+      const newX = enemy.x + (dx / distance) * moveDistance;
+      const newZ = enemy.z + (dz / distance) * moveDistance;
+      
+      gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
+    }
+  } else {
+    // No towers found, follow normal path
+    const path = enemy.path || getPath();
+    
+    // Check if enemy has crossed the life line (z > 8) - aligned with red line
+    if (enemy.z > 8) {
+      gameState.removeEnemy(enemy.id);
+      gameState.takeDamage(1);
+      return;
+    }
+    
+    if (enemy.pathIndex >= path.length - 1) {
+      gameState.removeEnemy(enemy.id);
+      gameState.takeDamage(1);
+      return;
+    }
+    
+    const currentTarget = path[enemy.pathIndex + 1];
+    const dx = currentTarget.x - enemy.x;
+    const dz = currentTarget.z - enemy.z;
+    const distance = Math.sqrt(dx * dx + dz * dz);
+    
+    if (distance < 0.1) {
+      gameState.updateEnemy(enemy.id, currentTarget.x, currentTarget.z, enemy.pathIndex + 1);
+    } else {
+      const moveDistance = enemy.speed * delta;
+      const newX = enemy.x + (dx / distance) * moveDistance;
+      const newZ = enemy.z + (dz / distance) * moveDistance;
+      
+      gameState.updateEnemy(enemy.id, newX, newZ, enemy.pathIndex);
+    }
+  }
 }
 
 function updateTowers(gameState: any, currentTime: number) {
@@ -714,6 +826,8 @@ function checkWaveCompletion(gameState: any) {
     
     const pauseTime = getPauseTime(gameState.wave);
     if (now - gameState.waveCompletionTime >= pauseTime) {
+      // Reset bomb counter for new wave
+      gameState.bombsSpawnedThisWave = 0;
       gameState.nextWave();
     }
   }

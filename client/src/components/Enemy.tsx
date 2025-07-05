@@ -11,11 +11,21 @@ interface EnemyProps {
 
 export default function Enemy({ position, health, maxHealth, type }: EnemyProps) {
   const meshRef = useRef<THREE.Group>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
 
   // Animate enemy
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 4) * 0.2;
+    }
+
+    // Special animation for bomb enemy - alternating black and red
+    if (type === 'bomb' && materialRef.current) {
+      const flashSpeed = 3; // How fast the color alternates
+      const isRed = Math.sin(state.clock.elapsedTime * flashSpeed) > 0;
+      const color = isRed ? 0xdc2626 : 0x000000;
+      materialRef.current.color.setHex(color);
+      materialRef.current.emissive.setHex(color);
     }
   });
 
@@ -82,6 +92,12 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
           size: 0.7,
           segments: 16 
         };
+      case "bomb":
+        return { 
+          color: "#000000", // Will alternate with red 
+          size: 0.28, // Same size as verdant dasher (fast enemy)
+          segments: 8 
+        };
       default:
         return { 
           color: "#ef4444", 
@@ -100,6 +116,7 @@ export default function Enemy({ position, health, maxHealth, type }: EnemyProps)
       <mesh>
         <sphereGeometry args={[config.size, config.segments, config.segments]} />
         <meshStandardMaterial 
+          ref={materialRef}
           color={config.color}
           emissive={config.color}
           emissiveIntensity={0.2}
