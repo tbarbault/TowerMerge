@@ -6,22 +6,33 @@ class AudioPool {
   private maxSize: number;
   private src: string;
   private volume: number;
+  private lastPlayTime: number = 0;
+  private throttleMs: number = 100; // Prevent audio spam
 
-  constructor(src: string, volume: number = 0.5, maxSize: number = 3) {
+  constructor(src: string, volume: number = 0.5, maxSize: number = 2) {
     this.src = src;
     this.volume = volume;
     this.maxSize = maxSize;
   }
 
   private createAudio(): HTMLAudioElement {
-    const audio = new Audio(this.src);
+    const audio = new Audio();
     audio.volume = this.volume;
-    audio.preload = "none"; // Load on demand for better iOS performance
+    audio.preload = "none"; // Load on demand for better performance
+    audio.crossOrigin = "anonymous"; // Prevent CORS issues
     return audio;
   }
 
   play(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
+      // Throttle audio to prevent spam and lag
+      const now = Date.now();
+      if (now - this.lastPlayTime < this.throttleMs) {
+        resolve();
+        return;
+      }
+      this.lastPlayTime = now;
+
       // Find available audio or create new one
       let audio = this.pool.find(a => a.paused);
       
@@ -29,25 +40,22 @@ class AudioPool {
         audio = this.createAudio();
         this.pool.push(audio);
       } else if (!audio) {
-        // All are playing, skip instead of interrupting on iOS for better performance
-        if (isIOS()) {
-          resolve();
-          return;
-        }
-        // On desktop, use the oldest one
-        audio = this.pool[0];
-        audio.currentTime = 0;
+        // All are playing, skip to prevent lag
+        resolve();
+        return;
+      }
+
+      // Only set src if it's not already set to avoid reloading
+      if (audio.src !== this.src && !audio.src.endsWith(this.src)) {
+        audio.src = this.src;
       }
 
       audio.currentTime = 0;
       audio.play()
         .then(() => resolve())
-        .catch(error => {
-          // Silently fail on iOS to avoid console spam
-          if (!isIOS()) {
-            console.log("Audio play prevented:", error);
-          }
-          reject(error);
+        .catch(() => {
+          // Silently fail to prevent console spam
+          resolve();
         });
     });
   }
@@ -81,6 +89,7 @@ interface AudioState {
   
   // Control functions
   initialize: () => Promise<void>;
+  ensureAudioPools: () => void;
   toggleMute: () => void;
   enableAudio: () => void;
   playHit: () => void;
@@ -92,7 +101,7 @@ interface AudioState {
 
 export const useAudio = create<AudioState>((set, get) => ({
   isInitialized: false,
-  isMuted: false, // Start unmuted by default
+  isMuted: true, // Start muted by default to prevent lag
   isIOS: isIOS(),
   audioEnabled: false,
   
@@ -102,7 +111,7 @@ export const useAudio = create<AudioState>((set, get) => ({
   enemyDeathPool: null,
   
   initialize: async () => {
-    const { isInitialized, isIOS: deviceIsIOS } = get();
+    const { isInitialized } = get();
     if (isInitialized) return;
 
     try {
@@ -114,27 +123,38 @@ export const useAudio = create<AudioState>((set, get) => ({
         }
       }
 
-      // Create audio pools with iOS-optimized settings
-      const poolSize = deviceIsIOS ? 2 : 3; // Smaller pool size on iOS
-      const hitVolume = deviceIsIOS ? 0.2 : 0.3; // Lower volume on iOS
-      
-      const hitPool = new AudioPool("/sounds/bullet_impact.wav", hitVolume, poolSize);
-      const successPool = new AudioPool("/sounds/success.mp3", 0.5, poolSize);
-      const towerPlacePool = new AudioPool("/sounds/hit.mp3", 0.3, poolSize);
-      const enemyDeathPool = new AudioPool("/sounds/bubble_death.wav", 0.4, poolSize);
+      // Mark as initialized but delay audio pool creation until needed
+      set({ isInitialized: true });
 
-      set({
-        hitPool,
-        successPool,
-        towerPlacePool,
-        enemyDeathPool,
-        isInitialized: true
-      });
-
-      console.log(`Audio initialized for ${deviceIsIOS ? 'iOS' : 'desktop'} device`);
+      console.log(`Audio initialized for ${isIOS() ? 'iOS' : 'desktop'} device`);
     } catch (error) {
       console.warn("Audio initialization failed:", error);
     }
+  },
+
+  // Lazy initialize audio pools only when needed
+  ensureAudioPools: () => {
+    const { hitPool, successPool, towerPlacePool, enemyDeathPool, isIOS: deviceIsIOS } = get();
+    
+    if (hitPool && successPool && towerPlacePool && enemyDeathPool) {
+      return; // Already initialized
+    }
+
+    // Create audio pools with minimal sizes to reduce lag
+    const poolSize = deviceIsIOS ? 1 : 2; // Very small pool size to prevent lag
+    const hitVolume = deviceIsIOS ? 0.15 : 0.2; // Lower volume to reduce processing
+    
+    const newHitPool = new AudioPool("/sounds/bullet_impact.wav", hitVolume, poolSize);
+    const newSuccessPool = new AudioPool("/sounds/success.mp3", 0.3, poolSize);
+    const newTowerPlacePool = new AudioPool("/sounds/hit.mp3", 0.2, poolSize);
+    const newEnemyDeathPool = new AudioPool("/sounds/bubble_death.wav", 0.25, poolSize);
+
+    set({
+      hitPool: newHitPool,
+      successPool: newSuccessPool,
+      towerPlacePool: newTowerPlacePool,
+      enemyDeathPool: newEnemyDeathPool,
+    });
   },
 
   enableAudio: () => {
@@ -159,10 +179,14 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playHit: () => {
-    const { hitPool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
-    if (!hitPool || isMuted || (deviceIsIOS && !audioEnabled)) {
+    const { isMuted, audioEnabled, isIOS: deviceIsIOS, ensureAudioPools } = get();
+    if (isMuted || (deviceIsIOS && !audioEnabled)) {
       return;
     }
+    
+    ensureAudioPools();
+    const { hitPool } = get();
+    if (!hitPool) return;
     
     hitPool.play().catch(() => {
       // Silently fail for better performance
@@ -170,10 +194,14 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playSuccess: () => {
-    const { successPool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
-    if (!successPool || isMuted || (deviceIsIOS && !audioEnabled)) {
+    const { isMuted, audioEnabled, isIOS: deviceIsIOS, ensureAudioPools } = get();
+    if (isMuted || (deviceIsIOS && !audioEnabled)) {
       return;
     }
+    
+    ensureAudioPools();
+    const { successPool } = get();
+    if (!successPool) return;
     
     successPool.play().catch(() => {
       // Silently fail for better performance
@@ -181,22 +209,29 @@ export const useAudio = create<AudioState>((set, get) => ({
   },
   
   playTowerPlace: () => {
-    const { towerPlacePool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
-    if (!towerPlacePool || isMuted || (deviceIsIOS && !audioEnabled)) {
+    const { isMuted, audioEnabled, isIOS: deviceIsIOS, ensureAudioPools } = get();
+    if (isMuted || (deviceIsIOS && !audioEnabled)) {
       return;
     }
     
-    console.log(`Playing ${towerPlacePool === get().towerPlacePool ? 'turret' : 'mortar'} placement sound`);
+    ensureAudioPools();
+    const { towerPlacePool } = get();
+    if (!towerPlacePool) return;
+    
     towerPlacePool.play().catch(() => {
       // Silently fail for better performance
     });
   },
   
   playEnemyDeath: () => {
-    const { enemyDeathPool, isMuted, audioEnabled, isIOS: deviceIsIOS } = get();
-    if (!enemyDeathPool || isMuted || (deviceIsIOS && !audioEnabled)) {
+    const { isMuted, audioEnabled, isIOS: deviceIsIOS, ensureAudioPools } = get();
+    if (isMuted || (deviceIsIOS && !audioEnabled)) {
       return;
     }
+    
+    ensureAudioPools();
+    const { enemyDeathPool } = get();
+    if (!enemyDeathPool) return;
     
     enemyDeathPool.play().catch(() => {
       // Silently fail for better performance
